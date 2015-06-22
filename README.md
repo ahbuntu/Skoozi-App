@@ -1,0 +1,3 @@
+# Skoozi-App
+
+Android application
