@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Skoozi</string>
+    <string name="app_api_url">https:skoozi-959.appspot.com/_ah/api</string>
+
+    <string name="title_section1">NEARBY</string>
+    <string name="nearby_section_label">Showing all activity within a 100 km radius</string>
+    <string name="title_section2">MINE</string>
+
+    <!-- menu items -->
+    <string name="action_home">Home</string>
+    <string name="action_add_q">New Question</string>
+    <string name="action_my_activity">My Activity</string>
+
+    <string name="new_question_heading">Ask a question</string>
+    <string name="new_question_map_heading">Your current location</string>
+    <string name="post_new_question">POST</string>
+    <string name="new_question_location_change">CHANGE</string>
+    <string name="new_question_location_hint">enter location if not correct</string>
+
+</resources>

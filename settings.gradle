@@ -1,0 +1,2 @@
+include ':app'
+include ':app:libs:skooziqna-v1'

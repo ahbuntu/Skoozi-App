@@ -1,0 +1,96 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/new_toolbar"
+        layout="@layout/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        />
+
+    <TextView
+        android:id="@+id/new_question_heading"
+        android:text="@string/new_question_heading"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/new_question_vertical_margin"
+        android:layout_marginBottom="@dimen/new_question_vertical_margin"
+        android:layout_marginLeft="@dimen/new_question_horizontal_margin"
+        />
+
+    <EditText
+        android:id="@+id/new_question_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:minLines="5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/new_question_horizontal_margin"
+        />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/new_question_progress"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:visibility="invisible"
+            />
+
+        <Button
+            android:id="@+id/post_new_question_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/post_new_question"
+            android:layout_gravity="right"
+            android:layout_marginTop="@dimen/new_question_vertical_margin"
+            android:layout_marginBottom="@dimen/new_question_vertical_margin"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/new_question_map_heading"
+        android:text="@string/new_question_map_heading"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/new_question_vertical_margin"
+        android:layout_marginBottom="@dimen/new_question_vertical_margin"
+        android:layout_marginLeft="@dimen/new_question_horizontal_margin"
+        />
+
+    <fragment android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/new_question_map"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/nearby_map_height"/>
+
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal">-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/new_question_location"-->
+            <!--android:hint="@string/new_question_location_hint"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"/>-->
+
+        <!--<Button-->
+            <!--android:id="@+id/new_question_location_change"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/new_question_location_change"-->
+            <!--android:layout_gravity="end" />-->
+
+    <!--</LinearLayout>-->
+</LinearLayout>
