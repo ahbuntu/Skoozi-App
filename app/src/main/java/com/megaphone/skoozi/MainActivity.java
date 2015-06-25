@@ -154,27 +154,18 @@ public class MainActivity extends ActionBarActivity
                 .build();
     }
 
-    private int counter = 0;
     @Override
     protected void onResume() {
         super.onResume();
         IntentFilter mIntentFilter = new IntentFilter(BROADCAST_QUESTIONS_LIST_RESULT);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
-        counter++;
         try {
             SkooziQnARequestService.startActionGetQuestionsList(this);
-//            URL get_questions_url = new URL("http://valued-pact-89315.appspot.com/_get_questions");
-//            new GetQuestionsTask().execute(get_questions_url);
-
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
-//        catch (MalformedURLException e) {
-//            Log.d(TAG, e.getMessage());
-//        }
 
 //        pickUserAccount();
-        Log.d(TAG, "onResume has been called - " + counter + " times");
     }
 
     @Override
@@ -352,75 +343,5 @@ public class MainActivity extends ActionBarActivity
     public void handleGoogleAuthTokenException(UserRecoverableAuthException exception) {
         //TODO: need to determine how to properlyt handle this
     }
-    private class GetQuestionsTask extends AsyncTask<URL, Integer, List<Question>> {
-
-        protected List<Question> doInBackground(URL... urls) {
-            long totalSize = 0;
-            List<Question> downloadedQuestions = new ArrayList<>();
-
-            String questionsStringified = getNearbyQuestions(urls[0].toString());
-            try {
-                JSONObject result = new JSONObject(questionsStringified);
-                JSONArray questionsArray = result.getJSONArray("result");
-                for (int i = 0; i < questionsArray.length(); i++) {
-                    JSONObject jsonobject = questionsArray.getJSONObject(i);
-                    String added_by = jsonobject.getString("added_by");
-                    String content = jsonobject.getString("content");
-                    String key = jsonobject.getString("key");
-                    String timestamp = jsonobject.getString("timestamp");
-                    JSONObject locationJSON = jsonobject.getJSONObject("location");
-                    String locationLat = locationJSON.getString("lat");
-                    String locationLon = locationJSON.getString("lon");
-                    downloadedQuestions.add(new Question(added_by, content, key, timestamp,
-                            Double.parseDouble(locationLat), Double.parseDouble(locationLon)));
-                }
-            } catch (JSONException e) {
-                Log.d(TAG, e.getLocalizedMessage());
-            }
-            return downloadedQuestions;
-        }
-
-        /**
-         * Implementation taken from
-         * http://www.vogella.com/tutorials/AndroidJSON/article.html
-         * @param getPath
-         * @return
-         */
-        public String getNearbyQuestions(String getPath) {
-            StringBuilder builder = new StringBuilder();
-            HttpClient client = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(getPath);
-            try {
-                HttpResponse response = client.execute(httpGet);
-                StatusLine statusLine = response.getStatusLine();
-                int statusCode = statusLine.getStatusCode();
-                if (statusCode == 200) {
-                    HttpEntity entity = response.getEntity();
-                    InputStream content = entity.getContent();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        builder.append(line);
-                    }
-                } else {
-                    Log.d(TAG, "Failed to download file");
-                }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return builder.toString();
-        }
-
-        protected void onProgressUpdate(Integer... progress) {
-//            setProgressPercent(progress[0]);
-        }
-
-        protected void onPostExecute(List<Question> result) {
-            updateNearbyList(result);
-        }
-    }
-
-
+    
 }
