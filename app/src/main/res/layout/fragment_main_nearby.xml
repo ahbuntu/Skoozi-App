@@ -28,15 +28,6 @@
         android:layout_below="@+id/nearby_map"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <!--map:cameraTilt="30"-->
-        <!--map:cameraZoom="13"-->
-        <!--map:mapType="normal"-->
-        <!--map:uiCompass="false"-->
-        <!--map:uiRotateGestures="true"-->
-        <!--map:uiScrollGestures="false"-->
-        <!--map:uiTiltGestures="true"-->
-        <!--map:uiZoomControls="false"-->
-        <!--map:uiZoomGestures="true"-->
 
 
 </RelativeLayout>
