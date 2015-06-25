@@ -68,8 +68,8 @@ public class MainActivity extends ActionBarActivity
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";
-    public static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
-    public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
+    static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
+    static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
 
     Toolbar mToolbar;
     GoogleMap nearbyMap;
@@ -157,7 +157,7 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter mIntentFilter = new IntentFilter(BROADCAST_QUESTIONS_LIST_RESULT);
+        IntentFilter mIntentFilter = new IntentFilter(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
         try {
             SkooziQnARequestService.startActionGetQuestionsList(this);
@@ -289,7 +289,7 @@ public class MainActivity extends ActionBarActivity
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ArrayList<Question> questions = intent.getParcelableArrayListExtra(EXTRAS_QUESTIONS_LIST);
+            ArrayList<Question> questions = intent.getParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST);
             Log.d(TAG, String.valueOf(questions.size()));
             updateNearbyList(questions);
         }
@@ -343,5 +343,5 @@ public class MainActivity extends ActionBarActivity
     public void handleGoogleAuthTokenException(UserRecoverableAuthException exception) {
         //TODO: need to determine how to properlyt handle this
     }
-    
+
 }
