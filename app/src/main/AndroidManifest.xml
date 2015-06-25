@@ -46,7 +46,8 @@
 
         <activity android:name=".PostQuestionActivity" >
         </activity>
-        <activity android:name=".ThreadActivity" >
+        <activity android:name=".ThreadActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden">
         </activity>
 
         <service
