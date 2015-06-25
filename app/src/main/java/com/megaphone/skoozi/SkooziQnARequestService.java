@@ -90,11 +90,25 @@ public class SkooziQnARequestService extends IntentService {
         initializeApiConnection();
         try {
             CoreModelsAnswerMessageCollection threadRepsonse =  skooziqnaService.question().listAnswers().setId(question_key).execute();
-            if (threadRepsonse.size() > 2) {
-                //kind & etag are always returned. LIst<AnswerMessage> is only returned if there are answers for the question
-                for (CoreModelsAnswerMessage answer : threadRepsonse.getAnswers()) {
-                    //TODO: create an Answer object here
+            List<CoreModelsAnswerMessage> threadAnswerMessages = threadRepsonse.getAnswers();
+            ArrayList<Answer> threadAnswers = null;
+            if (!threadAnswerMessages.isEmpty()) {
+                for (CoreModelsAnswerMessage answerMessage : threadAnswerMessages) {
+                    threadAnswers = new ArrayList<>(threadAnswerMessages.size());
+                    threadAnswers.add(new Answer(
+                            "agxzfnNrb296aS05NTlyGgsSDVF1ZXN0aW9uTW9kZWwYgICAgKvzhwoM",
+                            answerMessage.getEmail(),
+                            answerMessage.getContent(),
+                            answerMessage.getTimestampUTCsec().toString(),
+                            answerMessage.getLocationLat(),
+                            answerMessage.getLocationLon()));
                 }
+                Intent localIntent = new Intent(ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT)
+                        .putParcelableArrayListExtra(ThreadActivity.EXTRAS_THREAD_ANSWERS, threadAnswers);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+            } else {
+                //TODO: need to figure out how to display a lack of answers properly
+                Log.d(TAG, "No answers for this question");
             }
         } catch (IOException e) {
             // TODO: Check for network connectivity before starting the AsyncTask.
@@ -115,7 +129,7 @@ public class SkooziQnARequestService extends IntentService {
                 questionList.add(new Question(
                         questionMessage.getEmail(),
                         questionMessage.getContent(),
-                        "dummykey",
+                        "agxzfnNrb296aS05NTlyGgsSDVF1ZXN0aW9uTW9kZWwYgICAgKvzhwoM",
                         questionMessage.getTimestampUTCsec().toString(),
                         questionMessage.getLocationLat(),
                         questionMessage.getLocationLon()));

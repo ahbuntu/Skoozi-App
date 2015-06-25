@@ -60,4 +60,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+
+    <LinearLayout
+        android:id="@+id/thread_answer_layout"
+        android:layout_below="@id/thread_answer_list"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/new_answer_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:minLines="2"
+            android:layout_weight="2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/new_question_horizontal_margin"
+            />
+
+        <Button
+            android:id="@+id/new_answer_post"
+            android:text="@string/post_new_answer"
+            android:layout_weight="1"
+            android:layout_gravity="right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
 </RelativeLayout>

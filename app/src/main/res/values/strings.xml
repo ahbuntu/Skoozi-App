@@ -17,4 +17,6 @@
     <string name="new_question_location_change">CHANGE</string>
     <string name="new_question_location_hint">enter location if not correct</string>
 
+    <string name="post_new_answer">POST</string>
+
 </resources>

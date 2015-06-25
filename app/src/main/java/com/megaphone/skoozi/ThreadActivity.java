@@ -1,13 +1,22 @@
 package com.megaphone.skoozi;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,13 +34,17 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ThreadActivity extends ActionBarActivity
         implements OnMapReadyCallback {
 
     private static final String TAG = "ThreadActivity";
-    static final String EXTRA_QUESTION = "question_parcel";
+    static final String EXTRA_QUESTION = "com.megaphone.skoozi.extras.question_parcel";
+    static final String BROADCAST_THREAD_ANSWERS_RESULT = "com.megaphone.skoozi.broadcast.THREAD_ANSWERS_RESULT";
+    static final String EXTRAS_THREAD_ANSWERS  = "com.megaphone.skoozi.extras.THREAD_ANSWERS";
 
     private Toolbar mToolbar;
     private GoogleMap newQuestionMap;
@@ -39,6 +52,17 @@ public class ThreadActivity extends ActionBarActivity
     private Question threadQuestion;
     private TextView textAuthor;
     private TextView textContent;
+
+    private List<Answer> threadAnswers;
+    private ListView threadAnswerListView;
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            threadAnswers = intent.getParcelableArrayListExtra(ThreadActivity.EXTRAS_THREAD_ANSWERS);
+            updateThreadAnswerList();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +77,9 @@ public class ThreadActivity extends ActionBarActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         threadQuestion = getIntent().getParcelableExtra(EXTRA_QUESTION);
+
+        threadAnswerListView = (ListView) findViewById(R.id.thread_answer_list);
+
         textAuthor = (TextView) findViewById(R.id.thread_profile_name);
         textContent = (TextView) findViewById(R.id.thread_question_content);
 
@@ -99,6 +126,8 @@ public class ThreadActivity extends ActionBarActivity
         if (mMapFragment != null) {
             mMapFragment.getMapAsync(this);
         }
+        IntentFilter mIntentFilter = new IntentFilter(ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
         SkooziQnARequestService.startActionGetThreadAnswers(this, threadQuestion.getKey());
     }
 
@@ -127,59 +156,55 @@ public class ThreadActivity extends ActionBarActivity
         }
     }
 
-    private class InsertQuestionAsyncTask extends AsyncTask<Question, Void, String> {
-        private Skooziqna skooziqnaService = null;
-
-        @Override
-        protected void onPreExecute() {
-//            postQuestionProgress.setVisibility(View.VISIBLE);
-//            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.hideSoftInputFromWindow(postQuestionText.getWindowToken(), 0);
-        }
-
-        /**
-         * Calls REST API to insert question
-         */
-        @Override
-        protected String doInBackground(Question... params) {
-            String postKey = null;
-            if (skooziqnaService == null) { // do this once
-                Skooziqna.Builder builder = new Skooziqna.Builder(AndroidHttp.newCompatibleTransport(),
-                        new AndroidJsonFactory(), null)
-                        .setRootUrl(getString(R.string.app_api_url));
-                skooziqnaService = builder.build();
-            }
-            Question userQuestion = params[0];
-            try {
-                CoreModelsQuestionMessage question = new CoreModelsQuestionMessage();
-
-                question.setEmail("proper@proper.com");
-                question.setContent(userQuestion.getContent());
-                question.setLocationLat(userQuestion.getLocationLat());
-                question.setLocationLon(userQuestion.getLocationLon());
-                question.setTimestampUTCsec(System.currentTimeMillis()/1000);
-
-                CoreModelsPostResponse insertResponse = skooziqnaService.question().insert(question).execute();
-                //TODO: figure out if I need to do anything with this
-                postKey = insertResponse.getPostKey();
-
-            } catch (IOException e) {
-                // TODO: Check for network connectivity before starting the AsyncTask.
-                Log.e(TAG, e.getMessage());
-            }
-            return postKey;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-//            postQuestionProgress.setVisibility(View.INVISIBLE);
-//            if (result != null) {
-//                showToast(true);
-//            } else {
-//                showToast(false);
-//            }
-        }
-
+    private void updateThreadAnswerList() {
+        ThreadAnswerListAdapter mThreadListAdapter = new ThreadAnswerListAdapter(threadAnswers);
+        threadAnswerListView.setAdapter(mThreadListAdapter);
     }
+
+    private class ThreadAnswerListAdapter extends BaseAdapter {
+
+
+        public ThreadAnswerListAdapter(List<Answer> answers) {
+            threadAnswers = answers;
+        }
+        @Override
+        public int getCount() {
+            /**
+             * TODO: this count should be memoized
+             * http://stackoverflow.com/questions/8921162/how-to-update-listview-on-scrolling-while-retrieving-data-from-server-in-android
+             */
+            return threadAnswers.size();
+        }
+
+        @Override
+        public Object getItem(int arg0) {
+            return threadAnswers.get(arg0);
+        }
+
+        @Override
+        public long getItemId(int arg0) {
+            return arg0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = inflater.inflate(R.layout.nearby_list_row, parent, false);
+            }
+            TextView textAuthor = (TextView) convertView.findViewById(R.id.nearby_list_profile_name);
+            TextView textContent = (TextView) convertView.findViewById(R.id.nearby_list_question);
+
+            Answer currentAnswer = threadAnswers.get(position);
+            textAuthor.setText(currentAnswer.getAuthor());
+            textContent.setText(currentAnswer.getContent());
+
+            //TODO: display the answers on the map
+//            mMapQCallback.onMapQuestion(currentAnswer.getLocationLat(), currentAnswer.getLocationLon());
+            return convertView;
+        }
+    }
+
+
 
 }
