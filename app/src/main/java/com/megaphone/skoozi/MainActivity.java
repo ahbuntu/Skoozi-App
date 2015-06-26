@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -67,11 +68,7 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Creating The Toolbar and setting it as the Toolbar for the activity
-        mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        if (mToolbar != null) {
-            setSupportActionBar(mToolbar);
-        }
+        setupToolbar();
 
 //        pickUserAccount();
         if (findViewById(R.id.main_fragment_container) != null) {
@@ -97,6 +94,14 @@ public class MainActivity extends ActionBarActivity
         buildGoogleApiClient();
     }
 
+    /**
+     * Creating The Toolbar and setting it as the Toolbar for the activity
+     * home as up set to true
+     */
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+    }
 
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
@@ -249,8 +254,10 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onMapQuestion(double lat, double lon) {
         LatLng questionLocation = new LatLng(lat,lon);
-        nearbyMap.addMarker(new MarkerOptions()
-                .position(questionLocation));
+        if (nearbyMap != null) {
+            nearbyMap.addMarker(new MarkerOptions()
+                    .position(questionLocation));
+        }
     }
 
     private void updateNearbyList(List<Question> questions) {

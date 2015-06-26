@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -68,12 +69,7 @@ public class ThreadActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question_thread);
 
-        // Creating The Toolbar and setting it as the Toolbar for the activity
-        mToolbar = (Toolbar) findViewById(R.id.new_toolbar);
-        if (mToolbar != null) {
-            setSupportActionBar(mToolbar);
-        }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupToolbar();
 
         threadQuestion = getIntent().getParcelableExtra(EXTRA_QUESTION);
         setActivityTitle(threadQuestion.getAuthor());
@@ -82,6 +78,21 @@ public class ThreadActivity extends ActionBarActivity
 
         textContent = (TextView) findViewById(R.id.thread_question_content);
         textContent.setText(threadQuestion.getContent());
+    }
+
+    /**
+     * Creating The Toolbar and setting it as the Toolbar for the activity
+     * home as up set to true
+     */
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Show menu icon
+        final ActionBar ab = getSupportActionBar();
+//        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private void setActivityTitle(String title) {
@@ -108,10 +119,6 @@ public class ThreadActivity extends ActionBarActivity
         }
         if (id == R.id.action_add_q) {
             return true;
-//        } else if (id == R.id.action_home) {
-//            Intent intent = new Intent(this, MainActivity.class);
-//            startActivity(intent);
-//            return true;
         } else if (id == R.id.action_my_activity) {
             Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
             return true;
