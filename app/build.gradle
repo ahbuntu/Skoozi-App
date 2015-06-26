@@ -40,6 +40,7 @@ dependencies {
      * Look at the comment by 'Jamie Nhu'
      * http://stackoverflow.com/questions/24548032/how-do-i-match-a-google-play-services-revision-with-an-install-version
      */
+    compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:support-v13:22.0.0'
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.google.android.gms:play-services:7.0.0'
