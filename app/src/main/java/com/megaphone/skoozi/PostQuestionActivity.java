@@ -86,7 +86,7 @@ public class PostQuestionActivity extends ActionBarActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_new, menu);
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
         return true;
     }
 
@@ -104,10 +104,10 @@ public class PostQuestionActivity extends ActionBarActivity
         }
         if (id == R.id.action_add_q) {
             return true;
-        } else if (id == R.id.action_home) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            return true;
+//        } else if (id == R.id.action_home) {
+//            Intent intent = new Intent(this, MainActivity.class);
+//            startActivity(intent);
+//            return true;
         } else if (id == R.id.action_my_activity) {
             Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
             return true;
