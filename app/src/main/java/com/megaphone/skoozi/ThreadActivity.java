@@ -50,7 +50,6 @@ public class ThreadActivity extends ActionBarActivity
     private GoogleMap newQuestionMap;
 
     private Question threadQuestion;
-    private TextView textAuthor;
     private TextView textContent;
 
     private List<Answer> threadAnswers;
@@ -77,20 +76,21 @@ public class ThreadActivity extends ActionBarActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         threadQuestion = getIntent().getParcelableExtra(EXTRA_QUESTION);
+        setActivityTitle(threadQuestion.getAuthor());
 
         threadAnswerListView = (ListView) findViewById(R.id.thread_answer_list);
 
-        textAuthor = (TextView) findViewById(R.id.thread_profile_name);
         textContent = (TextView) findViewById(R.id.thread_question_content);
-
-        textAuthor.setText(threadQuestion.getAuthor());
         textContent.setText(threadQuestion.getContent());
     }
 
+    private void setActivityTitle(String title) {
+        setTitle(title);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_new, menu);
+        // Inflate the toolbar menu
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
         return true;
     }
 
@@ -108,10 +108,10 @@ public class ThreadActivity extends ActionBarActivity
         }
         if (id == R.id.action_add_q) {
             return true;
-        } else if (id == R.id.action_home) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            return true;
+//        } else if (id == R.id.action_home) {
+//            Intent intent = new Intent(this, MainActivity.class);
+//            startActivity(intent);
+//            return true;
         } else if (id == R.id.action_my_activity) {
             Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
             return true;

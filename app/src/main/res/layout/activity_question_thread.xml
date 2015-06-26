@@ -29,20 +29,6 @@
         android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"/>
 
 
-    <TextView
-        android:id="@+id/thread_profile_name"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="FirstName"
-        android:textStyle="bold"
-        android:layout_below="@id/thread_map"
-        android:layout_toRightOf="@+id/thread_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-        android:layout_marginStart="@dimen/nearby_list_row_start_margin"
-        android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
-        android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
-
 
     <TextView
         android:id="@+id/thread_question_content"
