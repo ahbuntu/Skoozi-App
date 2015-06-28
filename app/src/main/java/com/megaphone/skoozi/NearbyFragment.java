@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -114,7 +113,7 @@ public class NearbyFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.nearby_list_row, parent, false);
+                convertView = inflater.inflate(R.layout.row_nearby_list, parent, false);
             }
             TextView textAuthor = (TextView) convertView.findViewById(R.id.nearby_list_profile_name);
             TextView textContent = (TextView) convertView.findViewById(R.id.nearby_list_question);
