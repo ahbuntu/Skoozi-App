@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -75,6 +76,7 @@ public class ThreadActivity extends ActionBarActivity
 
 //        threadAnswerListView = (ListView) findViewById(R.id.thread_answer_list);
         threadAnswerRecycler = (RecyclerView) findViewById(R.id.thread_answer_recycler);
+        threadAnswerRecycler.setHasFixedSize(true);
         // use a linear layout manager
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         threadAnswerRecycler.setLayoutManager(mLayoutManager);
@@ -167,56 +169,20 @@ public class ThreadActivity extends ActionBarActivity
     }
 
     private void updateThreadAnswerList() {
-//        ThreadAnswerListAdapter mThreadListAdapter = new ThreadAnswerListAdapter(threadAnswers);
-//        threadAnswerListView.setAdapter(mThreadListAdapter);
         ThreadRecyclerViewAdapter mAdapter = new ThreadRecyclerViewAdapter(this, threadAnswers);
-        threadAnswerRecycler.setAdapter(mAdapter);
+
+        // This is the code to provide a sectioned list
+        // https://gist.github.com/gabrielemariotti/4c189fb1124df4556058
+        List<ThreadSectionedAdapter.Section> sections = new ArrayList<>();
+        //Sections
+        sections.add(new ThreadSectionedAdapter.Section(0,threadQuestion.getContent()));
+
+        ThreadSectionedAdapter mSectionedAdapter = new
+                ThreadSectionedAdapter(this,R.layout.section_thread,R.id.section_question_content,mAdapter);
+        ThreadSectionedAdapter.Section[] dummy = new ThreadSectionedAdapter.Section[sections.size()];
+        mSectionedAdapter.setSections(sections.toArray(dummy));
+
+        threadAnswerRecycler.setAdapter(mSectionedAdapter);
     }
-
-    private class ThreadAnswerListAdapter extends BaseAdapter {
-
-
-        public ThreadAnswerListAdapter(List<Answer> answers) {
-            threadAnswers = answers;
-        }
-        @Override
-        public int getCount() {
-            /**
-             * TODO: this count should be memoized
-             * http://stackoverflow.com/questions/8921162/how-to-update-listview-on-scrolling-while-retrieving-data-from-server-in-android
-             */
-            return threadAnswers.size();
-        }
-
-        @Override
-        public Object getItem(int arg0) {
-            return threadAnswers.get(arg0);
-        }
-
-        @Override
-        public long getItemId(int arg0) {
-            return arg0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.row_nearby_list, parent, false);
-            }
-            TextView textAuthor = (TextView) convertView.findViewById(R.id.nearby_list_profile_name);
-            TextView textContent = (TextView) convertView.findViewById(R.id.nearby_list_question);
-
-            Answer currentAnswer = threadAnswers.get(position);
-            textAuthor.setText(currentAnswer.getAuthor());
-            textContent.setText(currentAnswer.getContent());
-
-            //TODO: display the answers on the map
-//            mMapQCallback.onMapQuestion(currentAnswer.getLocationLat(), currentAnswer.getLocationLon());
-            return convertView;
-        }
-    }
-
-
 
 }

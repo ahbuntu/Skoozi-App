@@ -3,11 +3,14 @@ package com.megaphone.skoozi;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -48,8 +51,7 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
     public AnswerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.card_thread_answer, parent, false);
-        AnswerViewHolder vh = new AnswerViewHolder(v);
-        return vh;
+        return new AnswerViewHolder(v);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
