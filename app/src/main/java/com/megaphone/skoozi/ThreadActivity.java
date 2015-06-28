@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,9 +21,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.appspot.skoozi_959.skooziqna.Skooziqna;
-import com.appspot.skoozi_959.skooziqna.model.CoreModelsPostResponse;
-import com.appspot.skoozi_959.skooziqna.model.CoreModelsQuestionMessage;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -31,11 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -54,7 +47,7 @@ public class ThreadActivity extends ActionBarActivity
     private TextView textContent;
 
     private List<Answer> threadAnswers;
-    private ListView threadAnswerListView;
+    private RecyclerView threadAnswerRecycler;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -63,6 +56,10 @@ public class ThreadActivity extends ActionBarActivity
             updateThreadAnswerList();
         }
     };
+
+
+//    private ListView threadAnswerListView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +71,13 @@ public class ThreadActivity extends ActionBarActivity
         threadQuestion = getIntent().getParcelableExtra(EXTRA_QUESTION);
         setActivityTitle(threadQuestion.getAuthor());
 
-        threadAnswerListView = (ListView) findViewById(R.id.thread_answer_list);
+        //TODO: need to put in a check to ensure that threadQuestion is properly retrieved
+
+//        threadAnswerListView = (ListView) findViewById(R.id.thread_answer_list);
+        threadAnswerRecycler = (RecyclerView) findViewById(R.id.thread_answer_recycler);
+        // use a linear layout manager
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        threadAnswerRecycler.setLayoutManager(mLayoutManager);
 
         textContent = (TextView) findViewById(R.id.thread_question_content);
         textContent.setText(threadQuestion.getContent());
@@ -164,8 +167,10 @@ public class ThreadActivity extends ActionBarActivity
     }
 
     private void updateThreadAnswerList() {
-        ThreadAnswerListAdapter mThreadListAdapter = new ThreadAnswerListAdapter(threadAnswers);
-        threadAnswerListView.setAdapter(mThreadListAdapter);
+//        ThreadAnswerListAdapter mThreadListAdapter = new ThreadAnswerListAdapter(threadAnswers);
+//        threadAnswerListView.setAdapter(mThreadListAdapter);
+        ThreadRecyclerViewAdapter mAdapter = new ThreadRecyclerViewAdapter(this, threadAnswers);
+        threadAnswerRecycler.setAdapter(mAdapter);
     }
 
     private class ThreadAnswerListAdapter extends BaseAdapter {
@@ -197,7 +202,7 @@ public class ThreadActivity extends ActionBarActivity
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.nearby_list_row, parent, false);
+                convertView = inflater.inflate(R.layout.row_nearby_list, parent, false);
             }
             TextView textAuthor = (TextView) convertView.findViewById(R.id.nearby_list_profile_name);
             TextView textContent = (TextView) convertView.findViewById(R.id.nearby_list_question);
