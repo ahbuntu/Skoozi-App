@@ -40,29 +40,14 @@
         app:fabSize="normal" />
 
 
-    <TextView
-        android:id="@+id/thread_question_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_below="@+id/thread_map"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/new_question_horizontal_margin"
-        />
 
     <!-- A RecyclerView with some commonly used attributes -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/thread_answer_recycler"
         android:scrollbars="vertical"
-        android:layout_below="@+id/thread_question_content"
+        android:layout_below="@+id/thread_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
-    <!--<ListView-->
-        <!--android:id="@+id/thread_answer_list"-->
-        <!--android:layout_below="@+id/thread_question_content"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content" />-->
-
 
     <!--<LinearLayout-->
         <!--android:id="@+id/thread_answer_layout"-->

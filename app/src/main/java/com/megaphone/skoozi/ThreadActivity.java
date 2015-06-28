@@ -41,11 +41,9 @@ public class ThreadActivity extends ActionBarActivity
     static final String BROADCAST_THREAD_ANSWERS_RESULT = "com.megaphone.skoozi.broadcast.THREAD_ANSWERS_RESULT";
     static final String EXTRAS_THREAD_ANSWERS  = "com.megaphone.skoozi.extras.THREAD_ANSWERS";
 
-    private Toolbar mToolbar;
     private GoogleMap newQuestionMap;
 
     private Question threadQuestion;
-    private TextView textContent;
 
     private List<Answer> threadAnswers;
     private RecyclerView threadAnswerRecycler;
@@ -81,8 +79,6 @@ public class ThreadActivity extends ActionBarActivity
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         threadAnswerRecycler.setLayoutManager(mLayoutManager);
 
-        textContent = (TextView) findViewById(R.id.thread_question_content);
-        textContent.setText(threadQuestion.getContent());
     }
 
     /**
