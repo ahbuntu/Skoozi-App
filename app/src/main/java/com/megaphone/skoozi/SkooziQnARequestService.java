@@ -96,10 +96,11 @@ public class SkooziQnARequestService extends IntentService {
                 for (CoreModelsAnswerMessage answerMessage : threadAnswerMessages) {
                     threadAnswers = new ArrayList<>(threadAnswerMessages.size());
                     threadAnswers.add(new Answer(
-                            "agxzfnNrb296aS05NTlyGgsSDVF1ZXN0aW9uTW9kZWwYgICAgKvzhwoM",
+                            //TODO: need to verify if getIDUrlsafe() actually returns anything
+                            answerMessage.getIdUrlsafe(),
                             answerMessage.getEmail(),
                             answerMessage.getContent(),
-                            answerMessage.getTimestampUTCsec().toString(),
+                            answerMessage.getTimestampUnix().toString(),
                             answerMessage.getLocationLat(),
                             answerMessage.getLocationLon()));
                 }
@@ -129,8 +130,8 @@ public class SkooziQnARequestService extends IntentService {
                 questionList.add(new Question(
                         questionMessage.getEmail(),
                         questionMessage.getContent(),
-                        "agxzfnNrb296aS05NTlyGgsSDVF1ZXN0aW9uTW9kZWwYgICAgKvzhwoM",
-                        questionMessage.getTimestampUTCsec().toString(),
+                        questionMessage.getIdUrlsafe(),
+                        questionMessage.getTimestampUnix().toString(),
                         questionMessage.getLocationLat(),
                         questionMessage.getLocationLon()));
             }

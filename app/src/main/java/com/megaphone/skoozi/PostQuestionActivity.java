@@ -198,9 +198,9 @@ public class PostQuestionActivity extends ActionBarActivity
         }
     }
 
-    private void showThread(String key) {
-        if (key != null) {
-            postQuestion.setKey(key);
+    private void showThread(String questionKey) {
+        if (questionKey != null) {
+            postQuestion.setKey(questionKey);
             Intent threadIntent = new Intent(this, ThreadActivity.class);
             Bundle questionBundle = new Bundle();
             questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, postQuestion);
@@ -250,7 +250,7 @@ public class PostQuestionActivity extends ActionBarActivity
                 question.setContent(userQuestion.getContent());
                 question.setLocationLat(userQuestion.getLocationLat());
                 question.setLocationLon(userQuestion.getLocationLon());
-                question.setTimestampUTCsec(System.currentTimeMillis()/1000);
+                question.setTimestampUnix((int)System.currentTimeMillis() / 1000L);
 
                 CoreModelsPostResponse insertResponse = skooziqnaService.question().insert(question).execute();
                 //TODO: figure out if I need to do anything with this
