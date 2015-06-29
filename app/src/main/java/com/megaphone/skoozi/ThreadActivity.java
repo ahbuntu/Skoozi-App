@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -41,6 +42,7 @@ public class ThreadActivity extends ActionBarActivity
     static final String BROADCAST_THREAD_ANSWERS_RESULT = "com.megaphone.skoozi.broadcast.THREAD_ANSWERS_RESULT";
     static final String EXTRAS_THREAD_ANSWERS  = "com.megaphone.skoozi.extras.THREAD_ANSWERS";
 
+    private CollapsingToolbarLayout collapsingToolbar;
     private GoogleMap newQuestionMap;
 
     private Question threadQuestion;
@@ -94,10 +96,12 @@ public class ThreadActivity extends ActionBarActivity
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
+
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
     }
 
     private void setActivityTitle(String title) {
-        setTitle(title);
+        collapsingToolbar.setTitle(title);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
