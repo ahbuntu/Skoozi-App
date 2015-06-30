@@ -51,8 +51,8 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabBtn"
-        android:src="@drawable/profile"
-        app:fabSize="normal"
+        android:src="@mipmap/ic_place_black_24dp"
+        app:fabSize="mini"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_anchor="@+id/appbar"
