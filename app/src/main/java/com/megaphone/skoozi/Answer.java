@@ -108,9 +108,9 @@ public class Answer implements Parcelable {
      * @param in the parcel used to construct the Answer object
      */
     public void readFromParcel(Parcel in) {
+        setKey(in.readString());
         setAuthor(in.readString());
         setContent(in.readString());
-        setKey(in.readString());
         setTimestamp(in.readString());
         setLocationLat(in.readDouble());
         setLocationLon(in.readDouble());
@@ -124,9 +124,9 @@ public class Answer implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(getKey());
         dest.writeString(getAuthor());
         dest.writeString(getContent());
-        dest.writeString(getKey());
         dest.writeString(getTimestamp());
         dest.writeDouble(getLocationLat());
         dest.writeDouble(getLocationLon());

@@ -6,13 +6,16 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * Created by ahmadulhassan on 2015-06-28. Big shout out to:
+ * Created by ahmadulhassan on 2015-06-28.
+ * Big shout out to:
  * https://gist.github.com/gabrielemariotti/4c189fb1124df4556058
  */
 public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -64,13 +67,26 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         });
     }
 
+
     public static class SectionViewHolder extends RecyclerView.ViewHolder {
 
+        public Button postAnswer;
         public TextView title;
+        private EditText answerContent;
+        private ThreadActivity mActivity;
 
-        public SectionViewHolder(View view,int mTextResourceid) {
+        public SectionViewHolder(View view,int mTextResourceid, ThreadActivity context) {
             super(view);
             title = (TextView) view.findViewById(mTextResourceid);
+            postAnswer = (Button) view.findViewById(R.id.section_answer_post);
+            answerContent = (EditText) view.findViewById(R.id.section_answer_content);
+            mActivity = context;
+            postAnswer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mActivity.insertSkooziServiceAnswer(answerContent.getText().toString());
+                }
+            });
         }
     }
 
@@ -78,9 +94,9 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int typeView) {
         if (typeView == SECTION_TYPE) {
             final View view = LayoutInflater.from(mContext).inflate(mSectionResourceId, parent, false);
-            return new SectionViewHolder(view,mTextResourceId);
+            return new SectionViewHolder(view,mTextResourceId, (ThreadActivity) mContext);
         }else{
-            return mBaseAdapter.onCreateViewHolder(parent, typeView -1);
+            return mBaseAdapter.onCreateViewHolder(parent, typeView);
         }
     }
 
@@ -98,7 +114,7 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public int getItemViewType(int position) {
         return isSectionHeaderPosition(position)
                 ? SECTION_TYPE
-                : mBaseAdapter.getItemViewType(sectionedPositionToPosition(position)) +1 ;
+                : mBaseAdapter.getItemViewType(sectionedPositionToPosition(position));
     }
 
 

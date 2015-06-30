@@ -9,6 +9,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -34,32 +35,44 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ThreadActivity extends ActionBarActivity
+public class ThreadActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     private static final String TAG = "ThreadActivity";
     static final String EXTRA_QUESTION = "com.megaphone.skoozi.extras.question_parcel";
     static final String BROADCAST_THREAD_ANSWERS_RESULT = "com.megaphone.skoozi.broadcast.THREAD_ANSWERS_RESULT";
     static final String EXTRAS_THREAD_ANSWERS  = "com.megaphone.skoozi.extras.THREAD_ANSWERS";
+    static final String BROADCAST_POST_ANSWER_RESULT = "com.megaphone.skoozi.broadcast.POST_ANSWER_RESULT";
+    static final String EXTRAS_ANSWER_KEY  = "com.megaphone.skoozi.extras.ANSWER_KEY";
 
     private CollapsingToolbarLayout collapsingToolbar;
-    private GoogleMap newQuestionMap;
 
     private Question threadQuestion;
-
-    private List<Answer> threadAnswers;
+    private List<Answer> threadAnswers; //null value is good and well
     private RecyclerView threadAnswerRecycler;
+
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            threadAnswers = intent.getParcelableArrayListExtra(ThreadActivity.EXTRAS_THREAD_ANSWERS);
-            updateThreadAnswerList();
+            switch (intent.getAction()) {
+                case ThreadActivity.BROADCAST_POST_ANSWER_RESULT:
+                    String answer_key = intent.getStringExtra(ThreadActivity.EXTRAS_ANSWER_KEY);
+                    if (answer_key == null) {
+                        Toast.makeText(context, "Looks like there was an error. Please try again.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Answer key : " + answer_key, Toast.LENGTH_SHORT).show();
+                    }
+                    //TODO: need to figure out what to do next? maybe update the thread?
+                    break;
+                case ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT:
+                default:
+                    threadAnswers = intent.getParcelableArrayListExtra(ThreadActivity.EXTRAS_THREAD_ANSWERS);
+                    updateThreadAnswerList();
+                    break;
+            }
         }
     };
-
-
-//    private ListView threadAnswerListView;
 
 
     @Override
@@ -74,13 +87,11 @@ public class ThreadActivity extends ActionBarActivity
 
         //TODO: need to put in a check to ensure that threadQuestion is properly retrieved
 
-//        threadAnswerListView = (ListView) findViewById(R.id.thread_answer_list);
         threadAnswerRecycler = (RecyclerView) findViewById(R.id.thread_answer_recycler);
         threadAnswerRecycler.setHasFixedSize(true);
         // use a linear layout manager
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         threadAnswerRecycler.setLayoutManager(mLayoutManager);
-
     }
 
     /**
@@ -118,7 +129,6 @@ public class ThreadActivity extends ActionBarActivity
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            //TODO: determine if MainActivity is well and truly the parent activity to all this stuff
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
@@ -138,9 +148,27 @@ public class ThreadActivity extends ActionBarActivity
         if (mMapFragment != null) {
             mMapFragment.getMapAsync(this);
         }
-        IntentFilter mIntentFilter = new IntentFilter(ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
+        setupLocalBroadcastPair();
+
         SkooziQnARequestService.startActionGetThreadAnswers(this, threadQuestion.getKey());
+    }
+
+    private void setupLocalBroadcastPair() {
+        IntentFilter mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT);
+        mIntentFilter.addAction(ThreadActivity.BROADCAST_POST_ANSWER_RESULT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
+    }
+
+    public void insertSkooziServiceAnswer(String content) {
+
+        Answer mAnswer = new Answer(threadQuestion.getKey(),
+                "response@response.com", //TODO: this needs to be fixed once OAuth is setup
+                content,
+                "timestamp", //TODO: Answer needs to be updated to make this into a long
+                12,//TODO: need to figure out the current location
+                12);
+        SkooziQnARequestService.startActionInsertAnswer(this,threadQuestion.getKey(), mAnswer);
     }
 
     @Override
@@ -155,7 +183,7 @@ public class ThreadActivity extends ActionBarActivity
 
     @Override
     public void onMapReady(GoogleMap map) {
-        newQuestionMap = map;
+        GoogleMap newQuestionMap = map;
         if (threadQuestion.getLocationLat() != 0.0 && threadQuestion.getLocationLat() != 0.0 ) {
             LatLng postLocation = new LatLng(threadQuestion.getLocationLat(),threadQuestion.getLocationLon());
             newQuestionMap.addMarker(new MarkerOptions()
@@ -168,11 +196,12 @@ public class ThreadActivity extends ActionBarActivity
         }
     }
 
+    /**
+     * This method is called after the API request to get answers for the question has been made
+     */
     private void updateThreadAnswerList() {
         ThreadRecyclerViewAdapter mAdapter = new ThreadRecyclerViewAdapter(this, threadAnswers);
 
-        // This is the code to provide a sectioned list
-        // https://gist.github.com/gabrielemariotti/4c189fb1124df4556058
         List<ThreadSectionedAdapter.Section> sections = new ArrayList<>();
         //Sections
         sections.add(new ThreadSectionedAdapter.Section(0,threadQuestion.getContent()));

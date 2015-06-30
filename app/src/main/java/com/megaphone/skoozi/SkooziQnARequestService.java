@@ -9,6 +9,7 @@ import android.util.Log;
 import com.appspot.skoozi_959.skooziqna.Skooziqna;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsAnswerMessage;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsAnswerMessageCollection;
+import com.appspot.skoozi_959.skooziqna.model.CoreModelsPostResponse;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsQuestionMessage;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsQuestionMessageCollection;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -22,14 +23,15 @@ import java.util.List;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
  */
 public class SkooziQnARequestService extends IntentService {
+
     private static final String TAG = "SkooziQnARequestService";
     private static final String ACTION_GET_THREAD_ANSWERS = "com.megaphone.skoozi.action.GET_THREAD_ANSWERS";
     private static final String ACTION_GET_QUESTIONS_LIST = "com.megaphone.skoozi.action.GET_QUESTIONS_LIST";
+    private static final String ACTION_INSERT_QUESTION_ANSWER = "com.megaphone.skoozi.action.INSERT_QUESTION_ANSWER";
     private static final String EXTRA_QUESTION_KEY = "com.megaphone.skoozi.extra.QUESTION_KEY";
+    private static final String EXTRA_ANSWER_PARCEL = "com.megaphone.skoozi.extra.ANSWER_PARCEL";
 
     private Skooziqna skooziqnaService;
 
@@ -54,6 +56,20 @@ public class SkooziQnARequestService extends IntentService {
         context.startService(intent);
     }
 
+    /**
+     * Starts this service to perform action Insert Answer for Question. If
+     * the service is already performing a task this action will be queued.
+     */
+    public static void startActionInsertAnswer(Context context, String question_key, Answer userAnswer) {
+        Intent intent = new Intent(context, SkooziQnARequestService.class);
+        intent.setAction(ACTION_INSERT_QUESTION_ANSWER);
+        intent.putExtra(EXTRA_QUESTION_KEY, question_key);
+        intent.putExtra(EXTRA_ANSWER_PARCEL, userAnswer);
+        context.startService(intent);
+    }
+
+
+    // TODO: Check for network connectivity before starting the Service.
     public SkooziQnARequestService() {
         super("SkooziQnARequestService");
     }
@@ -67,6 +83,10 @@ public class SkooziQnARequestService extends IntentService {
                 handleActionGetThreadAnswers(key);
             } else if (ACTION_GET_QUESTIONS_LIST.equals(action)) {
                 handleActionGetQuestionsList();
+            } else if (ACTION_INSERT_QUESTION_ANSWER.equals(action)) {
+                final String key = intent.getStringExtra(EXTRA_QUESTION_KEY);
+                final Answer mAnswer = intent.getParcelableExtra(EXTRA_ANSWER_PARCEL);
+                handleActionInsertAnswer(key, mAnswer);
             }
         }
     }
@@ -88,10 +108,10 @@ public class SkooziQnARequestService extends IntentService {
      */
     private void handleActionGetThreadAnswers(String question_key) {
         initializeApiConnection();
+        ArrayList<Answer> threadAnswers = null;
         try {
             CoreModelsAnswerMessageCollection threadRepsonse =  skooziqnaService.question().listAnswers().setId(question_key).execute();
             List<CoreModelsAnswerMessage> threadAnswerMessages = threadRepsonse.getAnswers();
-            ArrayList<Answer> threadAnswers = null;
             if (threadAnswerMessages != null) {
                 for (CoreModelsAnswerMessage answerMessage : threadAnswerMessages) {
                     threadAnswers = new ArrayList<>(threadAnswerMessages.size());
@@ -104,17 +124,14 @@ public class SkooziQnARequestService extends IntentService {
                             answerMessage.getLocationLat(),
                             answerMessage.getLocationLon()));
                 }
-                Intent localIntent = new Intent(ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT)
-                        .putParcelableArrayListExtra(ThreadActivity.EXTRAS_THREAD_ANSWERS, threadAnswers);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
-            } else {
-                //TODO: need to figure out how to display a lack of answers properly
-                Log.d(TAG, "No answers for this question");
+
             }
         } catch (IOException e) {
-            // TODO: Check for network connectivity before starting the AsyncTask.
             Log.e(TAG, e.getMessage());
         }
+        Intent localIntent = new Intent(ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT)
+                .putParcelableArrayListExtra(ThreadActivity.EXTRAS_THREAD_ANSWERS, threadAnswers);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
     /**
@@ -140,9 +157,35 @@ public class SkooziQnARequestService extends IntentService {
                     .putParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST, questionList);
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         } catch (IOException e) {
-            // TODO: Check for network connectivity before starting the AsyncTask.
+            //TODO: what to do if there are no questions nearby?
             Log.e(TAG, e.getMessage());
         }
+    }
+
+    /**
+     * Handle action Insert New Answer in the background thread
+     */
+    private void handleActionInsertAnswer(String question_key, Answer userAnswer) {
+        initializeApiConnection();
+        String postKey = null;
+        try {
+            CoreModelsAnswerMessage answerMsg = new CoreModelsAnswerMessage();
+
+            answerMsg.setQuestionUrlsafe(question_key);
+            answerMsg.setEmail("response@response.com");
+            answerMsg.setContent(userAnswer.getContent());
+            answerMsg.setLocationLat(userAnswer.getLocationLat());
+            answerMsg.setLocationLon(userAnswer.getLocationLon());
+            answerMsg.setTimestampUnix((int)System.currentTimeMillis() / 1000L);
+
+            CoreModelsPostResponse insertResponse = skooziqnaService.answer().insert(answerMsg).execute();
+            postKey = insertResponse.getPostKey();
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        Intent localIntent = new Intent(ThreadActivity.BROADCAST_POST_ANSWER_RESULT)
+                .putExtra(ThreadActivity.EXTRAS_ANSWER_KEY, postKey);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
 }
