@@ -79,17 +79,6 @@
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="@dimen/nearby_map_height"/>-->
 
-    <!--<com.megaphone.skoozi.CircularImageView-->
-        <!--android:id="@+id/thread_image"-->
-        <!--android:src="@drawable/profile"-->
-        <!--app:border_color="@color/accent"-->
-        <!--app:border_width="1dp"-->
-        <!--android:layout_below="@+id/thread_map"-->
-        <!--android:layout_width="56dp"-->
-        <!--android:layout_height="56dp"-->
-        <!--android:layout_marginLeft="@dimen/nearby_list_row_start_margin"-->
-        <!--android:layout_marginStart="@dimen/nearby_list_row_start_margin"-->
-        <!--android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"/>-->
 
     <!--<android.support.design.widget.FloatingActionButton-->
         <!--android:id="@+id/fabBtn"-->

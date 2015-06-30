@@ -4,17 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.megaphone.skoozi.CircularImageView
+
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/nearby_list_profile_image"
         android:src="@drawable/profile"
-        app:border_color="@color/accent"
-        app:border_width="1dp"
+        app:border_width="0dp"
+        app:border_color="?attr/colorAccent"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
         android:layout_marginStart="@dimen/nearby_list_row_start_margin"
         android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"/>
-
 
     <TextView
         android:id="@+id/nearby_list_profile_name"
