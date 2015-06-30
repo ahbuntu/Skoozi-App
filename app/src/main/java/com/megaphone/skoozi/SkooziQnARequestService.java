@@ -92,7 +92,7 @@ public class SkooziQnARequestService extends IntentService {
             CoreModelsAnswerMessageCollection threadRepsonse =  skooziqnaService.question().listAnswers().setId(question_key).execute();
             List<CoreModelsAnswerMessage> threadAnswerMessages = threadRepsonse.getAnswers();
             ArrayList<Answer> threadAnswers = null;
-            if (!threadAnswerMessages.isEmpty()) {
+            if (threadAnswerMessages != null) {
                 for (CoreModelsAnswerMessage answerMessage : threadAnswerMessages) {
                     threadAnswers = new ArrayList<>(threadAnswerMessages.size());
                     threadAnswers.add(new Answer(
