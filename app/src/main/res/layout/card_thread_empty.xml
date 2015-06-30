@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/thread_question_card"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_margin="4dp"
+    card_view:cardCornerRadius="4dp">
+
+    <TextView
+        android:id="@+id/thread_empty_heading"
+        android:text="@string/thread_empty_heading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"/>
+
+</android.support.v7.widget.CardView>
