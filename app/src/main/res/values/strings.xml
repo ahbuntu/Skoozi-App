@@ -18,5 +18,6 @@
     <string name="new_question_location_hint">enter location if not correct</string>
 
     <string name="post_new_answer">POST</string>
+    <string name="new_answer_content_hint">Enter a response</string>
 
 </resources>

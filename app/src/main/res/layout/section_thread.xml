@@ -2,14 +2,62 @@
 <!--adapted from here:-->
 <!--https://gist.github.com/gabrielemariotti/4c189fb1124df4556058-->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/section_question_content"
-    android:textSize="16sp"
-    android:textStyle="bold"
-    android:textAllCaps="true"
-    android:background="@android:color/transparent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    />
-    <!--android:paddingLeft="16dp"-->
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/section_question_timestamp"
+        android:background="@android:color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
+        android:layout_marginStart="@dimen/nearby_list_row_start_margin"
+        android:layout_marginRight="@dimen/nearby_list_row_start_margin"
+        android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
+        />
+
+    <TextView
+        android:id="@+id/section_question_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+        android:background="@android:color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
+        android:layout_marginStart="@dimen/nearby_list_row_start_margin"
+        android:layout_marginRight="@dimen/nearby_list_row_start_margin"
+        android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/section_answer_content"
+            android:hint="@string/new_answer_content_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:paddingLeft="@dimen/nearby_list_row_start_margin"
+            android:paddingStart="@dimen/nearby_list_row_start_margin"
+            android:paddingRight="@dimen/nearby_list_row_start_margin"
+            android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin" />
+
+        <Button
+            android:id="@+id/section_answer_post"
+            android:text="@string/post_new_answer"
+            android:layout_weight="1"
+            android:layout_gravity="right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+</LinearLayout>
