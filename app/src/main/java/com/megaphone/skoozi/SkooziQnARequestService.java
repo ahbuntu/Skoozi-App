@@ -117,13 +117,13 @@ public class SkooziQnARequestService extends IntentService {
                 for (CoreModelsAnswerMessage answerMessage : threadAnswerMessages) {
                     threadAnswers.add(new Answer(
                             answerMessage.getIdUrlsafe(),
+                            question_key,
                             answerMessage.getEmail(),
                             answerMessage.getContent(),
-                            answerMessage.getTimestampUnix().toString(),
+                            answerMessage.getTimestampUnix(),
                             answerMessage.getLocationLat(),
                             answerMessage.getLocationLon()));
                 }
-
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
@@ -178,7 +178,7 @@ public class SkooziQnARequestService extends IntentService {
             answerMsg.setContent(userAnswer.getContent());
             answerMsg.setLocationLat(userAnswer.getLocationLat());
             answerMsg.setLocationLon(userAnswer.getLocationLon());
-            answerMsg.setTimestampUnix(System.currentTimeMillis() / 1000L);
+            answerMsg.setTimestampUnix(userAnswer.getTimestamp());
 
             CoreModelsPostResponse insertResponse = skooziqnaService.answer().insert(answerMsg).execute();
             postKey = insertResponse.getPostKey();

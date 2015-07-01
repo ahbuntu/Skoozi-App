@@ -160,12 +160,15 @@ public class ThreadActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
     }
 
+    /**
+     * Creates an instance of Answer and calls the SkooziQnA API intent service to post
+     * @param content
+     */
     public void insertSkooziServiceAnswer(String content) {
-
         Answer mAnswer = new Answer(threadQuestion.getKey(),
                 "response@response.com", //TODO: this needs to be fixed once OAuth is setup
                 content,
-                "timestamp", //TODO: Answer needs to be updated to make this into a long
+                System.currentTimeMillis()/1000L,
                 12,//TODO: need to figure out the current location
                 12);
         SkooziQnARequestService.startActionInsertAnswer(this,threadQuestion.getKey(), mAnswer);

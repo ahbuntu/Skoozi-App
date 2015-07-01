@@ -88,7 +88,7 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
         switch (viewType) {
             case CARD_ANSWER_TYPE:
                 Answer answerItem = threadAnswers.get(position);
-                holder.threadTimestamp.setText(PresentationUtil.unixTimestampAge(Long.parseLong(answerItem.getTimestamp())));
+                holder.threadTimestamp.setText(PresentationUtil.unixTimestampAge(answerItem.getTimestamp()));
                 holder.threadUserName.setText(answerItem.getAuthor());
                 holder.threadContent.setText(answerItem.getContent());
 

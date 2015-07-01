@@ -9,22 +9,65 @@ import android.os.Parcelable;
 public class Answer implements Parcelable {
     private String author;
     private String content;
-    private String key;
-    private String timestamp;
+    private String questionKey;
+    private long timestamp;
     private double locationLat;
     private double locationLon;
+
+    private String postKey;
 
     public Answer() {
 
     }
 
-    public Answer(String key, String author, String content, String timestamp, double locationLat, double locationLon) {
-        this.key = key;
+    /**
+     * Use when creating an instance of Answer that hasen't been posted yet
+     * @param questionKey
+     * @param author
+     * @param content
+     * @param timestamp
+     * @param locationLat
+     * @param locationLon
+     */
+    public Answer(String questionKey, String author, String content, long timestamp, double locationLat, double locationLon) {
+        this.questionKey = questionKey;
         this.author = author;
         this.content = content;
         this.timestamp = timestamp;
         this.locationLat = locationLat;
         this.locationLon = locationLon;
+    }
+
+    /**
+     * Use when creating an instance of an Answer that already exists
+     * @param postKey
+     * @param questionKey
+     * @param author
+     * @param content
+     * @param timestamp
+     * @param locationLat
+     * @param locationLon
+     */
+    public Answer(String postKey, String questionKey, String author, String content, long timestamp, double locationLat, double locationLon) {
+        this.postKey = postKey;
+        this.questionKey = questionKey;
+        this.author = author;
+        this.content = content;
+        this.timestamp = timestamp;
+        this.locationLat = locationLat;
+        this.locationLon = locationLon;
+    }
+
+    public String getPostKey() {
+        return postKey;
+    }
+
+    public String getQuestionKey() {
+        return questionKey;
+    }
+
+    public void setQuestionKey(String questionKey) {
+        this.questionKey = questionKey;
     }
 
     public String getAuthor() {
@@ -43,19 +86,11 @@ public class Answer implements Parcelable {
         this.content = content;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -108,10 +143,10 @@ public class Answer implements Parcelable {
      * @param in the parcel used to construct the Answer object
      */
     public void readFromParcel(Parcel in) {
-        setKey(in.readString());
+        setQuestionKey(in.readString());
         setAuthor(in.readString());
         setContent(in.readString());
-        setTimestamp(in.readString());
+        setTimestamp(in.readLong());
         setLocationLat(in.readDouble());
         setLocationLon(in.readDouble());
     }
@@ -124,10 +159,10 @@ public class Answer implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(getKey());
+        dest.writeString(getQuestionKey());
         dest.writeString(getAuthor());
         dest.writeString(getContent());
-        dest.writeString(getTimestamp());
+        dest.writeLong(getTimestamp());
         dest.writeDouble(getLocationLat());
         dest.writeDouble(getLocationLon());
     }
