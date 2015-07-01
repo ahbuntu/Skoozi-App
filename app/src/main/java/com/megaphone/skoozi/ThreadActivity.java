@@ -59,11 +59,11 @@ public class ThreadActivity extends AppCompatActivity
                 case ThreadActivity.BROADCAST_POST_ANSWER_RESULT:
                     String answer_key = intent.getStringExtra(ThreadActivity.EXTRAS_ANSWER_KEY);
                     if (answer_key == null) {
+                        //TODO: use a Snackbar here with option to retry :)
                         Toast.makeText(context, "Looks like there was an error. Please try again.", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "Answer key : " + answer_key, Toast.LENGTH_SHORT).show();
+                        refreshThreadList();
                     }
-                    //TODO: need to figure out what to do next? maybe update the thread?
                     break;
                 case ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT:
                 default:
@@ -107,7 +107,6 @@ public class ThreadActivity extends AppCompatActivity
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
-
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
     }
 
@@ -149,8 +148,7 @@ public class ThreadActivity extends AppCompatActivity
             mMapFragment.getMapAsync(this);
         }
         setupLocalBroadcastPair();
-
-        SkooziQnARequestService.startActionGetThreadAnswers(this, threadQuestion.getKey());
+        refreshThreadList();
     }
 
     private void setupLocalBroadcastPair() {
@@ -158,6 +156,13 @@ public class ThreadActivity extends AppCompatActivity
         mIntentFilter.addAction(ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT);
         mIntentFilter.addAction(ThreadActivity.BROADCAST_POST_ANSWER_RESULT);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
+    }
+
+    /**
+     * Makes a new call to the SkooziQnA API to get all the answers related to the question
+     */
+    public void refreshThreadList() {
+        SkooziQnARequestService.startActionGetThreadAnswers(this, threadQuestion.getKey());
     }
 
     /**
