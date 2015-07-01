@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.megaphone.skoozi.util.PresentationUtil;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -86,7 +88,7 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
         switch (viewType) {
             case CARD_ANSWER_TYPE:
                 Answer answerItem = threadAnswers.get(position);
-                holder.threadTimestamp.setText( answerItem.getTimestamp());
+                holder.threadTimestamp.setText(PresentationUtil.unixTimestampAge(Long.parseLong(answerItem.getTimestamp())));
                 holder.threadUserName.setText(answerItem.getAuthor());
                 holder.threadContent.setText(answerItem.getContent());
 
