@@ -250,7 +250,7 @@ public class PostQuestionActivity extends ActionBarActivity
                 question.setContent(userQuestion.getContent());
                 question.setLocationLat(userQuestion.getLocationLat());
                 question.setLocationLon(userQuestion.getLocationLon());
-                question.setTimestampUnix((int)System.currentTimeMillis() / 1000L);
+                question.setTimestampUnix(System.currentTimeMillis() / 1000L);
 
                 CoreModelsPostResponse insertResponse = skooziqnaService.question().insert(question).execute();
                 //TODO: figure out if I need to do anything with this

@@ -113,10 +113,9 @@ public class SkooziQnARequestService extends IntentService {
             CoreModelsAnswerMessageCollection threadRepsonse =  skooziqnaService.question().listAnswers().setId(question_key).execute();
             List<CoreModelsAnswerMessage> threadAnswerMessages = threadRepsonse.getAnswers();
             if (threadAnswerMessages != null) {
+                threadAnswers = new ArrayList<>(threadAnswerMessages.size());
                 for (CoreModelsAnswerMessage answerMessage : threadAnswerMessages) {
-                    threadAnswers = new ArrayList<>(threadAnswerMessages.size());
                     threadAnswers.add(new Answer(
-                            //TODO: need to verify if getIDUrlsafe() actually returns anything
                             answerMessage.getIdUrlsafe(),
                             answerMessage.getEmail(),
                             answerMessage.getContent(),
@@ -139,10 +138,11 @@ public class SkooziQnARequestService extends IntentService {
      */
     private void handleActionGetQuestionsList() {
         initializeApiConnection();
+        ArrayList<Question> questionList = null;
         try {
             CoreModelsQuestionMessageCollection questionsListResponse =  skooziqnaService.questions().list().execute();
             List<CoreModelsQuestionMessage> questionMessages =  questionsListResponse.getQuestions();
-            ArrayList<Question> questionList = new ArrayList<>(questionMessages.size());
+            questionList = new ArrayList<>(questionMessages.size());
             for (CoreModelsQuestionMessage questionMessage: questionMessages) {
                 questionList.add(new Question(
                         questionMessage.getEmail(),
@@ -153,13 +153,15 @@ public class SkooziQnARequestService extends IntentService {
                         questionMessage.getLocationLon()));
             }
 
-            Intent localIntent = new Intent(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT)
-                    .putParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST, questionList);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+
         } catch (IOException e) {
-            //TODO: what to do if there are no questions nearby?
             Log.e(TAG, e.getMessage());
         }
+
+        // if no questions, return null; service should not handle this
+        Intent localIntent = new Intent(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT)
+                .putParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST, questionList);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
     /**
@@ -176,7 +178,7 @@ public class SkooziQnARequestService extends IntentService {
             answerMsg.setContent(userAnswer.getContent());
             answerMsg.setLocationLat(userAnswer.getLocationLat());
             answerMsg.setLocationLon(userAnswer.getLocationLon());
-            answerMsg.setTimestampUnix((int)System.currentTimeMillis() / 1000L);
+            answerMsg.setTimestampUnix(System.currentTimeMillis() / 1000L);
 
             CoreModelsPostResponse insertResponse = skooziqnaService.answer().insert(answerMsg).execute();
             postKey = insertResponse.getPostKey();
