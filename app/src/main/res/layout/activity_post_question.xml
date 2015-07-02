@@ -3,60 +3,55 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        android:elevation="2dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <TextView
-        android:id="@+id/new_question_heading"
-        android:text="@string/new_question_heading"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+    <!--TODO: standardize the layout heights-->
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
+        android:layout_height="232dp"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="2dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+            <EditText
+                android:id="@+id/new_question_content"
+                android:hint="@string/new_question_hint"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:minLines="5"
+                android:maxLines="5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:paddingLeft="@dimen/new_question_horizontal_margin"/>
+
+            <Button
+                android:id="@+id/post_new_question"
+                android:text="@string/post_new_question"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|end"
+                android:layout_marginTop="@dimen/new_question_vertical_margin"
+                android:layout_marginBottom="@dimen/new_question_vertical_margin"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <ProgressBar
+        android:id="@+id/new_question_progress"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/new_question_vertical_margin"
-        android:layout_marginBottom="@dimen/new_question_vertical_margin"
-        android:layout_marginLeft="@dimen/new_question_horizontal_margin"
+        android:layout_gravity="center"
+        android:visibility="invisible"
         />
-
-    <EditText
-        android:id="@+id/new_question_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:minLines="5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/new_question_horizontal_margin"
-        />
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <ProgressBar
-            android:id="@+id/new_question_progress"
-            style="?android:attr/progressBarStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:visibility="invisible"
-            />
-
-        <Button
-            android:id="@+id/post_new_question_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/post_new_question"
-            android:layout_gravity="right"
-            android:layout_marginTop="@dimen/new_question_vertical_margin"
-            android:layout_marginBottom="@dimen/new_question_vertical_margin"/>
-
-    </LinearLayout>
 
     <TextView
         android:id="@+id/new_question_map_heading"
@@ -64,7 +59,6 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/new_question_vertical_margin"
         android:layout_marginBottom="@dimen/new_question_vertical_margin"
         android:layout_marginLeft="@dimen/new_question_horizontal_margin"
         />

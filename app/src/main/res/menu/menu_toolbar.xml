@@ -11,5 +11,5 @@
         android:title="@string/action_add_q"
         android:orderInCategory="300"
         app:showAsAction="always"
-        android:icon="@drawable/add_q"/>
+        android:icon="@mipmap/ic_chat_white_18dp"/>
 </menu>

@@ -11,7 +11,7 @@
     <string name="action_add_q">New Question</string>
     <string name="action_my_activity">My Activity</string>
 
-    <string name="new_question_heading">Ask a question</string>
+    <string name="new_question_hint">Ask a question</string>
     <string name="new_question_map_heading">Your current location</string>
     <string name="post_new_question">POST</string>
     <string name="new_question_location_change">CHANGE</string>
