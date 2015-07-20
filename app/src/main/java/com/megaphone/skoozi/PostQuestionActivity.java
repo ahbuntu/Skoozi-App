@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -37,7 +38,7 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import java.io.IOException;
 
 
-public class PostQuestionActivity extends ActionBarActivity
+public class PostQuestionActivity extends AppCompatActivity
         implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
@@ -64,7 +65,7 @@ public class PostQuestionActivity extends ActionBarActivity
 
         postQuestionProgress = (ProgressBar) findViewById(R.id.new_question_progress);
         postQuestionText = (EditText) findViewById(R.id.new_question_content);
-        postQuestionButton = (Button) findViewById(R.id.post_new_question_button);
+        postQuestionButton = (Button) findViewById(R.id.post_new_question);
         postQuestionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
