@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -46,8 +47,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Refer to this for backwards compatibility
  * http://stackoverflow.com/questions/26449454/extending-activity-or-actionbaractivity
  */
-public class MainActivity extends ActionBarActivity
-                            implements OnMapReadyCallback, NearbyFragment.OnMapQuestionsCallback, NearbyFragment.OnQuestionItemSelected,
+public class MainActivity extends AppCompatActivity
+                            implements OnMapReadyCallback, NearbyFragment.OnMapQuestionsCallback, NearbyRecyclerViewAdapter.OnQuestionItemSelected,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";

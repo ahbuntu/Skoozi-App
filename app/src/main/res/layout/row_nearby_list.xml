@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?android:attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -18,7 +19,7 @@
 
     <TextView
         android:id="@+id/nearby_list_profile_name"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="FirstName"
         android:textStyle="bold"
         android:layout_toRightOf="@+id/nearby_list_profile_image"
@@ -29,10 +30,10 @@
         android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
         android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
 
+
     <TextView
-        android:id="@+id/nearby_list_question_state"
+        android:id="@+id/nearby_list_question_duration"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Expired"
         android:gravity="right"
         android:layout_toRightOf="@+id/nearby_list_profile_name"
         android:layout_alignParentRight="true"
@@ -41,6 +42,19 @@
         android:layout_marginRight="@dimen/nearby_list_row_start_margin"
         android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
         android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
+
+    <!--<TextView-->
+        <!--android:id="@+id/nearby_list_question_state"-->
+        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+        <!--android:text="Expired"-->
+        <!--android:gravity="right"-->
+        <!--android:layout_toRightOf="@+id/nearby_list_profile_name"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginRight="@dimen/nearby_list_row_start_margin"-->
+        <!--android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"-->
+        <!--android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>-->
 
     <TextView
         android:id="@+id/nearby_list_question"
@@ -59,16 +73,4 @@
         android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
         android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
 
-    <TextView
-        android:id="@+id/nearby_list_question_duration"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="12h ago"
-        android:gravity="center"
-        android:layout_below="@+id/nearby_list_profile_image"
-        android:layout_toLeftOf="@id/nearby_list_question"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-        android:layout_marginStart="@dimen/nearby_list_row_start_margin"
-        android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"/>
 </RelativeLayout>
