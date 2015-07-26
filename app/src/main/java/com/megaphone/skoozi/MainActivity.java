@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -34,6 +36,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.megaphone.skoozi.util.ConnectionUtil;
 
 /**
  * Material design sliding tab implementation taken from
@@ -55,7 +58,7 @@ public class MainActivity extends AppCompatActivity
     static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
     static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
 
-    Toolbar mToolbar;
+    CoordinatorLayout mLayoutView;
     GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
 
@@ -68,10 +71,10 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         setupToolbar();
-
+        mLayoutView = (CoordinatorLayout) findViewById(R.id.main_coordinator_layout);
 //        pickUserAccount();
+
         if (findViewById(R.id.main_fragment_container) != null) {
             // However, if we're being restored from a previous state,
             // then we don't need to do anything and should return or else
@@ -80,10 +83,8 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            /**
-             * when it's better to use newInstance
-             * http://www.androiddesignpatterns.com/2012/05/using-newinstance-to-instantiate.html
-             */
+            // when it's better to use newInstance
+            // http://www.androiddesignpatterns.com/2012/05/using-newinstance-to-instantiate.html
             // Create a new Fragment to be placed in the activity layout
             nearbyFragment = NearbyFragment.newInstance(this);
 
@@ -91,7 +92,6 @@ public class MainActivity extends AppCompatActivity
             getFragmentManager().beginTransaction()
                     .add(R.id.main_fragment_container, nearbyFragment).commit();
         }
-
         buildGoogleApiClient();
     }
 
@@ -145,10 +145,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter mIntentFilter = new IntentFilter(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
         try {
-            SkooziQnARequestService.startActionGetQuestionsList(this);
+            if (ConnectionUtil.isDeviceOnline()) {
+                IntentFilter mIntentFilter = new IntentFilter(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT);
+                LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
+                SkooziQnARequestService.startActionGetQuestionsList(this);
+            } else {
+                displayNetworkErrorMessage();
+            }
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
@@ -188,11 +192,6 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, PostQuestionActivity.class);
             startActivity(intent);
             return true;
-//        }
-            //TODO: maybe do a refresh?
-//        else if (id == R.id.action_home) {
-//            Toast.makeText(this,"nearby activity",Toast.LENGTH_SHORT).show();
-//            return true;
         } else if (id == R.id.action_my_activity) {
             Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
             return true;
@@ -286,12 +285,6 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    private boolean isDeviceOnline() {
-        //TODO: this method needs to check whether network connectivity is avaiable
-        //https://developer.android.com/training/basics/network-ops/connecting.html
-        return true;
-    }
-
     //http://stackoverflow.com/questions/10400428/can-i-use-androids-accountmanager-for-getting-oauth-access-token-for-appengine
     private final static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
     private final static String USERINFO_PROFILE_SCOPE = "https://www.googleapis.com/auth/userinfo.profile";
@@ -321,18 +314,24 @@ public class MainActivity extends AppCompatActivity
         if (mEmail == null) {
             pickUserAccount();
         } else {
-            if (isDeviceOnline()) {
+            if (ConnectionUtil.isDeviceOnline()) {
+                //https://developer.android.com/training/basics/network-ops/connecting.html
 //                new GetUsernameTask(this, mEmail, SCOPE).execute();
                 new GetUsernameTask(this,getAccountForName(this,mEmail)).execute();
             } else {
-//                Toast.makeText(this, R.string.not_online, Toast.LENGTH_LONG).show();
-                //TODO: need to dislay proper error message
+                displayNetworkErrorMessage();
             }
         }
     }
 
     public void handleGoogleAuthTokenException(UserRecoverableAuthException exception) {
         //TODO: need to determine how to properlyt handle this
+    }
+
+    private void displayNetworkErrorMessage() {
+        Snackbar.make(mLayoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
+//                .setAction(R.string.snackbar_action_undo, clickListener)
+                .show();
     }
 
 }

@@ -24,4 +24,7 @@
     <string name="new_answer_content_hint">Enter a response</string>
     <string name="thread_question_timestamp">asked on %s</string>
 
+    <!--Snackbar-->
+    <string name="no_network_message">Network connectivity is currently unavailable</string>
+
 </resources>
