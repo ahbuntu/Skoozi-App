@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,11 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +26,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.megaphone.skoozi.util.ConnectionUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +42,7 @@ public class ThreadActivity extends AppCompatActivity
     static final String BROADCAST_POST_ANSWER_RESULT = "com.megaphone.skoozi.broadcast.POST_ANSWER_RESULT";
     static final String EXTRAS_ANSWER_KEY  = "com.megaphone.skoozi.extras.ANSWER_KEY";
 
+    CoordinatorLayout mLayoutView;
     private CollapsingToolbarLayout collapsingToolbar;
 
     private Question threadQuestion;
@@ -79,6 +78,7 @@ public class ThreadActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question_thread);
 
+        mLayoutView = (CoordinatorLayout) findViewById(R.id.thread_coordinator_layout);
         setupToolbar();
 
         threadQuestion = getIntent().getParcelableExtra(EXTRA_QUESTION);
@@ -163,7 +163,11 @@ public class ThreadActivity extends AppCompatActivity
      * Makes a new call to the SkooziQnA API to get all the answers related to the question
      */
     public void refreshThreadList() {
-        SkooziQnARequestService.startActionGetThreadAnswers(this, threadQuestion.key);
+        if (ConnectionUtil.isDeviceOnline()) {
+            SkooziQnARequestService.startActionGetThreadAnswers(this, threadQuestion.key);
+        } else {
+            displayNetworkErrorMessage();
+        }
     }
 
     /**
@@ -171,13 +175,17 @@ public class ThreadActivity extends AppCompatActivity
      * @param content
      */
     public void insertSkooziServiceAnswer(String content) {
-        Answer mAnswer = new Answer(threadQuestion.key,
-                "response@response.com", //TODO: this needs to be fixed once OAuth is setup
-                content,
-                System.currentTimeMillis()/1000L,
-                12,//TODO: need to figure out the current location
-                12);
-        SkooziQnARequestService.startActionInsertAnswer(this,threadQuestion.key, mAnswer);
+        if (ConnectionUtil.isDeviceOnline()) {
+            Answer mAnswer = new Answer(threadQuestion.key,
+                    "response@response.com", //TODO: this needs to be fixed once OAuth is setup
+                    content,
+                    System.currentTimeMillis() / 1000L,
+                    12,//TODO: need to figure out the current location
+                    12);
+            SkooziQnARequestService.startActionInsertAnswer(this, threadQuestion.key, mAnswer);
+        } else {
+            displayNetworkErrorMessage();
+        }
     }
 
     @Override
@@ -223,6 +231,11 @@ public class ThreadActivity extends AppCompatActivity
         mSectionedAdapter.setSections(sections.toArray(dummy));
 
         threadAnswerRecycler.setAdapter(mSectionedAdapter);
+    }
+
+    private void displayNetworkErrorMessage() {
+        Snackbar.make(mLayoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
+                .show();
     }
 
 }
