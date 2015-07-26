@@ -59,7 +59,7 @@ public class NearbyFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        MapFragment nearbyMap = (MapFragment)  getChildFragmentManager().findFragmentById(R.id.nearby_map);
+        MapFragment nearbyMap = (MapFragment)  getFragmentManager().findFragmentById(R.id.nearby_map);
         if (nearbyMap != null) {
             nearbyMap.getMapAsync(mCallback);
         }
