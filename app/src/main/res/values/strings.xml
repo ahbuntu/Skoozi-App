@@ -22,6 +22,6 @@
     <!--Instructions-->
     <string name="new_question_hint">Ask a question</string>
     <string name="new_answer_content_hint">Enter a response</string>
-    <string name="thread_question_timestamp">Asked on %s</string>
+    <string name="thread_question_timestamp">asked on %s</string>
 
 </resources>

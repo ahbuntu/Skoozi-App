@@ -86,9 +86,9 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
     public void onBindViewHolder(final NearbyViewHolder holder, int position) {
         final int viewType = holder.getItemViewType();
         Question questionItem = nearbyQuestions.get(position);
-        holder.nearbyTimestamp.setText(PresentationUtil.unixTimestampAge(Long.parseLong(questionItem.getTimestamp()))); // FIXME: 2015-07-20 remove Long.parseLong()_
-        holder.nearbyUserName.setText(questionItem.getAuthor());
-        holder.nearbyContent.setText(questionItem.getContent());
+        holder.nearbyTimestamp.setText(PresentationUtil.unixTimestampAge(questionItem.timestamp));
+        holder.nearbyUserName.setText(questionItem.author);
+        holder.nearbyContent.setText(questionItem.content);
 
     }
 

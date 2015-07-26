@@ -148,7 +148,7 @@ public class SkooziQnARequestService extends IntentService {
                         questionMessage.getEmail(),
                         questionMessage.getContent(),
                         questionMessage.getIdUrlsafe(),
-                        questionMessage.getTimestampUnix().toString(),
+                        questionMessage.getTimestampUnix(),
                         questionMessage.getLocationLat(),
                         questionMessage.getLocationLon()));
             }

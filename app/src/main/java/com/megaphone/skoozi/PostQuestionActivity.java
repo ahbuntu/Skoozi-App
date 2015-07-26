@@ -72,7 +72,7 @@ public class PostQuestionActivity extends AppCompatActivity
                 String postContent = postQuestionText.getText().toString().trim();
                 if (postLocation != null && postContent.length() != 0) {
                     postQuestion = new Question("test", postContent,
-                            "what's a key", "why is timestamp string",
+                            "what's a key", (long)123123,
                             postLocation.latitude, postLocation.longitude );
                     new InsertQuestionAsyncTask().execute(postQuestion);
                 }
@@ -201,7 +201,7 @@ public class PostQuestionActivity extends AppCompatActivity
 
     private void showThread(String questionKey) {
         if (questionKey != null) {
-            postQuestion.setKey(questionKey);
+            postQuestion.key = questionKey;
             Intent threadIntent = new Intent(this, ThreadActivity.class);
             Bundle questionBundle = new Bundle();
             questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, postQuestion);
@@ -248,9 +248,9 @@ public class PostQuestionActivity extends AppCompatActivity
                 CoreModelsQuestionMessage question = new CoreModelsQuestionMessage();
 
                 question.setEmail("proper@proper.com");
-                question.setContent(userQuestion.getContent());
-                question.setLocationLat(userQuestion.getLocationLat());
-                question.setLocationLon(userQuestion.getLocationLon());
+                question.setContent(userQuestion.content);
+                question.setLocationLat(userQuestion.locationLat);
+                question.setLocationLon(userQuestion.locationLon);
                 question.setTimestampUnix(System.currentTimeMillis() / 1000L);
 
                 CoreModelsPostResponse insertResponse = skooziqnaService.question().insert(question).execute();

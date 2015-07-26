@@ -82,7 +82,7 @@ public class ThreadActivity extends AppCompatActivity
         setupToolbar();
 
         threadQuestion = getIntent().getParcelableExtra(EXTRA_QUESTION);
-        setActivityTitle(threadQuestion.getAuthor());
+        setActivityTitle(threadQuestion.author);
 
         //TODO: need to put in a check to ensure that threadQuestion is properly retrieved
 
@@ -163,7 +163,7 @@ public class ThreadActivity extends AppCompatActivity
      * Makes a new call to the SkooziQnA API to get all the answers related to the question
      */
     public void refreshThreadList() {
-        SkooziQnARequestService.startActionGetThreadAnswers(this, threadQuestion.getKey());
+        SkooziQnARequestService.startActionGetThreadAnswers(this, threadQuestion.key);
     }
 
     /**
@@ -171,13 +171,13 @@ public class ThreadActivity extends AppCompatActivity
      * @param content
      */
     public void insertSkooziServiceAnswer(String content) {
-        Answer mAnswer = new Answer(threadQuestion.getKey(),
+        Answer mAnswer = new Answer(threadQuestion.key,
                 "response@response.com", //TODO: this needs to be fixed once OAuth is setup
                 content,
                 System.currentTimeMillis()/1000L,
                 12,//TODO: need to figure out the current location
                 12);
-        SkooziQnARequestService.startActionInsertAnswer(this,threadQuestion.getKey(), mAnswer);
+        SkooziQnARequestService.startActionInsertAnswer(this,threadQuestion.key, mAnswer);
     }
 
     @Override
@@ -193,8 +193,8 @@ public class ThreadActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap map) {
         GoogleMap newQuestionMap = map;
-        if (threadQuestion.getLocationLat() != 0.0 && threadQuestion.getLocationLat() != 0.0 ) {
-            LatLng postLocation = new LatLng(threadQuestion.getLocationLat(),threadQuestion.getLocationLon());
+        if (threadQuestion.locationLat != 0.0 && threadQuestion.locationLat != 0.0 ) {
+            LatLng postLocation = new LatLng(threadQuestion.locationLat,threadQuestion.locationLon);
             newQuestionMap.addMarker(new MarkerOptions()
                     .position(postLocation)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));

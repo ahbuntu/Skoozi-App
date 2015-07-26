@@ -112,7 +112,7 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if (isSectionHeaderPosition(position)) {
             ((SectionViewHolder)sectionViewHolder).title.setText(mSections.get(position).title);
             ((SectionViewHolder)sectionViewHolder).timestamp.setText(mContext.getString(R.string.thread_question_timestamp,
-                    PresentationUtil.unixTimestampAsDateTime(Long.parseLong(mSections.get(position).timestamp))));
+                    PresentationUtil.unixTimestampAsDateTime(mSections.get(position).timestamp)));
         }else{
             mBaseAdapter.onBindViewHolder(sectionViewHolder,sectionedPositionToPosition(position));
         }
@@ -131,7 +131,7 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         int firstPosition;
         int sectionedPosition;
         CharSequence title;
-        String timestamp;
+        Long timestamp;
 
         public Section(int firstPosition, Question question) {
             this.firstPosition = firstPosition;
