@@ -11,14 +11,17 @@
     <string name="action_add_q">New Question</string>
     <string name="action_my_activity">My Activity</string>
 
-    <string name="new_question_hint">Ask a question</string>
     <string name="new_question_map_heading">Your current location</string>
     <string name="post_new_question">POST</string>
     <string name="new_question_location_change">CHANGE</string>
     <string name="new_question_location_hint">enter location if not correct</string>
 
     <string name="post_new_answer">POST</string>
-    <string name="new_answer_content_hint">Enter a response</string>
     <string name="thread_empty_heading">No answers to this question yet.</string>
+
+    <!--Instructions-->
+    <string name="new_question_hint">Ask a question</string>
+    <string name="new_answer_content_hint">Enter a response</string>
+    <string name="thread_question_timestamp">Asked on %s</string>
 
 </resources>

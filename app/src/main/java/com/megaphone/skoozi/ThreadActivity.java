@@ -213,10 +213,12 @@ public class ThreadActivity extends AppCompatActivity
 
         List<ThreadSectionedAdapter.Section> sections = new ArrayList<>();
         //Sections
-        sections.add(new ThreadSectionedAdapter.Section(0,threadQuestion.getContent()));
+        sections.add(new ThreadSectionedAdapter.Section(0,threadQuestion));
 
         ThreadSectionedAdapter mSectionedAdapter = new
-                ThreadSectionedAdapter(this,R.layout.section_thread,R.id.section_question_content,mAdapter);
+                ThreadSectionedAdapter(this,R.layout.section_thread,
+                R.id.section_question_content, R.id.section_question_timestamp, //represents the section header content
+                mAdapter);
         ThreadSectionedAdapter.Section[] dummy = new ThreadSectionedAdapter.Section[sections.size()];
         mSectionedAdapter.setSections(sections.toArray(dummy));
 

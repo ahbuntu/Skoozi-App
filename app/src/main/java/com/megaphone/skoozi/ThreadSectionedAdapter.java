@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.megaphone.skoozi.util.PresentationUtil;
+
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -26,17 +28,19 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     private LayoutInflater mLayoutInflater;
     private int mSectionResourceId;
-    private int mTextResourceId;
+    private int mQuesTitleResId;
+    private int mQuesTimestampResId;
     private RecyclerView.Adapter mBaseAdapter;
     private boolean mValid = true;
     private SparseArray<Section> mSections = new SparseArray<Section>();
 
-    public ThreadSectionedAdapter(Context context, int sectionResourceId, int textResourceId,
-                                              RecyclerView.Adapter baseAdapter) {
+    public ThreadSectionedAdapter(Context context, int sectionResourceId, int questionTitleResId,
+                                  int questionTimestampResId, RecyclerView.Adapter baseAdapter) {
 
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSectionResourceId = sectionResourceId;
-        mTextResourceId = textResourceId;
+        mQuesTitleResId = questionTitleResId;
+        mQuesTimestampResId = questionTimestampResId;
         mBaseAdapter = baseAdapter;
         mContext = context;
 
@@ -72,12 +76,15 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         public Button postAnswer;
         public TextView title;
+        public TextView timestamp;
         private EditText answerContent;
         private ThreadActivity mActivity;
 
-        public SectionViewHolder(View view,int mTextResourceid, ThreadActivity context) {
+        public SectionViewHolder(View view, int questionTitleResId,
+                                 int questionTimestampResId, ThreadActivity context) {
             super(view);
-            title = (TextView) view.findViewById(mTextResourceid);
+            title = (TextView) view.findViewById(questionTitleResId);
+            timestamp = (TextView) view.findViewById(questionTimestampResId);
             postAnswer = (Button) view.findViewById(R.id.section_answer_post);
             answerContent = (EditText) view.findViewById(R.id.section_answer_content);
             mActivity = context;
@@ -94,7 +101,7 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int typeView) {
         if (typeView == SECTION_TYPE) {
             final View view = LayoutInflater.from(mContext).inflate(mSectionResourceId, parent, false);
-            return new SectionViewHolder(view,mTextResourceId, (ThreadActivity) mContext);
+            return new SectionViewHolder(view, mQuesTitleResId, mQuesTimestampResId, (ThreadActivity) mContext);
         }else{
             return mBaseAdapter.onCreateViewHolder(parent, typeView);
         }
@@ -103,7 +110,9 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder sectionViewHolder, int position) {
         if (isSectionHeaderPosition(position)) {
-            ((SectionViewHolder)sectionViewHolder).title.setText(mSections.get(position).getTitle());
+            ((SectionViewHolder)sectionViewHolder).title.setText(mSections.get(position).title);
+            ((SectionViewHolder)sectionViewHolder).timestamp.setText(mContext.getString(R.string.thread_question_timestamp,
+                    PresentationUtil.unixTimestampAsDateTime(Long.parseLong(mSections.get(position).timestamp))));
         }else{
             mBaseAdapter.onBindViewHolder(sectionViewHolder,sectionedPositionToPosition(position));
         }
@@ -122,14 +131,12 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         int firstPosition;
         int sectionedPosition;
         CharSequence title;
+        String timestamp;
 
-        public Section(int firstPosition, CharSequence questionContent) {
+        public Section(int firstPosition, Question question) {
             this.firstPosition = firstPosition;
-            this.title = questionContent;
-        }
-
-        public CharSequence getTitle() {
-            return title;
+            this.title = question.content;
+            this.timestamp = question.timestamp;
         }
     }
 

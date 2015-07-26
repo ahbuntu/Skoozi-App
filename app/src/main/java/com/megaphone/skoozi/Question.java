@@ -7,12 +7,12 @@ import android.os.Parcelable;
  * Created by ahmadul.hassan on 2015-05-02.
  */
 public class Question implements Parcelable {
-    private String author;
-    private String content;
-    private String key;
-    private String timestamp;
-    private double locationLat;
-    private double locationLon;
+    public String author;
+    public String content;
+    public String key;
+    public String timestamp;
+    public double locationLat;
+    public double locationLon;
 
     public Question() {
 
