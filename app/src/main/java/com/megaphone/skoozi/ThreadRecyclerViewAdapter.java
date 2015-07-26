@@ -1,9 +1,7 @@
 package com.megaphone.skoozi;
 
 import android.content.Context;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +9,6 @@ import android.widget.TextView;
 
 import com.megaphone.skoozi.util.PresentationUtil;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -20,8 +16,8 @@ import java.util.List;
  */
 public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecyclerViewAdapter.AnswerViewHolder> {
 
-    private static final int CARD_EMPTY_TYPE = 1000;
-    private static final int CARD_ANSWER_TYPE = 2000;
+    private static final int ROW_EMPTY_TYPE = 1000;
+    private static final int ROW_ANSWER_TYPE = 2000;
 
     private Context mContext;
     private List<Answer> threadAnswers;
@@ -65,15 +61,15 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
     public AnswerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v;
         switch (viewType) {
-            case CARD_ANSWER_TYPE:
+            case ROW_ANSWER_TYPE:
                 v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.row_thread_list, parent, false);
                 return new AnswerViewHolder(v, true);
 
-            case CARD_EMPTY_TYPE:
+            case ROW_EMPTY_TYPE:
             default:
                 v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.card_thread_empty, parent, false);
+                        .inflate(R.layout.row_thread_empty, parent, false);
                 return new AnswerViewHolder(v, false);
         }
 
@@ -84,13 +80,13 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
     public void onBindViewHolder(final AnswerViewHolder holder, int position) {
         final int viewType = holder.getItemViewType();
         switch (viewType) {
-            case CARD_ANSWER_TYPE:
+            case ROW_ANSWER_TYPE:
                 Answer answerItem = threadAnswers.get(position);
                 holder.threadTimestamp.setText(PresentationUtil.unixTimestampAge(answerItem.getTimestamp()));
                 holder.threadUserName.setText(answerItem.getAuthor());
                 holder.threadContent.setText(answerItem.getContent());
 
-            case CARD_EMPTY_TYPE:
+            case ROW_EMPTY_TYPE:
             default:
                 break;
         }
@@ -105,7 +101,7 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
 
     @Override
     public int getItemViewType(int position) {
-        return threadAnswers == null ? CARD_EMPTY_TYPE : CARD_ANSWER_TYPE;
+        return threadAnswers == null ? ROW_EMPTY_TYPE : ROW_ANSWER_TYPE;
     }
     //endregion
 
