@@ -175,10 +175,10 @@ public class SkooziQnARequestService extends IntentService {
 
             answerMsg.setQuestionUrlsafe(question_key);
             answerMsg.setEmail("response@response.com");
-            answerMsg.setContent(userAnswer.getContent());
-            answerMsg.setLocationLat(userAnswer.getLocationLat());
-            answerMsg.setLocationLon(userAnswer.getLocationLon());
-            answerMsg.setTimestampUnix(userAnswer.getTimestamp());
+            answerMsg.setContent(userAnswer.content);
+            answerMsg.setLocationLat(userAnswer.locationLat);
+            answerMsg.setLocationLon(userAnswer.locationLon);
+            answerMsg.setTimestampUnix(userAnswer.timestamp);
 
             CoreModelsPostResponse insertResponse = skooziqnaService.answer().insert(answerMsg).execute();
             postKey = insertResponse.getPostKey();

@@ -82,9 +82,9 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
         switch (viewType) {
             case ROW_ANSWER_TYPE:
                 Answer answerItem = threadAnswers.get(position);
-                holder.threadTimestamp.setText(PresentationUtil.unixTimestampAge(answerItem.getTimestamp()));
-                holder.threadUserName.setText(answerItem.getAuthor());
-                holder.threadContent.setText(answerItem.getContent());
+                holder.threadTimestamp.setText(PresentationUtil.unixTimestampAge(answerItem.timestamp));
+                holder.threadUserName.setText(answerItem.author);
+                holder.threadContent.setText(answerItem.content);
 
             case ROW_EMPTY_TYPE:
             default:

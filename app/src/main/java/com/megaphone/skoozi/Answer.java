@@ -7,17 +7,15 @@ import android.os.Parcelable;
  * Created by ahmadul.hassan on 2015-05-02.
  */
 public class Answer implements Parcelable {
-    private String author;
-    private String content;
-    private String questionKey;
-    private long timestamp;
-    private double locationLat;
-    private double locationLon;
-
-    private String postKey;
+    public String postKey;
+    public String author;
+    public String content;
+    public String questionKey;
+    public long timestamp;
+    public double locationLat;
+    public double locationLon;
 
     public Answer() {
-
     }
 
     /**
@@ -58,59 +56,7 @@ public class Answer implements Parcelable {
         this.locationLon = locationLon;
     }
 
-    public String getPostKey() {
-        return postKey;
-    }
-
-    public String getQuestionKey() {
-        return questionKey;
-    }
-
-    public void setQuestionKey(String questionKey) {
-        this.questionKey = questionKey;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public double getLocationLat() {
-        return locationLat;
-    }
-
-    public void setLocationLat(double locationLat) {
-        this.locationLat = locationLat;
-    }
-
-    public double getLocationLon() {
-        return locationLon;
-    }
-
-    public void setLocationLon(double locationLon) {
-        this.locationLon = locationLon;
-    }
-
-    //region IParcelable implementation
+    //region Parcelable implementation
 
     /**
      * generate instances of the Answer class from a Parcel
@@ -143,12 +89,13 @@ public class Answer implements Parcelable {
      * @param in the parcel used to construct the Answer object
      */
     public void readFromParcel(Parcel in) {
-        setQuestionKey(in.readString());
-        setAuthor(in.readString());
-        setContent(in.readString());
-        setTimestamp(in.readLong());
-        setLocationLat(in.readDouble());
-        setLocationLon(in.readDouble());
+        this.postKey = in.readString();
+        this.questionKey = in.readString();
+        this.author = in.readString();
+        this.content = in.readString();
+        this.timestamp = in.readLong();
+        this.locationLat = in.readDouble();
+        this.locationLon= in.readDouble();
     }
 
     /**
@@ -159,12 +106,13 @@ public class Answer implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(getQuestionKey());
-        dest.writeString(getAuthor());
-        dest.writeString(getContent());
-        dest.writeLong(getTimestamp());
-        dest.writeDouble(getLocationLat());
-        dest.writeDouble(getLocationLon());
+        dest.writeString(this.postKey);
+        dest.writeString(this.questionKey);
+        dest.writeString(this.author);
+        dest.writeString(this.content);
+        dest.writeLong(this.timestamp);
+        dest.writeDouble(this.locationLat);
+        dest.writeDouble(this.locationLon);
     }
 
     //endregion
