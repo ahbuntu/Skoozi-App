@@ -59,8 +59,8 @@
     <TextView
         android:id="@+id/nearby_list_question"
         android:text="This is where the text of the question will be. This is a very long and elaborate example of what a question may look like."
-        android:lines="3"
-        android:maxLines="3"
+        android:lines="2"
+        android:maxLines="2"
         android:ellipsize="end"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
