@@ -3,6 +3,7 @@
 <!--https://gist.github.com/gabrielemariotti/4c189fb1124df4556058-->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -17,6 +18,7 @@
         android:layout_marginStart="@dimen/nearby_list_row_start_margin"
         android:layout_marginRight="@dimen/nearby_list_row_start_margin"
         android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
+        tools:text="10min"
         />
 
     <TextView
@@ -31,33 +33,28 @@
         android:layout_marginStart="@dimen/nearby_list_row_start_margin"
         android:layout_marginRight="@dimen/nearby_list_row_start_margin"
         android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"
+        tools:text="this is the question content and how it will be displayed"
         />
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/section_answer_content"
+        android:hint="@string/new_answer_content_hint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_weight="2"
+        android:paddingLeft="@dimen/nearby_list_row_start_margin"
+        android:paddingStart="@dimen/nearby_list_row_start_margin"
+        android:paddingRight="@dimen/nearby_list_row_start_margin"
+        android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"
+        android:layout_marginTop="20dp"
+        tools:text="this is the ANSWER CONTENT and how it will be displayed"/>
 
-        <EditText
-            android:id="@+id/section_answer_content"
-            android:hint="@string/new_answer_content_hint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:paddingLeft="@dimen/nearby_list_row_start_margin"
-            android:paddingStart="@dimen/nearby_list_row_start_margin"
-            android:paddingRight="@dimen/nearby_list_row_start_margin"
-            android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin" />
-
-        <Button
-            android:id="@+id/section_answer_post"
-            android:text="@string/post_new_answer"
-            android:layout_weight="1"
-            android:layout_gravity="right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/section_answer_post"
+        android:text="@string/post_new_answer"
+        android:layout_weight="1"
+        android:layout_gravity="right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

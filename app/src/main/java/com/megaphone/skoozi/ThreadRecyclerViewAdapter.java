@@ -29,7 +29,6 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
     // Provide a reference to the views for each data item
     public static class AnswerViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        CardView mCardView;
         TextView threadTimestamp;
         TextView threadContent;
         TextView threadUserName;
@@ -42,7 +41,6 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
         public AnswerViewHolder(View itemView, boolean populateAnswer) {
             super(itemView);
             if (populateAnswer) {
-                mCardView = (CardView) itemView.findViewById(R.id.thread_answer_card);
                 threadTimestamp = (TextView) itemView.findViewById(R.id.thread_answer_timestamp);
                 threadUserName = (TextView) itemView.findViewById(R.id.thread_answer_profile_name);
                 threadContent = (TextView) itemView.findViewById(R.id.thread_answer_content);
@@ -69,7 +67,7 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
         switch (viewType) {
             case CARD_ANSWER_TYPE:
                 v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.card_thread_answer, parent, false);
+                        .inflate(R.layout.row_thread_list, parent, false);
                 return new AnswerViewHolder(v, true);
 
             case CARD_EMPTY_TYPE:
