@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -31,6 +32,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -229,6 +232,15 @@ public class MainActivity extends AppCompatActivity
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Current location"));
             nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
+
+            // Instantiates a new CircleOptions object and defines the center and radius
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
+                    .fillColor(Color.GREEN)
+                    .radius(10000); // In meters
+
+            // Get back the mutable Circle
+            Circle circle = nearbyMap.addCircle(circleOptions);
         }
     }
 
@@ -246,6 +258,7 @@ public class MainActivity extends AppCompatActivity
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Default location"));
             nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 15));
+            nearbyMap.getUiSettings().setZoomControlsEnabled(true);
         }
     }
 
