@@ -39,15 +39,15 @@ public class PresentationUtil {
     public static String unixTimestampAge(long timestamp) {
         long delta = (System.currentTimeMillis()/1000L) - timestamp;
         if (delta/TimestampSeconds.SECONDS_IN_YEAR != 0) {
-            return delta/TimestampSeconds.SECONDS_IN_YEAR + " yr";
+            return delta/TimestampSeconds.SECONDS_IN_YEAR + " y";
         } else if (delta/TimestampSeconds.SECONDS_IN_MONTH != 0) {
-            return delta/TimestampSeconds.SECONDS_IN_MONTH + " mon";
+            return delta/TimestampSeconds.SECONDS_IN_MONTH + " mo";
         } else if (delta/TimestampSeconds.SECONDS_IN_DAY != 0) {
-            return delta/TimestampSeconds.SECONDS_IN_DAY + " day";
+            return delta/TimestampSeconds.SECONDS_IN_DAY + " d";
         } else if (delta/TimestampSeconds.SECONDS_IN_HOUR != 0) {
-            return delta/TimestampSeconds.SECONDS_IN_HOUR + " hr";
+            return delta/TimestampSeconds.SECONDS_IN_HOUR + " h";
         } else if (delta/TimestampSeconds.SECONDS_IN_MIN != 0) {
-            return delta/TimestampSeconds.SECONDS_IN_MIN + " min";
+            return delta/TimestampSeconds.SECONDS_IN_MIN + " m";
         } else {
             return delta + " sec";
         }
