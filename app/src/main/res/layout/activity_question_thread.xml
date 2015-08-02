@@ -39,6 +39,8 @@
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:layout_collapseMode="pin"/>
 
+
+
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
@@ -59,6 +61,16 @@
         app:layout_anchor="@+id/appbar"
         app:layout_anchorGravity="bottom|right|end"
         />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:layout_anchor="@+id/thread_answer_recycler"
+        app:layout_anchorGravity="bottom"/>
 
 </android.support.design.widget.CoordinatorLayout>
 
