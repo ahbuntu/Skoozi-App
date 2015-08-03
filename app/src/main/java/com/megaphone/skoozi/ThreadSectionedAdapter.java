@@ -74,27 +74,14 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     public static class SectionViewHolder extends RecyclerView.ViewHolder {
 
-        public Button postAnswer;
         public TextView title;
         public TextView timestamp;
-        private EditText answerContent;
-        private ThreadActivity mActivity;
 
         public SectionViewHolder(View view, int questionTitleResId,
-                                 int questionTimestampResId, ThreadActivity context) {
+                                 int questionTimestampResId) {
             super(view);
             title = (TextView) view.findViewById(questionTitleResId);
             timestamp = (TextView) view.findViewById(questionTimestampResId);
-            //fixme: this needs to move to the activity
-//            postAnswer = (Button) view.findViewById(R.id.thread_reply_post);
-//            answerContent = (EditText) view.findViewById(R.id.thread_reply_content);
-//            mActivity = context;
-//            postAnswer.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mActivity.insertSkooziServiceAnswer(answerContent.getText().toString());
-//                }
-//            });
         }
     }
 
@@ -102,7 +89,7 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int typeView) {
         if (typeView == SECTION_TYPE) {
             final View view = LayoutInflater.from(mContext).inflate(mSectionResourceId, parent, false);
-            return new SectionViewHolder(view, mQuesTitleResId, mQuesTimestampResId, (ThreadActivity) mContext);
+            return new SectionViewHolder(view, mQuesTitleResId, mQuesTimestampResId);
         }else{
             return mBaseAdapter.onCreateViewHolder(parent, typeView);
         }

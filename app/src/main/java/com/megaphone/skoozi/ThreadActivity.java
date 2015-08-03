@@ -17,6 +17,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -49,6 +52,7 @@ public class ThreadActivity extends AppCompatActivity
     private List<Answer> threadAnswers; //null value is good and well
     private RecyclerView threadAnswerRecycler;
 
+    private EditText answerContent;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -93,6 +97,15 @@ public class ThreadActivity extends AppCompatActivity
         threadAnswerRecycler.setLayoutManager(mLayoutManager);
         RecyclerView.ItemDecoration mItemDecoration = new DividerItemDecoration(this, LinearLayoutManager.VERTICAL);
         threadAnswerRecycler.addItemDecoration(mItemDecoration);
+
+        Button postAnswer = (Button) findViewById(R.id.thread_reply_post);
+        answerContent = (EditText) findViewById(R.id.thread_reply_content);
+        postAnswer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((ThreadActivity) v.getContext()).insertSkooziServiceAnswer(answerContent.getText().toString());
+            }
+        });
     }
 
     /**

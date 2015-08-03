@@ -19,12 +19,11 @@
         android:paddingLeft="@dimen/nearby_list_row_start_margin"
         android:paddingStart="@dimen/nearby_list_row_start_margin"
         android:paddingRight="@dimen/nearby_list_row_start_margin"
-        tools:text="this is the ANSWER CONTENT and how it will be displayed"/>
+        tools:text="this is the REPLY CONTENT and how it will be displayed"/>
 
     <Button
         android:id="@+id/thread_reply_post"
         android:text="@string/post_new_answer"
-
         android:layout_gravity="end|bottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

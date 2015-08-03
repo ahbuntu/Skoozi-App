@@ -11,9 +11,10 @@
     <TextView
         android:id="@+id/section_question_timestamp"
         android:background="@android:color/transparent"
-        android:layout_width="match_parent"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:layout_gravity="start"
         android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
         android:layout_marginStart="@dimen/nearby_list_row_start_margin"
         android:layout_marginRight="@dimen/nearby_list_row_start_margin"
