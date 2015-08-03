@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_coordinator_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -25,25 +24,22 @@
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
+            <fragment android:name="com.google.android.gms.maps.MapFragment"
+                android:id="@+id/nearby_map"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nearby_map_height"
+                app:layout_collapseMode="parallax"/>
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                android:minHeight="?attr/actionBarSize"
                 android:elevation="2dp"
                 app:layout_scrollFlags="scroll|enterAlways"
+                app:layout_collapseMode="pin"
                 />
-            <!--app:layout_collapseMode="pin"-->
 
-            <!--follow instructions here to get rid of 'Unexpected namespace errors'-->
-            <!--http://stackoverflow.com/questions/15024430/android-google-maps-fragment-in-the-xml-i-get-unexpected-namespace-prefix-->
 
-            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                android:name="com.google.android.gms.maps.MapFragment"
-                android:id="@+id/nearby_map"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/nearby_map_height"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
