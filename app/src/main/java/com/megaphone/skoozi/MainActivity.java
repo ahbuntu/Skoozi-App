@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity
                 //fail silently
                 //todo: determine if there's a better approach to this
                 return;
-            
+
             Log.d(TAG, String.valueOf(questions.size()));
             updateNearbyList(questions);
         }

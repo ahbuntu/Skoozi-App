@@ -85,15 +85,16 @@ public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             super(view);
             title = (TextView) view.findViewById(questionTitleResId);
             timestamp = (TextView) view.findViewById(questionTimestampResId);
-            postAnswer = (Button) view.findViewById(R.id.section_answer_post);
-            answerContent = (EditText) view.findViewById(R.id.section_answer_content);
-            mActivity = context;
-            postAnswer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mActivity.insertSkooziServiceAnswer(answerContent.getText().toString());
-                }
-            });
+            //fixme: this needs to move to the activity
+//            postAnswer = (Button) view.findViewById(R.id.thread_reply_post);
+//            answerContent = (EditText) view.findViewById(R.id.thread_reply_content);
+//            mActivity = context;
+//            postAnswer.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    mActivity.insertSkooziServiceAnswer(answerContent.getText().toString());
+//                }
+//            });
         }
     }
 
