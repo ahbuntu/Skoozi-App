@@ -302,6 +302,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             ArrayList<Question> questions = intent.getParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST);
+            if (questions == null)
+                //fail silently
+                //todo: determine if there's a better approach to this
+                return;
+            
             Log.d(TAG, String.valueOf(questions.size()));
             updateNearbyList(questions);
         }

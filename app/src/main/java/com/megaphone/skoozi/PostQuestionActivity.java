@@ -162,6 +162,9 @@ public class PostQuestionActivity extends AppCompatActivity
     public void onConnected(Bundle connectionHint) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
+        if (mLastLocation == null)
+            //todo: display persistent message
+            return;
         updateCurrentLocation();
     }
     @Override
@@ -191,12 +194,11 @@ public class PostQuestionActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap map) {
         newQuestionMap = map;
-        if (postLocation != null) {
-//            defaultLocation = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
-            updateCurrentLocation();
-        } else {
-            //TODO: need to decide what to do if the current locaiton cannot be determined
+        if (postLocation == null) {
+            //TODO: show persistent message that GPS needs to be enabled in order to post new question
+            return;
         }
+        updateCurrentLocation();
     }
 
     private void showThread(String questionKey) {
