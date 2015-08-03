@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -61,14 +62,16 @@ public class MainActivity extends AppCompatActivity
     static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
     static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
 
-    CoordinatorLayout mLayoutView;
-    GoogleMap nearbyMap;
+    private CoordinatorLayout mLayoutView;
+    private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
 
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
 
-    Marker defaultMarker, currentMarker;
+    private Marker defaultMarker, currentMarker;
+
+    private CollapsingToolbarLayout collapsingToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +108,8 @@ public class MainActivity extends AppCompatActivity
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(this.getString(R.string.app_name));
     }
 
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
