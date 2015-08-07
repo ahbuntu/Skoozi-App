@@ -43,8 +43,9 @@
         <activity android:name=".PostQuestionActivity" >
         </activity>
 
+        <!--http://stackoverflow.com/questions/30801379/coordinatorlayout-with-collapsingtoolbarlayout-breaks-with-keyboard-in-dialog-fr-->
         <activity android:name=".ThreadActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden">
+            android:windowSoftInputMode="adjustPan">
         </activity>
 
         <service

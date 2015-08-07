@@ -14,7 +14,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start|center_vertical"
         android:layout_weight="1"
-        android:gravity="start|center_vertical"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
         android:paddingLeft="@dimen/nearby_list_row_start_margin"
         android:paddingStart="@dimen/nearby_list_row_start_margin"
@@ -26,6 +25,7 @@
         android:text="@string/post_new_answer"
         android:layout_gravity="end|bottom"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        style="?android:attr/borderlessButtonStyle"/>
 
 </LinearLayout>
