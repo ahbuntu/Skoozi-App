@@ -12,4 +12,9 @@
     <!-- New Question definitions-->
     <dimen name="new_question_horizontal_margin">4dp</dimen>
     <dimen name="new_question_vertical_margin">8dp</dimen>
+
+    <!-- FAB button-->
+    <dimen name="fab_margin_right">0dp</dimen>
+    <dimen name="fab_margin_bottom">0dp</dimen>
+
 </resources>
