@@ -65,6 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/fab_margin_bottom"
         android:layout_marginRight="@dimen/fab_margin_right"
+        app:layout_behavior="com.megaphone.skoozi.FloatingActionButtonScrollBehavior"
         app:layout_anchor="@+id/main_fragment_container"
         app:layout_anchorGravity="bottom|right|end"
         />

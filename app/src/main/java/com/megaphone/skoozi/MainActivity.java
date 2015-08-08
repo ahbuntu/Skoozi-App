@@ -281,6 +281,7 @@ public class MainActivity extends AppCompatActivity
             nearbyMap.addMarker(new MarkerOptions()
                     .position(questionLocation));
         }
+
     }
 
     private void updateNearbyList(List<Question> questions) {
