@@ -205,11 +205,7 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_add_q) {
-            Intent intent = new Intent(this, PostQuestionActivity.class);
-            startActivity(intent);
-            return true;
-        } else if (id == R.id.action_my_activity) {
+        if (id == R.id.action_my_activity) {
             Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
             return true;
         }

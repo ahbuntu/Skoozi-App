@@ -6,10 +6,4 @@
         android:orderInCategory="300"
         app:showAsAction="always"
         android:icon="@drawable/my_activity"/>
-
-    <item android:id="@+id/action_add_q"
-        android:title="@string/action_add_q"
-        android:orderInCategory="300"
-        app:showAsAction="always"
-        android:icon="@mipmap/ic_chat_white_18dp"/>
 </menu>

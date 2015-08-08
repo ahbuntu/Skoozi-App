@@ -110,16 +110,8 @@ public class PostQuestionActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            //TODO: determine if MainActivity is well and truly the parent activity to all this stuff
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
-        }
-        if (id == R.id.action_add_q) {
-            return true;
-//        } else if (id == R.id.action_home) {
-//            Intent intent = new Intent(this, MainActivity.class);
-//            startActivity(intent);
-//            return true;
         } else if (id == R.id.action_my_activity) {
             Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
             return true;

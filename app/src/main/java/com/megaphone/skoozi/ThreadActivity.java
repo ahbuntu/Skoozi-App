@@ -144,8 +144,6 @@ public class ThreadActivity extends AppCompatActivity
         if (id == android.R.id.home) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
-        }
-        if (id == R.id.action_add_q) {
             return true;
         } else if (id == R.id.action_my_activity) {
             Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
