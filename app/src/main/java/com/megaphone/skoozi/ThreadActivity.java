@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -98,7 +99,7 @@ public class ThreadActivity extends AppCompatActivity
         RecyclerView.ItemDecoration mItemDecoration = new DividerItemDecoration(this, LinearLayoutManager.VERTICAL);
         threadAnswerRecycler.addItemDecoration(mItemDecoration);
 
-        Button postAnswer = (Button) findViewById(R.id.thread_reply_post);
+        ImageButton postAnswer = (ImageButton) findViewById(R.id.thread_reply_post);
         answerContent = (EditText) findViewById(R.id.thread_reply_content);
         postAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
