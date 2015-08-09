@@ -68,13 +68,18 @@ public class MainActivity extends AppCompatActivity
 
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-
+    private final static int DEFAULT_ZOOM = 10;
+    private final static int DEFAULT_RADIUS_METRES = 10000;
+    private final static int RADIUS_TRANSPARENCY = 64; //75%
+    private static int RADIUS_COLOR_RGB;
     private Marker defaultMarker, currentMarker;
 
     private CollapsingToolbarLayout collapsingToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        RADIUS_COLOR_RGB = getResources().getColor(R.color.accent_material_light);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupToolbar();
@@ -243,13 +248,20 @@ public class MainActivity extends AppCompatActivity
                     .position(currentLocation)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Current location"));
-            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
+            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, DEFAULT_ZOOM));
+
+
+
+
 
             // Instantiates a new CircleOptions object and defines the center and radius
             CircleOptions circleOptions = new CircleOptions()
                     .center(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
-                    .fillColor(Color.GREEN)
-                    .radius(10000); // In meters
+                    .fillColor(Color.argb(RADIUS_TRANSPARENCY,
+                            Color.red(RADIUS_COLOR_RGB),
+                            Color.green(RADIUS_COLOR_RGB),
+                            Color.blue(RADIUS_COLOR_RGB)))
+                    .radius(DEFAULT_RADIUS_METRES);
 
             // Get back the mutable Circle
             Circle circle = nearbyMap.addCircle(circleOptions);
@@ -269,7 +281,7 @@ public class MainActivity extends AppCompatActivity
                     .position(defaultLocation)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Default location"));
-            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 15));
+            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
             nearbyMap.getUiSettings().setZoomControlsEnabled(true);
         }
     }
@@ -286,7 +298,7 @@ public class MainActivity extends AppCompatActivity
 
     private void updateNearbyList(List<Question> questions) {
         if (nearbyFragment != null) {
-            nearbyFragment.updateNearbyQuestions(questions);
+            nearbyFragment.updateNearbyQuestions(questions, nearbyMap);
         }
     }
 

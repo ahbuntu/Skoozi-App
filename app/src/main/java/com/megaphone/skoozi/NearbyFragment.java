@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
@@ -65,8 +66,8 @@ public class NearbyFragment extends Fragment {
         }
     }
 
-    public void updateNearbyQuestions(List<Question> questions) {
-        NearbyRecyclerViewAdapter mNearbyListAdapter = new NearbyRecyclerViewAdapter(getActivity(), questions);
+    public void updateNearbyQuestions(List<Question> questions, GoogleMap map) {
+        NearbyRecyclerViewAdapter mNearbyListAdapter = new NearbyRecyclerViewAdapter(getActivity(), questions, map);
         nearbyListView.setAdapter(mNearbyListAdapter);
     }
 

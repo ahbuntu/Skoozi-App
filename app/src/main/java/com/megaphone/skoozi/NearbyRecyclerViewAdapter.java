@@ -8,6 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.util.PresentationUtil;
 
 import java.util.List;
@@ -24,6 +28,7 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
 
     private Context mContext;
     private List<Question> nearbyQuestions;
+    private GoogleMap nearbyMap;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -35,7 +40,6 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
         TextView nearbyContent;
         TextView nearbyUserName;
 
-        private Context context;
         private OnQuestionItemSelected mQuestionItemCallback;
         /**
          * initializes all the views for a data item in a view holder
@@ -46,7 +50,7 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
             nearbyTimestamp = (TextView) itemView.findViewById(R.id.nearby_list_question_duration);
             nearbyUserName = (TextView) itemView.findViewById(R.id.nearby_list_profile_name);
             nearbyContent = (TextView) itemView.findViewById(R.id.nearby_list_question);
-            this.context = context;
+//            this.context = context;
             mQuestionItemCallback = (OnQuestionItemSelected) context;
             itemView.setOnClickListener(this);
         }
@@ -58,6 +62,13 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
             mQuestionItemCallback.onQuestionSelected(clickedQuestion);
         }
 
+        protected void displayOnMap(double locLat, double locLon) {
+            nearbyMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(locLat, locLon))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
+                    );
+        }
+
     }
 
     /**
@@ -65,9 +76,10 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
      * @param context
      * @param questions NULL value is acceptable.
      */
-    public NearbyRecyclerViewAdapter(Context context, List<Question> questions) {
+    public NearbyRecyclerViewAdapter(Context context, List<Question> questions, GoogleMap map) {
         mContext = context;
         nearbyQuestions = questions;
+        nearbyMap = map;
     }
 
     //region AnswerViewHolder Lifecycle callbacks
@@ -89,7 +101,7 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
         holder.nearbyTimestamp.setText(PresentationUtil.unixTimestampAge(questionItem.timestamp));
         holder.nearbyUserName.setText(questionItem.author);
         holder.nearbyContent.setText(questionItem.content);
-
+        holder.displayOnMap(questionItem.locationLat, questionItem.locationLon);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
