@@ -18,6 +18,7 @@
 
     <string name="post_new_answer">POST</string>
     <string name="thread_empty_heading">No answers to this question yet.</string>
+    <string name="reply_error_message">No response provided</string>
 
     <!--Instructions-->
     <string name="new_question_hint">Ask a question</string>

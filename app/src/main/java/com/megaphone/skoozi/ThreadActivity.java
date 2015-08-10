@@ -14,11 +14,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -104,7 +103,9 @@ public class ThreadActivity extends AppCompatActivity
         postAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ThreadActivity) v.getContext()).insertSkooziServiceAnswer(answerContent.getText().toString());
+                if (validReply()) {
+                    ((ThreadActivity) v.getContext()).insertSkooziServiceAnswer(answerContent.getText().toString());
+                }
             }
         });
     }
@@ -118,13 +119,20 @@ public class ThreadActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         // Show menu icon
         final ActionBar ab = getSupportActionBar();
-//        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
     }
 
+    private boolean validReply() {
+        if (TextUtils.isEmpty(answerContent.getText().toString())) {
+            Snackbar.make(mLayoutView, R.string.reply_error_message, Snackbar.LENGTH_SHORT)
+                    .show();
+            return false;
+        }
+        return true;
+    }
     private void setActivityTitle(String title) {
         collapsingToolbar.setTitle(title);
     }
