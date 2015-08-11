@@ -211,8 +211,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        mGoogleApiClient.disconnect();
         super.onStop();
+        if (mGoogleApiClient != null) mGoogleApiClient.disconnect();
     }
 
     @Override
