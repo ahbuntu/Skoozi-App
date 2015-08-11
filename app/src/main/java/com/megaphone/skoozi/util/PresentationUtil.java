@@ -31,6 +31,19 @@ public class PresentationUtil {
     }
 
     /**
+     * Formats the unix timestamp
+     *
+     * @param timestamp
+     * @return timestamp formatted as MMM dd, hh:mm a
+     */
+    public static String unixTimestampQuestionDateTime(long timestamp) {
+        Date date = new Date(timestamp * 1000L);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd @ hh:mm a");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+        return dateFormat.format(date);
+    }
+
+    /**
      * Calculates the age of the unix timestamp from the current time
      *
      * @param timestamp

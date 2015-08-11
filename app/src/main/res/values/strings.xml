@@ -15,6 +15,7 @@
     <string name="post_new_question">POST</string>
     <string name="new_question_location_change">CHANGE</string>
     <string name="new_question_location_hint">enter location if not correct</string>
+    <string name="new_question_error_message">Question details are missing</string>
 
     <string name="post_new_answer">POST</string>
     <string name="thread_empty_heading">No answers to this question yet.</string>
@@ -23,7 +24,7 @@
     <!--Instructions-->
     <string name="new_question_hint">Ask a question</string>
     <string name="new_answer_content_hint">Enter a response</string>
-    <string name="thread_question_timestamp">asked on %s</string>
+    <string name="thread_question_timestamp">%s</string>
 
     <!--Snackbar-->
     <string name="no_network_message">Network connectivity is currently unavailable</string>

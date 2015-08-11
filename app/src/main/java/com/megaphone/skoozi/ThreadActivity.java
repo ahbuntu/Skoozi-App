@@ -103,7 +103,7 @@ public class ThreadActivity extends AppCompatActivity
         postAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validReply()) {
+                if (validContent(answerContent.getText().toString())) {
                     ((ThreadActivity) v.getContext()).insertSkooziServiceAnswer(answerContent.getText().toString());
                 }
             }
@@ -125,14 +125,15 @@ public class ThreadActivity extends AppCompatActivity
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
     }
 
-    private boolean validReply() {
-        if (TextUtils.isEmpty(answerContent.getText().toString())) {
+    private boolean validContent(String value) {
+        if (TextUtils.isEmpty(value)) {
             Snackbar.make(mLayoutView, R.string.reply_error_message, Snackbar.LENGTH_SHORT)
                     .show();
             return false;
         }
         return true;
     }
+
     private void setActivityTitle(String title) {
         collapsingToolbar.setTitle(title);
     }

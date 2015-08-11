@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,9 +52,10 @@ public class PostQuestionActivity extends AppCompatActivity
     LatLng postLocation;
     GoogleApiClient mGoogleApiClient;
 
-    EditText postQuestionText;
-    Button postQuestionButton;
-    ProgressBar postQuestionProgress;
+    private EditText postQuestionText;
+    private Button postQuestionButton;
+    private ProgressBar postQuestionProgress;
+    private CoordinatorLayout coordinatorLayout;
 
     Question postQuestion;
     @Override
@@ -63,6 +67,7 @@ public class PostQuestionActivity extends AppCompatActivity
 
         buildGoogleApiClient();
 
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.new_question_coordinator_layout);
         postQuestionProgress = (ProgressBar) findViewById(R.id.new_question_progress);
         postQuestionText = (EditText) findViewById(R.id.new_question_content);
         postQuestionButton = (Button) findViewById(R.id.post_new_question);
@@ -70,7 +75,7 @@ public class PostQuestionActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 String postContent = postQuestionText.getText().toString().trim();
-                if (postLocation != null && postContent.length() != 0) {
+                if (validContent(postContent) && postLocation != null) {
                     postQuestion = new Question("test", postContent,
                             "what's a key", (long)123123,
                             postLocation.latitude, postLocation.longitude );
@@ -93,6 +98,15 @@ public class PostQuestionActivity extends AppCompatActivity
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    private boolean validContent(String value) {
+        if (TextUtils.isEmpty(value)) {
+            Snackbar.make(coordinatorLayout, R.string.new_question_error_message, Snackbar.LENGTH_SHORT)
+                    .show();
+            return false;
+        }
+        return true;
     }
 
     @Override
