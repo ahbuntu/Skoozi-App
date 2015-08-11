@@ -1,6 +1,7 @@
 package com.megaphone.skoozi.util;
 
 import android.content.Context;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -19,6 +20,12 @@ public class ConnectionUtil {
             return true;
         }
         return false;
+    }
+
+    public static boolean isGPSEnabled (Context mContext){
+        LocationManager locationManager = (LocationManager)
+                mContext.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
 }

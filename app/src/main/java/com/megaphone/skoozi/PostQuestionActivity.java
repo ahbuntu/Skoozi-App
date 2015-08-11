@@ -53,7 +53,6 @@ public class PostQuestionActivity extends AppCompatActivity
     GoogleApiClient mGoogleApiClient;
 
     private EditText postQuestionText;
-    private Button postQuestionButton;
     private ProgressBar postQuestionProgress;
     private CoordinatorLayout coordinatorLayout;
 
@@ -70,7 +69,7 @@ public class PostQuestionActivity extends AppCompatActivity
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.new_question_coordinator_layout);
         postQuestionProgress = (ProgressBar) findViewById(R.id.new_question_progress);
         postQuestionText = (EditText) findViewById(R.id.new_question_content);
-        postQuestionButton = (Button) findViewById(R.id.post_new_question);
+        Button postQuestionButton = (Button) findViewById(R.id.post_new_question);
         postQuestionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

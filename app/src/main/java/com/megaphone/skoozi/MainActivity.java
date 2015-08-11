@@ -5,17 +5,23 @@ import java.util.List;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,6 +35,7 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -59,20 +66,23 @@ public class MainActivity extends AppCompatActivity
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";
-    static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
-    static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
+    public static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
+    public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
 
     private CoordinatorLayout mLayoutView;
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
 
     private GoogleApiClient mGoogleApiClient;
+    private static final int GOOGLE_API_REQUEST_RESOLVE_ERROR = 1001; // Request code to use when launching the resolution activity
+    private static final String DIALOG_ERROR = "dialog_error"; // Unique tag for the error dialog fragment
+    private boolean mResolvingError = false;// Bool to track whether the app is already resolving an error
     private Location mLastLocation;
     private final static int DEFAULT_ZOOM = 10;
     private final static int DEFAULT_RADIUS_METRES = 10000;
     private final static int RADIUS_TRANSPARENCY = 64; //75%
     private static int RADIUS_COLOR_RGB;
-    private Marker defaultMarker, currentMarker;
+    private Marker defaultMarker;
 
     private CollapsingToolbarLayout collapsingToolbar;
 
@@ -103,7 +113,12 @@ public class MainActivity extends AppCompatActivity
             getFragmentManager().beginTransaction()
                     .add(R.id.main_fragment_container, nearbyFragment).commit();
         }
-        buildGoogleApiClient();
+
+        if (ConnectionUtil.isGPSEnabled(this)) {
+            buildGoogleApiClient();
+        } else {
+            displayGpsErrorMessage();
+        }
     }
 
     /**
@@ -131,30 +146,34 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
-            // Receiving a result from the AccountPicker
-            if (resultCode == RESULT_OK) {
-                mEmail = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                // With the account name acquired, go get the auth token
-                getUsername();
-            } else if (resultCode == RESULT_CANCELED) {
-                // The account picker dialog closed without selecting an account.
-                // Notify users that they must pick an account to proceed.
+        switch (requestCode) {
+            case REQUEST_CODE_PICK_ACCOUNT:
+                // Receiving a result from the AccountPicker
+                if (resultCode == RESULT_OK) {
+                    mEmail = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    // With the account name acquired, go get the auth token
+                    getUsername();
+                } else if (resultCode == RESULT_CANCELED) {
+                    // The account picker dialog closed without selecting an account.
+                    // Notify users that they must pick an account to proceed.
 //                Toast.makeText(this, R.string.pick_account, Toast.LENGTH_SHORT).show();
-            }
+                }
+                // Handle the result from exceptions
+                break;
+            case GOOGLE_API_REQUEST_RESOLVE_ERROR:
+                mResolvingError = false;
+                if (resultCode == RESULT_OK) {
+                    // Make sure the app is not already connected or attempting to connect
+                    if (!mGoogleApiClient.isConnecting() &&
+                            !mGoogleApiClient.isConnected()) {
+                        mGoogleApiClient.connect();
+                    }
+                }
+                break;
         }
-        // Handle the result from exceptions
-//        ...
     }
 
-    private synchronized void buildGoogleApiClient(){
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-//                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
+//region Activity Lifecycle methods
     @Override
     protected void onResume() {
         super.onResume();
@@ -179,15 +198,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        if (ConnectionUtil.isGPSEnabled(this) && !mResolvingError) {
+            mGoogleApiClient.connect();
+        }
 //        pickUserAccount();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-//        if (!mResolvingError) {  // more about this later
-            mGoogleApiClient.connect();
-//        }
     }
 
     @Override
@@ -217,6 +236,20 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+//endregion
+
+//region GoogleApi calls
+
+    /**
+     * https://developers.google.com/android/guides/api-client
+     */
+    private synchronized void buildGoogleApiClient(){
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
 
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -227,17 +260,36 @@ public class MainActivity extends AppCompatActivity
     }
     @Override
     public void onConnectionSuspended (int cause) {
+        // The connection has been interrupted.
+        // Disable any UI components that depend on Google APIs
+        // until onConnected() is called.
         Log.d(TAG, "BOO - connection suspended due to " + cause);
     }
 
+    /**
+     * This callback is important for handling errors that
+     * may occur while attempting to connect with Google.
+     * @param result contains the reason as to why the connection failed
+     */
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        // This callback is important for handling errors that
-        // may occur while attempting to connect with Google.
-        //
-        // More about this in the next section.
         Log.d(TAG, "connection to GPS failed for " + result.toString());
+        if (mResolvingError) {
+            return; // Already attempting to resolve an error.
+        } else if (result.hasResolution()) {
+            try {
+                mResolvingError = true;
+                result.startResolutionForResult(this, GOOGLE_API_REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                mGoogleApiClient.connect(); // There was an error with the resolution intent. Try again.
+            }
+        } else {
+            mResolvingError = true;
+            displayGoogleApiErrorMessage(result.getErrorCode()); // Show dialog using GooglePlayServicesUtil.getErrorDialog()
+        }
     }
+//endregion
+
     private void updateCurrentLocation() {
         if (nearbyMap != null) {
             if (defaultMarker != null) {
@@ -249,10 +301,6 @@ public class MainActivity extends AppCompatActivity
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Current location"));
             nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, DEFAULT_ZOOM));
-
-
-
-
 
             // Instantiates a new CircleOptions object and defines the center and radius
             CircleOptions circleOptions = new CircleOptions()
@@ -369,10 +417,58 @@ public class MainActivity extends AppCompatActivity
         //TODO: need to determine how to properlyt handle this
     }
 
+//region Error Message handlers
     private void displayNetworkErrorMessage() {
         Snackbar.make(mLayoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
 //                .setAction(R.string.snackbar_action_undo, clickListener)
                 .show();
     }
 
+    private void displayGpsErrorMessage() {
+        Snackbar.make(mLayoutView, R.string.no_gps_message, Snackbar.LENGTH_LONG)
+                .setAction(R.string.snackbar_enable_gps, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .show();
+    }
+
+    /**
+     *  Creates a dialog for an error message about connecting to Google Api
+     */
+    private void displayGoogleApiErrorMessage(int errorCode) {
+        // Create a fragment for the error dialog
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        // Pass the error that should be displayed
+        Bundle args = new Bundle();
+        args.putInt(DIALOG_ERROR, errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(getSupportFragmentManager(), "errordialog");
+    }
+
+    /* Called from ErrorDialogFragment when the dialog is dismissed. */
+    public void onDialogDismissed() {
+        mResolvingError = false;
+    }
+
+    /* A fragment to display an error dialog */
+    public static class ErrorDialogFragment extends DialogFragment {
+        public ErrorDialogFragment() { }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Get the error code and retrieve the appropriate dialog
+            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
+            return GooglePlayServicesUtil.getErrorDialog(errorCode,
+                    this.getActivity(), GOOGLE_API_REQUEST_RESOLVE_ERROR);
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            ((MainActivity)getActivity()).onDialogDismissed();
+        }
+    }
+//endregion
 }

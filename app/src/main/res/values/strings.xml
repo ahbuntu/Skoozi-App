@@ -26,7 +26,10 @@
     <string name="new_answer_content_hint">Enter a response</string>
     <string name="thread_question_timestamp">%s</string>
 
-    <!--Snackbar-->
+    <!-- Error messages-->
     <string name="no_network_message">Network connectivity is currently unavailable</string>
+    <string name="no_gps_message">GPS is disabled</string>
+    <string name="snackbar_enable_gps">Enable</string>
+
 
 </resources>
