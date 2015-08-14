@@ -3,6 +3,7 @@ package com.megaphone.skoozi;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.location.Location;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -12,6 +13,7 @@ import com.appspot.skoozi_959.skooziqna.model.CoreModelsAnswerMessageCollection;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsPostResponse;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsQuestionMessage;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsQuestionMessageCollection;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 
@@ -32,6 +34,9 @@ public class SkooziQnARequestService extends IntentService {
     private static final String ACTION_INSERT_QUESTION_ANSWER = "com.megaphone.skoozi.action.INSERT_QUESTION_ANSWER";
     private static final String EXTRA_QUESTION_KEY = "com.megaphone.skoozi.extra.QUESTION_KEY";
     private static final String EXTRA_ANSWER_PARCEL = "com.megaphone.skoozi.extra.ANSWER_PARCEL";
+    private static final String EXTRA_LATITUDE = "com.megaphone.skoozi.extra.LATITUDE";
+    private static final String EXTRA_LONGITUDE = "com.megaphone.skoozi.extra.LONGITUDE";
+    private static final String EXTRA_RADIUS = "com.megaphone.skoozi.extra.RADIUS";
 
     private Skooziqna skooziqnaService;
 
@@ -50,9 +55,12 @@ public class SkooziQnARequestService extends IntentService {
      * Starts this service to perform action Get Questions List. If
      * the service is already performing a task this action will be queued.
      */
-    public static void startActionGetQuestionsList(Context context) {
+    public static void startActionGetQuestionsList(Context context, LatLng currentLocation, double radius_km) {
         Intent intent = new Intent(context, SkooziQnARequestService.class);
         intent.setAction(ACTION_GET_QUESTIONS_LIST);
+        intent.putExtra(EXTRA_LATITUDE, currentLocation == null ? 0 : currentLocation.latitude);
+        intent.putExtra(EXTRA_LONGITUDE, currentLocation == null ? 0 : currentLocation.longitude);
+        intent.putExtra(EXTRA_RADIUS, radius_km);
         context.startService(intent);
     }
 
@@ -82,7 +90,10 @@ public class SkooziQnARequestService extends IntentService {
                 final String key = intent.getStringExtra(EXTRA_QUESTION_KEY);
                 handleActionGetThreadAnswers(key);
             } else if (ACTION_GET_QUESTIONS_LIST.equals(action)) {
-                handleActionGetQuestionsList();
+                final double lat = intent.getDoubleExtra(EXTRA_LATITUDE, 0);
+                final double lon = intent.getDoubleExtra(EXTRA_LONGITUDE, 0);
+                final double radius = intent.getDoubleExtra(EXTRA_RADIUS, MainActivity.DEFAULT_RADIUS_METRES / 1000); //API expects in km
+                handleActionGetQuestionsList(lat, lon, radius);
             } else if (ACTION_INSERT_QUESTION_ANSWER.equals(action)) {
                 final String key = intent.getStringExtra(EXTRA_QUESTION_KEY);
                 final Answer mAnswer = intent.getParcelableExtra(EXTRA_ANSWER_PARCEL);
@@ -136,11 +147,21 @@ public class SkooziQnARequestService extends IntentService {
     /**
      * Handle action Get Questions List in the background thread
      */
-    private void handleActionGetQuestionsList() {
+    private void handleActionGetQuestionsList(double lat, double lon, double radius) {
         initializeApiConnection();
         ArrayList<Question> questionList = null;
         try {
-            CoreModelsQuestionMessageCollection questionsListResponse =  skooziqnaService.questions().list().execute();
+            CoreModelsQuestionMessageCollection questionsListResponse;
+            if (lat == 0 || lon == 0) {
+                //need to get ALL since no location information was provided
+                questionsListResponse =  skooziqnaService.questions().list()
+                        .execute();
+            } else {
+                questionsListResponse =  skooziqnaService.questions().list()
+                        .setLat(lat).setLon(lon).setRadiusKm(radius)
+                        .execute();
+            }
+
             List<CoreModelsQuestionMessage> questionMessages =  questionsListResponse.getQuestions();
             questionList = new ArrayList<>(questionMessages.size());
             for (CoreModelsQuestionMessage questionMessage: questionMessages) {

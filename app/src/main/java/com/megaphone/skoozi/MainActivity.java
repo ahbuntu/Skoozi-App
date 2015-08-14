@@ -14,9 +14,7 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -73,14 +71,15 @@ public class MainActivity extends AppCompatActivity
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
 
+    public final static int DEFAULT_RADIUS_METRES = 10000;
     private GoogleApiClient mGoogleApiClient;
     private static final int GOOGLE_API_REQUEST_RESOLVE_ERROR = 1001; // Request code to use when launching the resolution activity
     private static final String DIALOG_ERROR = "dialog_error"; // Unique tag for the error dialog fragment
     private boolean mResolvingError = false;// Bool to track whether the app is already resolving an error
     private Location mLastLocation;
-    private final static int DEFAULT_ZOOM = 10;
-    private final static int DEFAULT_RADIUS_METRES = 10000;
-    private final static int RADIUS_TRANSPARENCY = 64; //75%
+    private static final LatLng DEFAULT_LOCATION = new LatLng(43.6532,-79.3832);
+    private static final int DEFAULT_ZOOM = 10;
+    private static final int RADIUS_TRANSPARENCY = 64; //75%
     private static int RADIUS_COLOR_RGB;
     private Marker defaultMarker;
 
@@ -181,7 +180,9 @@ public class MainActivity extends AppCompatActivity
             if (ConnectionUtil.isDeviceOnline()) {
                 IntentFilter mIntentFilter = new IntentFilter(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT);
                 LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
-                SkooziQnARequestService.startActionGetQuestionsList(this);
+                SkooziQnARequestService.startActionGetQuestionsList(this,
+                        mLastLocation == null ? DEFAULT_LOCATION : new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()),
+                        (long) DEFAULT_RADIUS_METRES/1000);
             } else {
                 displayNetworkErrorMessage();
             }
@@ -319,17 +320,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap map) {
         nearbyMap = map;
-        LatLng defaultLocation;
         if (mLastLocation != null) {
             updateCurrentLocation();
         } else {
-            defaultLocation = new LatLng(43.6532,-79.3832);
             // Move the camera instantly to Toronto
             defaultMarker = nearbyMap.addMarker(new MarkerOptions()
-                    .position(defaultLocation)
+                    .position(DEFAULT_LOCATION)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Default location"));
-            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, DEFAULT_ZOOM));
             nearbyMap.getUiSettings().setZoomControlsEnabled(true);
         }
     }
