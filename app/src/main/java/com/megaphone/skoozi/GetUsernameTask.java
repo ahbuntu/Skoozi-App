@@ -1,13 +1,8 @@
 package com.megaphone.skoozi;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AccountsException;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.auth.GoogleAuthException;
@@ -32,12 +27,6 @@ public class GetUsernameTask extends AsyncTask<Void, Void, Void> {
         this.mEmail = name;
     }
 
-
-    GetUsernameTask(Activity activity, Account account) {
-        this.mActivity = activity;
-        this.mAccount = account;
-    }
-
     /**
      * Executes the asynchronous job. This runs when you call execute()
      * on the AsyncTask instance.
@@ -45,21 +34,16 @@ public class GetUsernameTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         try {
-//            String token = fetchToken();
-            String token = getAuthToken(mAccount);
+            String token = fetchToken();
             if (token != null) {
                 // **Insert the good stuff here.**
                 // Use the token to access the user's Google data.
-//                    ...
+                Log.d(TAG, "Received token");
             }
         } catch (IOException e) {
             // The fetchToken() method handles Google-specific exceptions,
             // so this indicates something went wrong at a higher level.
-            // TODO: Check for network connectivity before starting the AsyncTask.
             Log.e(TAG, e.getMessage());
-        } catch (AccountsException e) {
-            // TODO: handle properly
-            Log.d(TAG, e.getMessage());
         }
         return null;
     }
@@ -74,7 +58,6 @@ public class GetUsernameTask extends AsyncTask<Void, Void, Void> {
         } catch (UserRecoverableAuthException userRecoverableException) {
             // GooglePlayServices.apk is either old, disabled, or not present
             // so we need to show the user some UI in the activity to recover.
-            //TODO: this should be made more robust - possibly through an interface
             MainActivity mainActivityRef = (MainActivity) mActivity;
             mainActivityRef.handleGoogleAuthTokenException(userRecoverableException);
         } catch (GoogleAuthException fatalException) {
@@ -83,17 +66,5 @@ public class GetUsernameTask extends AsyncTask<Void, Void, Void> {
             Log.e(TAG, fatalException.getMessage());
         }
         return null;
-    }
-
-    private String getAuthToken(Account account) throws AccountsException, IOException {
-        AccountManager manager = AccountManager.get(mActivity);
-        AccountManagerFuture<Bundle> future =  manager.getAuthToken(account, "ah", null, false, null, null);
-        Bundle bundle = future.getResult();
-        Intent intent = (Intent) bundle.get(AccountManager.KEY_INTENT);
-        if (intent != null) {
-            //Here you should start intent or throw your own exception that takes the intent and passes it to the other (preferably view) class.
-            //This intent is a popup saying that your application want to access accounts. It appears once per installation.
-        }
-        return bundle.getString(AccountManager.KEY_AUTHTOKEN);
     }
 }

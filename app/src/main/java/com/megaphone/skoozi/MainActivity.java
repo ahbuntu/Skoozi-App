@@ -30,6 +30,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
@@ -67,23 +68,31 @@ public class MainActivity extends AppCompatActivity
     public static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
     public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
 
-    private CoordinatorLayout mLayoutView;
-    private GoogleMap nearbyMap;
-    private NearbyFragment nearbyFragment;
+    //http://stackoverflow.com/questions/10400428/can-i-use-androids-accountmanager-for-getting-oauth-access-token-for-appengine
+    private final static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
+    private final static String USERINFO_PROFILE_SCOPE = "https://www.googleapis.com/auth/userinfo.profile";
+    private final static String SCOPE = "oauth2:" + USERINFO_EMAIL_SCOPE + " " + USERINFO_PROFILE_SCOPE;
 
-    public final static int DEFAULT_RADIUS_METRES = 10000;
-    private GoogleApiClient mGoogleApiClient;
     private static final int GOOGLE_API_REQUEST_RESOLVE_ERROR = 1001; // Request code to use when launching the resolution activity
-    private static final String DIALOG_ERROR = "dialog_error"; // Unique tag for the error dialog fragment
-    private boolean mResolvingError = false;// Bool to track whether the app is already resolving an error
-    private Location mLastLocation;
+    public final static int DEFAULT_RADIUS_METRES = 10000;
     private static final LatLng DEFAULT_LOCATION = new LatLng(43.6532,-79.3832);
     private static final int DEFAULT_ZOOM = 10;
     private static final int RADIUS_TRANSPARENCY = 64; //75%
+
+    private CoordinatorLayout mLayoutView;
+    private GoogleMap nearbyMap;
+    private NearbyFragment nearbyFragment;
+    private GoogleApiClient mGoogleApiClient;
+    private static final String DIALOG_ERROR = "dialog_error"; // Unique tag for the error dialog fragment
+    private boolean mResolvingError = false;// Bool to track whether the app is already resolving an error
+    private Location mLastLocation;
     private static int RADIUS_COLOR_RGB;
     private Marker defaultMarker;
 
+    private static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
+    private static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1002;
     private CollapsingToolbarLayout collapsingToolbar;
+    String mEmail; // Received from newChooseAccountIntent(); passed to getToken()
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +102,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         setupToolbar();
         mLayoutView = (CoordinatorLayout) findViewById(R.id.main_coordinator_layout);
-//        pickUserAccount();
 
         if (findViewById(R.id.main_fragment_container) != null) {
             // However, if we're being restored from a previous state,
@@ -103,9 +111,6 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            // when it's better to use newInstance
-            // http://www.androiddesignpatterns.com/2012/05/using-newinstance-to-instantiate.html
-            // Create a new Fragment to be placed in the activity layout
             nearbyFragment = NearbyFragment.newInstance(this);
 
             // Add the fragment to the 'fragment_container' FrameLayout
@@ -131,17 +136,14 @@ public class MainActivity extends AppCompatActivity
         collapsingToolbar.setTitle(this.getString(R.string.app_name));
     }
 
-    static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
     private void pickUserAccount() {
         String[] accountTypes = new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
-        //TODO: need to put in check to see if there is only one account - if so, use that as default
         Intent intent = AccountPicker.newChooseAccountIntent(null, null,
-                accountTypes, true, null, null, null, null); //alwaysPromptForAccount = true
+                accountTypes, false, null, null, null, null); //alwaysPromptForAccount = false
         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
     }
 
-    String mEmail; // Received from newChooseAccountIntent(); passed to getToken()
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -154,11 +156,16 @@ public class MainActivity extends AppCompatActivity
                     getUsername();
                 } else if (resultCode == RESULT_CANCELED) {
                     // The account picker dialog closed without selecting an account.
-                    // Notify users that they must pick an account to proceed.
-//                Toast.makeText(this, R.string.pick_account, Toast.LENGTH_SHORT).show();
+                    displayAccountLoginErrorMessage();
                 }
                 // Handle the result from exceptions
                 break;
+            case REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR:
+//            case REQUEST_CODE_RECOVER_FROM_AUTH_ERROR: //todo: figure out HOW/WHEN this is received
+                if (resultCode == RESULT_OK) {
+                    // Receiving a result that follows a GoogleAuthException, try auth again
+                    getUsername();
+                }
             case GOOGLE_API_REQUEST_RESOLVE_ERROR:
                 mResolvingError = false;
                 if (resultCode == RESULT_OK) {
@@ -194,8 +201,13 @@ public class MainActivity extends AppCompatActivity
         nearby_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), PostQuestionActivity.class);
-                startActivity(intent);
+                if (mEmail == null) {
+                    displayAccountLoginErrorMessage();
+                    pickUserAccount();
+                } else {
+                    Intent intent = new Intent(v.getContext(), PostQuestionActivity.class);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -373,10 +385,6 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    //http://stackoverflow.com/questions/10400428/can-i-use-androids-accountmanager-for-getting-oauth-access-token-for-appengine
-    private final static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
-    private final static String USERINFO_PROFILE_SCOPE = "https://www.googleapis.com/auth/userinfo.profile";
-    private final static String SCOPE = "oauth2:" + USERINFO_EMAIL_SCOPE + " " + USERINFO_PROFILE_SCOPE;
 
 
     private Account getAccountForName(Context context, String username) {
@@ -403,23 +411,55 @@ public class MainActivity extends AppCompatActivity
             pickUserAccount();
         } else {
             if (ConnectionUtil.isDeviceOnline()) {
-                //https://developer.android.com/training/basics/network-ops/connecting.html
-//                new GetUsernameTask(this, mEmail, SCOPE).execute();
-                new GetUsernameTask(this,getAccountForName(this,mEmail)).execute();
+                new GetUsernameTask(this, mEmail, SCOPE).execute();
             } else {
                 displayNetworkErrorMessage();
             }
         }
     }
 
-    public void handleGoogleAuthTokenException(UserRecoverableAuthException exception) {
+    /**
+     * This method is a hook for background threads and async tasks that need to
+     * provide the user a response UI when an exception occurs.
+     */
+    public void handleGoogleAuthTokenException(final UserRecoverableAuthException exception) {
         //TODO: need to determine how to properlyt handle this
+        // Because this call comes from the AsyncTask, we must ensure that the following
+        // code instead executes on the UI thread.
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (exception instanceof GooglePlayServicesAvailabilityException) {
+                    // The Google Play services APK is old, disabled, or not present.
+                    // Show a dialog created by Google Play services that allows
+                    // the user to update the APK
+                    int statusCode = ((GooglePlayServicesAvailabilityException) exception)
+                            .getConnectionStatusCode();
+                    Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
+                            MainActivity.this,
+                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                    dialog.show();
+                } else if (exception instanceof UserRecoverableAuthException) {
+                    // Unable to authenticate, such as when the user has not yet granted
+                    // the app access to the account, but the user can fix this.
+                    // Forward the user to an activity in Google Play services.
+                    Intent intent = exception.getIntent();
+                    startActivityForResult(intent,
+                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                }
+            }
+        });
     }
 
 //region Error Message handlers
     private void displayNetworkErrorMessage() {
         Snackbar.make(mLayoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
 //                .setAction(R.string.snackbar_action_undo, clickListener)
+                .show();
+    }
+
+    private void displayAccountLoginErrorMessage() {
+        Snackbar.make(mLayoutView, R.string.no_account_login_message, Snackbar.LENGTH_LONG)
                 .show();
     }
 

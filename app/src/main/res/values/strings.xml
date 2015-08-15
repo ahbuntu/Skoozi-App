@@ -30,6 +30,7 @@
     <string name="no_network_message">Network connectivity is currently unavailable</string>
     <string name="no_gps_message">GPS is disabled</string>
     <string name="snackbar_enable_gps">Enable</string>
+    <string name="no_account_login_message">You must log in to ask a question</string>
 
 
 </resources>
