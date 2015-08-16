@@ -1,5 +1,9 @@
 package com.megaphone.skoozi;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +11,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -18,8 +23,11 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -51,8 +59,10 @@ public class ThreadActivity extends AppCompatActivity
     private Question threadQuestion;
     private List<Answer> threadAnswers; //null value is good and well
     private RecyclerView threadAnswerRecycler;
-
+    private LinearLayout threadReply;
     private EditText answerContent;
+    private FloatingActionButton threadReplyFab;
+    private float mFabSize;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -86,26 +96,24 @@ public class ThreadActivity extends AppCompatActivity
         setupToolbar();
 
         threadQuestion = getIntent().getParcelableExtra(EXTRA_QUESTION);
+        if (threadQuestion == null) return;
+
         setActivityTitle(threadQuestion.author);
 
-        //TODO: need to put in a check to ensure that threadQuestion is properly retrieved
-
         threadAnswerRecycler = (RecyclerView) findViewById(R.id.thread_answer_recycler);
-//        threadAnswerRecycler.setHasFixedSize(true);
+        threadAnswerRecycler.setHasFixedSize(true);
         // use a linear layout manager
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         threadAnswerRecycler.setLayoutManager(mLayoutManager);
         RecyclerView.ItemDecoration mItemDecoration = new DividerItemDecoration(this, LinearLayoutManager.VERTICAL);
         threadAnswerRecycler.addItemDecoration(mItemDecoration);
 
-        ImageButton postAnswer = (ImageButton) findViewById(R.id.thread_reply_post);
-        answerContent = (EditText) findViewById(R.id.thread_reply_content);
-        postAnswer.setOnClickListener(new View.OnClickListener() {
+        threadReply = (LinearLayout) findViewById(R.id.thread_reply_container);
+        threadReplyFab = (FloatingActionButton) findViewById(R.id.reply_fab);
+        threadReplyFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validContent(answerContent.getText().toString())) {
-                    ((ThreadActivity) v.getContext()).insertSkooziServiceAnswer(answerContent.getText().toString());
-                }
+                onFabPressed();
             }
         });
     }
@@ -259,4 +267,104 @@ public class ThreadActivity extends AppCompatActivity
                 .show();
     }
 
+
+    public final static float SCALE_FACTOR      = 13f;
+    public final static int ANIMATION_DURATION  = 300;
+//    public final static int MINIMUN_X_DISTANCE  = 200;
+    public final static int MINIMUN_X_DISTANCE  = 20;
+
+    private boolean mRevealFlag;
+
+    private void onFabPressed() {
+        final float startX = threadReplyFab.getX();
+
+        CurvedAnimatorPath path = new CurvedAnimatorPath();
+        path.moveTo(0, 0);
+//        path.curveTo(-200, 200, -400, 100, -600, 50);
+        path.curveTo(-200, 200, -400, 100, threadReply.getX(), threadReply.getY());
+
+
+
+        final ObjectAnimator anim = ObjectAnimator.ofObject(this, "fabLoc",
+                path.new PathEvaluator(), path.getPoints().toArray());
+
+        anim.setInterpolator(new AccelerateInterpolator());
+        anim.setDuration(ANIMATION_DURATION);
+        anim.start();
+
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+
+                if (Math.abs(startX - threadReplyFab.getX()) > MINIMUN_X_DISTANCE) {
+
+                    if (!mRevealFlag) {
+                        mFabSize = getResources().getDimensionPixelSize(R.dimen.fab_size);
+//                        threadReply.setY(threadReply.getY() + mFabSize / 2);
+                        threadReply.setY(threadReply.getY());
+
+                        threadReplyFab.animate()
+                                .scaleXBy(SCALE_FACTOR)
+                                .scaleYBy(SCALE_FACTOR)
+                                .setListener(mEndRevealListener)
+                                .setDuration(ANIMATION_DURATION);
+
+
+                        mRevealFlag = true;
+                    }
+                }
+            }
+        });
+    }
+
+    private AnimatorListenerAdapter mEndRevealListener = new AnimatorListenerAdapter() {
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+
+            super.onAnimationEnd(animation);
+
+            threadReplyFab.setVisibility(View.INVISIBLE);
+//            threadReply.setBackgroundColor(getResources()
+//                    .getColor(R.color.accent));
+            threadReply.setVisibility(View.VISIBLE);
+            ImageButton postAnswer = (ImageButton) findViewById(R.id.thread_reply_post);
+            answerContent = (EditText) findViewById(R.id.thread_reply_content);
+            postAnswer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (validContent(answerContent.getText().toString())) {
+                        ((ThreadActivity) v.getContext()).insertSkooziServiceAnswer(answerContent.getText().toString());
+                    }
+                }
+            });
+
+//            for (int i = 0; i < mControlsContainer.getChildCount(); i++) {
+//
+//                View v = mControlsContainer.getChildAt(i);
+//                ViewPropertyAnimator animator = v.animate()
+//                        .scaleX(1).scaleY(1)
+//                        .setDuration(ANIMATION_DURATION);
+//
+//                animator.setStartDelay(i * 50);
+//                animator.start();
+//            }
+        }
+    };
+
+    /**
+     * We need this setter to translate between the information the animator
+     * produces (a new "PathPoint" describing the current animated location)
+     * and the information that the button requires (an xy location). The
+     * setter will be called by the ObjectAnimator given the 'fabLoc'
+     * property string.
+     */
+    public void setFabLoc(CurvedAnimatorPath.PathPoint newLoc) {
+        threadReplyFab.setTranslationX(newLoc.mX);
+        if (mRevealFlag)
+            threadReplyFab.setTranslationY(newLoc.mY - (mFabSize / 2));
+        else
+            threadReplyFab.setTranslationY(newLoc.mY);
+    }
 }

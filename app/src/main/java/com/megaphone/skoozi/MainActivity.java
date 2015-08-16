@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity
         // The connection has been interrupted.
         // Disable any UI components that depend on Google APIs
         // until onConnected() is called.
-        Log.d(TAG, "BOO - connection suspended due to " + cause);
+        Log.d(TAG, "connection to Google API suspended" + cause);
     }
 
     /**
@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.d(TAG, "connection to GPS failed for " + result.toString());
+        Log.d(TAG, "connection to Google API failed for " + result.toString());
         if (mResolvingError) {
             return; // Already attempting to resolve an error.
         } else if (result.hasResolution()) {
@@ -430,6 +430,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 if (exception instanceof GooglePlayServicesAvailabilityException) {
+                    Log.d(TAG, "GooglePlayServicesAvailabilityException received");
                     // The Google Play services APK is old, disabled, or not present.
                     // Show a dialog created by Google Play services that allows
                     // the user to update the APK
@@ -440,6 +441,7 @@ public class MainActivity extends AppCompatActivity
                             REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
                     dialog.show();
                 } else if (exception instanceof UserRecoverableAuthException) {
+                    Log.d(TAG, "UserRecoverableAuthException received");
                     // Unable to authenticate, such as when the user has not yet granted
                     // the app access to the account, but the user can fix this.
                     // Forward the user to an activity in Google Play services.
