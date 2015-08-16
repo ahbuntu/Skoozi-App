@@ -308,6 +308,7 @@ public class MainActivity extends AppCompatActivity
             if (defaultMarker != null) {
                 defaultMarker.remove();
             }
+            nearbyMap.clear(); // important to ensure that everything is cleared
             LatLng currentLocation = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
             nearbyMap.addMarker(new MarkerOptions()
                     .position(currentLocation)
@@ -323,9 +324,7 @@ public class MainActivity extends AppCompatActivity
                             Color.green(RADIUS_COLOR_RGB),
                             Color.blue(RADIUS_COLOR_RGB)))
                     .radius(DEFAULT_RADIUS_METRES);
-
-            // Get back the mutable Circle
-            Circle circle = nearbyMap.addCircle(circleOptions);
+            nearbyMap.addCircle(circleOptions);
         }
     }
 
