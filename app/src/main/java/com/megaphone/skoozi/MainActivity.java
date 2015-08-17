@@ -202,7 +202,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 if (mEmail == null) {
-                    displayAccountLoginErrorMessage();
                     pickUserAccount();
                 } else {
                     Intent intent = new Intent(v.getContext(), PostQuestionActivity.class);
