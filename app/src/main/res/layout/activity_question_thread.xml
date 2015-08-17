@@ -51,7 +51,7 @@
 
     <include layout="@layout/reply_thread"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="@dimen/thread_reply_container"
         android:layout_alignParentBottom="true"
         app:layout_anchor="@+id/thread_answer_recycler"
         app:layout_anchorGravity="bottom" />
