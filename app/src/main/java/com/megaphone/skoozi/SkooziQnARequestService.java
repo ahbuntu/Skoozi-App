@@ -1,5 +1,7 @@
 package com.megaphone.skoozi;
 
+import android.accounts.Account;
+import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
@@ -13,6 +15,9 @@ import com.appspot.skoozi_959.skooziqna.model.CoreModelsAnswerMessageCollection;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsPostResponse;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsQuestionMessage;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsQuestionMessageCollection;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -173,8 +178,6 @@ public class SkooziQnARequestService extends IntentService {
                         questionMessage.getLocationLat(),
                         questionMessage.getLocationLon()));
             }
-
-
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         }
@@ -209,6 +212,30 @@ public class SkooziQnARequestService extends IntentService {
         Intent localIntent = new Intent(ThreadActivity.BROADCAST_POST_ANSWER_RESULT)
                 .putExtra(ThreadActivity.EXTRAS_ANSWER_KEY, postKey);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+    }
+
+    private Activity mActivity;
+    private String mScope;
+    private Account mAccount;
+
+    /**
+     * Gets an authentication token from Google and handles any
+     * GoogleAuthException that may occur.
+     */
+    protected String fetchToken() throws IOException {
+        try {
+            return GoogleAuthUtil.getToken(mActivity, SkooziApplication.getUserAccount(), mScope);
+        } catch (UserRecoverableAuthException userRecoverableException) {
+            // GooglePlayServices.apk is either old, disabled, or not present
+            // so we need to show the user some UI in the activity to recover.
+            MainActivity mainActivityRef = (MainActivity) mActivity;
+            mainActivityRef.handleGoogleAuthTokenException(userRecoverableException);
+        } catch (GoogleAuthException fatalException) {
+            // Some other type of unrecoverable exception has occurred.
+            // Report and log the error as appropriate for your app.
+            Log.e(TAG, fatalException.getMessage());
+        }
+        return null;
     }
 
 }

@@ -3,7 +3,6 @@ package com.megaphone.skoozi;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -29,10 +28,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -41,11 +38,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
 
 /**
@@ -67,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     public static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
     public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
+    public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
 
     //http://stackoverflow.com/questions/10400428/can-i-use-androids-accountmanager-for-getting-oauth-access-token-for-appengine
     private final static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
@@ -89,10 +87,81 @@ public class MainActivity extends AppCompatActivity
     private static int RADIUS_COLOR_RGB;
     private Marker defaultMarker;
 
-    private static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
-    private static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1002;
+
     private CollapsingToolbarLayout collapsingToolbar;
-    String mEmail; // Received from newChooseAccountIntent(); passed to getToken()
+
+
+    /**
+     * Creating The Toolbar and setting it as the Toolbar for the activity
+     * home as up set to true
+     */
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(this.getString(R.string.app_name));
+    }
+
+    @Override
+    public void onQuestionSelected(Question mQuestion) {
+        Intent threadIntent = new Intent(this, ThreadActivity.class);
+        Bundle questionBundle = new Bundle();
+        questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, mQuestion);
+        threadIntent.putExtras(questionBundle);
+        startActivity(threadIntent);
+    }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ArrayList<Question> questions = intent.getParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST);
+            if (questions == null)
+                //fail silently
+                //todo: determine if there's a better approach to this
+                return;
+
+            Log.d(TAG, String.valueOf(questions.size()));
+            updateNearbyList(questions);
+        }
+    };
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
+                if (resultCode == RESULT_OK) {
+                    // Receiving a result from the AccountPicker
+                    SkooziApplication.setUserAccount(this, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
+                    String action = data.getStringExtra(AccountUtil.EXTRA_USER_ACCOUNT_ACTION); //can return null
+                    if (action != null && action.equals(ACTION_NEW_QUESTION)) {
+                        tryNewQuestion();
+                    }
+                } else if (resultCode == RESULT_CANCELED) {
+                    // The account picker dialog closed without selecting an account.
+                    displayAccountLoginErrorMessage();
+                }
+                break;
+            case AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR:
+//            case REQUEST_CODE_RECOVER_FROM_AUTH_ERROR: //todo: figure out HOW/WHEN this is received
+                if (resultCode == RESULT_OK) {
+                    // Receiving a result that follows a GoogleAuthException, try auth again
+//                    getUsername();
+                }
+            case GOOGLE_API_REQUEST_RESOLVE_ERROR:
+                mResolvingError = false;
+                if (resultCode == RESULT_OK) {
+                    // Make sure the app is not already connected or attempting to connect
+                    if (!mGoogleApiClient.isConnecting() &&
+                            !mGoogleApiClient.isConnected()) {
+                        mGoogleApiClient.connect();
+                    }
+                }
+                break;
+        }
+    }
+
+//region Activity Lifecycle methods
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,66 +194,15 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Creating The Toolbar and setting it as the Toolbar for the activity
-     * home as up set to true
-     */
-    private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(this.getString(R.string.app_name));
-    }
-
-
-    private void pickUserAccount() {
-        String[] accountTypes = new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
-        Intent intent = AccountPicker.newChooseAccountIntent(null, null,
-                accountTypes, false, null, null, null, null); //alwaysPromptForAccount = false
-        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CODE_PICK_ACCOUNT:
-                // Receiving a result from the AccountPicker
-                if (resultCode == RESULT_OK) {
-                    mEmail = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                    // With the account name acquired, go get the auth token
-                    getUsername();
-                } else if (resultCode == RESULT_CANCELED) {
-                    // The account picker dialog closed without selecting an account.
-                    displayAccountLoginErrorMessage();
-                }
-                // Handle the result from exceptions
-                break;
-            case REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR:
-//            case REQUEST_CODE_RECOVER_FROM_AUTH_ERROR: //todo: figure out HOW/WHEN this is received
-                if (resultCode == RESULT_OK) {
-                    // Receiving a result that follows a GoogleAuthException, try auth again
-                    getUsername();
-                }
-            case GOOGLE_API_REQUEST_RESOLVE_ERROR:
-                mResolvingError = false;
-                if (resultCode == RESULT_OK) {
-                    // Make sure the app is not already connected or attempting to connect
-                    if (!mGoogleApiClient.isConnecting() &&
-                            !mGoogleApiClient.isConnected()) {
-                        mGoogleApiClient.connect();
-                    }
-                }
-                break;
-        }
-    }
-
-//region Activity Lifecycle methods
     @Override
     protected void onResume() {
         super.onResume();
         try {
             if (ConnectionUtil.isDeviceOnline()) {
+                if (SkooziApplication.getUserAccount() == null) {
+                    AccountUtil.pickUserAccount(MainActivity.this, null);
+                }
+
                 IntentFilter mIntentFilter = new IntentFilter(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT);
                 LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
                 SkooziQnARequestService.startActionGetQuestionsList(this,
@@ -201,19 +219,22 @@ public class MainActivity extends AppCompatActivity
         nearby_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mEmail == null) {
-                    pickUserAccount();
-                } else {
-                    Intent intent = new Intent(v.getContext(), PostQuestionActivity.class);
-                    startActivity(intent);
-                }
+                tryNewQuestion();
             }
         });
 
         if (ConnectionUtil.isGPSEnabled(this) && !mResolvingError) {
             mGoogleApiClient.connect();
         }
-//        pickUserAccount();
+    }
+
+    private void tryNewQuestion() {
+        if (SkooziApplication.getUserAccount() == null) {
+            AccountUtil.pickUserAccount(MainActivity.this, ACTION_NEW_QUESTION);
+        } else {
+            Intent intent = new Intent(MainActivity.this, PostQuestionActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -242,7 +263,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_my_activity) {
-            Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this,"my activity",Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -360,61 +381,24 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    @Override
-    public void onQuestionSelected(Question mQuestion) {
-        Intent threadIntent = new Intent(this, ThreadActivity.class);
-        Bundle questionBundle = new Bundle();
-        questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, mQuestion);
-        threadIntent.putExtras(questionBundle);
-        startActivity(threadIntent);
-    }
-
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            ArrayList<Question> questions = intent.getParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST);
-            if (questions == null)
-                //fail silently
-                //todo: determine if there's a better approach to this
-                return;
-
-            Log.d(TAG, String.valueOf(questions.size()));
-            updateNearbyList(questions);
-        }
-    };
-
-
-
-    private Account getAccountForName(Context context, String username) {
-        AccountManager manager = AccountManager.get(context);
-        Account[] accounts = manager.getAccountsByType("com.google"); // gmail.com is within google.com type
-        if (accounts != null) {
-            for (Account account : accounts) {
-                if (account.name.equals(username)) {
-                    return account;
-                }
-            }
-        }
-        return null;
-    }
 
     /**
      * Attempts to retrieve the username.
      * If the account is not yet known, invoke the picker. Once the account is known,
      * start an instance of the AsyncTask to get the auth token and do work with it.
      */
-    private void getUsername() {
-
-        if (mEmail == null) {
-            pickUserAccount();
-        } else {
-            if (ConnectionUtil.isDeviceOnline()) {
-                new GetUsernameTask(this, mEmail, SCOPE).execute();
-            } else {
-                displayNetworkErrorMessage();
-            }
-        }
-    }
+//    private void getUsername() {
+//
+//        if (mEmail == null) {
+//            AccountUtil.pickUserAccount(MainActivity.this);
+//        } else {
+//            if (ConnectionUtil.isDeviceOnline()) {
+//                new GetUsernameTask(this, mEmail, SCOPE).execute();
+//            } else {
+//                displayNetworkErrorMessage();
+//            }
+//        }
+//    }
 
     /**
      * This method is a hook for background threads and async tasks that need to
@@ -436,7 +420,7 @@ public class MainActivity extends AppCompatActivity
                             .getConnectionStatusCode();
                     Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
                             MainActivity.this,
-                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                            AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
                     dialog.show();
                 } else if (exception instanceof UserRecoverableAuthException) {
                     Log.d(TAG, "UserRecoverableAuthException received");
@@ -445,7 +429,7 @@ public class MainActivity extends AppCompatActivity
                     // Forward the user to an activity in Google Play services.
                     Intent intent = exception.getIntent();
                     startActivityForResult(intent,
-                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                            AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
                 }
             }
         });
