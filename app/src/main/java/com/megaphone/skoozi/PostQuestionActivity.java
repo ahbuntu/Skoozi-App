@@ -1,6 +1,7 @@
 package com.megaphone.skoozi;
 
 import android.accounts.AccountManager;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -26,7 +27,10 @@ import android.widget.Toast;
 import com.appspot.skoozi_959.skooziqna.Skooziqna;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsPostResponse;
 import com.appspot.skoozi_959.skooziqna.model.CoreModelsQuestionMessage;
+import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -46,7 +50,7 @@ import java.io.IOException;
 
 public class PostQuestionActivity extends AppCompatActivity
         implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "PostQuestionActivty";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
@@ -84,10 +88,13 @@ public class PostQuestionActivity extends AppCompatActivity
             public void onClick(View v) {
                 String postContent = postQuestionText.getText().toString().trim();
                 if (validContent(postContent) && postLocation != null) {
-                    postQuestion = new Question("test", postContent,
+                    postQuestion = new Question(SkooziApplication.getUserAccount().name, postContent,
                             "what's a key", (long) 123123,
                             postLocation.latitude, postLocation.longitude);
                     new InsertQuestionAsyncTask().execute(postQuestion);
+                } else {
+                    //todo: need to add in display error message for disabled GPS/location
+                    //ie. postLocation == null condition
                 }
             }
         });
@@ -298,7 +305,7 @@ public class PostQuestionActivity extends AppCompatActivity
             try {
                 CoreModelsQuestionMessage question = new CoreModelsQuestionMessage();
 
-                question.setEmail("proper@proper.com");
+                question.setEmail(SkooziApplication.getUserAccount().name);
                 question.setContent(userQuestion.content);
                 question.setLocationLat(userQuestion.locationLat);
                 question.setLocationLon(userQuestion.locationLon);

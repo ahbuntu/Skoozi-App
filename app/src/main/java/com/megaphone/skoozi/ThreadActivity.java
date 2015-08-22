@@ -32,6 +32,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -228,12 +229,25 @@ public class ThreadActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
     }
 
+    private AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
+        @Override
+        public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
+            // Because this call comes from the AsyncTask, we must ensure that the following
+            // code instead executes on the UI thread.
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AccountUtil.resolveAuthExceptionError(ThreadActivity.this, exception);
+                }
+            });
+        }
+    };
     /**
      * Makes a new call to the SkooziQnA API to get all the answers related to the question
      */
     public void refreshThreadList() {
         if (ConnectionUtil.isDeviceOnline()) {
-            SkooziQnARequestService.startActionGetThreadAnswers(this, threadQuestion.key);
+            SkooziQnARequestService.startActionGetThreadAnswers(this, tokenListener, threadQuestion.key);
         } else {
             displayNetworkErrorMessage();
         }
@@ -246,12 +260,12 @@ public class ThreadActivity extends AppCompatActivity
     public void insertSkooziServiceAnswer(String content) {
         if (ConnectionUtil.isDeviceOnline()) {
             Answer mAnswer = new Answer(threadQuestion.key,
-                    "response@response.com", //TODO: this needs to be fixed once OAuth is setup
+                    SkooziApplication.getUserAccount().name, //TODO: this needs to be fixed once OAuth is setup
                     content,
                     System.currentTimeMillis() / 1000L,
                     12,//TODO: need to figure out the current location
                     12);
-            SkooziQnARequestService.startActionInsertAnswer(this, threadQuestion.key, mAnswer);
+            SkooziQnARequestService.startActionInsertAnswer(this, tokenListener, threadQuestion.key, mAnswer);
         } else {
             displayNetworkErrorMessage();
         }

@@ -66,11 +66,6 @@ public class MainActivity extends AppCompatActivity
     public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
 
-    //http://stackoverflow.com/questions/10400428/can-i-use-androids-accountmanager-for-getting-oauth-access-token-for-appengine
-    private final static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
-    private final static String USERINFO_PROFILE_SCOPE = "https://www.googleapis.com/auth/userinfo.profile";
-    private final static String SCOPE = "oauth2:" + USERINFO_EMAIL_SCOPE + " " + USERINFO_PROFILE_SCOPE;
-
     private static final int GOOGLE_API_REQUEST_RESOLVE_ERROR = 1001; // Request code to use when launching the resolution activity
     public final static int DEFAULT_RADIUS_METRES = 10000;
     private static final LatLng DEFAULT_LOCATION = new LatLng(43.6532,-79.3832);
@@ -194,6 +189,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
+        @Override
+        public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
+            // Because this call comes from the AsyncTask, we must ensure that the following
+            // code instead executes on the UI thread.
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AccountUtil.resolveAuthExceptionError(MainActivity.this, exception);
+                }
+            });
+        }
+    };
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -205,7 +214,7 @@ public class MainActivity extends AppCompatActivity
 
                 IntentFilter mIntentFilter = new IntentFilter(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT);
                 LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
-                SkooziQnARequestService.startActionGetQuestionsList(this,
+                SkooziQnARequestService.startActionGetQuestionsList(this, tokenListener,
                         mLastLocation == null ? DEFAULT_LOCATION : new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()),
                         (long) DEFAULT_RADIUS_METRES/1000);
             } else {
@@ -291,6 +300,7 @@ public class MainActivity extends AppCompatActivity
             updateCurrentLocation();
         }
     }
+
     @Override
     public void onConnectionSuspended (int cause) {
         // The connection has been interrupted.
@@ -399,41 +409,6 @@ public class MainActivity extends AppCompatActivity
 //            }
 //        }
 //    }
-
-    /**
-     * This method is a hook for background threads and async tasks that need to
-     * provide the user a response UI when an exception occurs.
-     */
-    public void handleGoogleAuthTokenException(final UserRecoverableAuthException exception) {
-        //TODO: need to determine how to properlyt handle this
-        // Because this call comes from the AsyncTask, we must ensure that the following
-        // code instead executes on the UI thread.
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (exception instanceof GooglePlayServicesAvailabilityException) {
-                    Log.d(TAG, "GooglePlayServicesAvailabilityException received");
-                    // The Google Play services APK is old, disabled, or not present.
-                    // Show a dialog created by Google Play services that allows
-                    // the user to update the APK
-                    int statusCode = ((GooglePlayServicesAvailabilityException) exception)
-                            .getConnectionStatusCode();
-                    Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
-                            MainActivity.this,
-                            AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
-                    dialog.show();
-                } else if (exception instanceof UserRecoverableAuthException) {
-                    Log.d(TAG, "UserRecoverableAuthException received");
-                    // Unable to authenticate, such as when the user has not yet granted
-                    // the app access to the account, but the user can fix this.
-                    // Forward the user to an activity in Google Play services.
-                    Intent intent = exception.getIntent();
-                    startActivityForResult(intent,
-                            AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
-                }
-            }
-        });
-    }
 
 //region Error Message handlers
 

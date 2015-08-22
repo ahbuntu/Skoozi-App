@@ -21,6 +21,7 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.megaphone.skoozi.util.AccountUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,13 +44,23 @@ public class SkooziQnARequestService extends IntentService {
     private static final String EXTRA_LONGITUDE = "com.megaphone.skoozi.extra.LONGITUDE";
     private static final String EXTRA_RADIUS = "com.megaphone.skoozi.extra.RADIUS";
 
+    //http://stackoverflow.com/questions/10400428/can-i-use-androids-accountmanager-for-getting-oauth-access-token-for-appengine
+    private final static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
+    private final static String USERINFO_PROFILE_SCOPE = "https://www.googleapis.com/auth/userinfo.profile";
+    private final static String SCOPE = "oauth2:" + USERINFO_EMAIL_SCOPE + " " + USERINFO_PROFILE_SCOPE;
+
+    private static Context intentContext;
     private Skooziqna skooziqnaService;
+    private static AccountUtil.GoogleAuthTokenExceptionListener authExceptionlistener;
 
     /**
      * Starts this service to perform action Get Thread Answers with the given parameters. If
      * the service is already performing a task this action will be queued.
      */
-    public static void startActionGetThreadAnswers(Context context, String question_key) {
+    public static void startActionGetThreadAnswers(Context context, AccountUtil.GoogleAuthTokenExceptionListener listener,
+                                                   String question_key) {
+        intentContext = context;
+        authExceptionlistener = listener;
         Intent intent = new Intent(context, SkooziQnARequestService.class);
         intent.setAction(ACTION_GET_THREAD_ANSWERS);
         intent.putExtra(EXTRA_QUESTION_KEY, question_key);
@@ -60,7 +71,10 @@ public class SkooziQnARequestService extends IntentService {
      * Starts this service to perform action Get Questions List. If
      * the service is already performing a task this action will be queued.
      */
-    public static void startActionGetQuestionsList(Context context, LatLng currentLocation, double radius_km) {
+    public static void startActionGetQuestionsList(Context context,  AccountUtil.GoogleAuthTokenExceptionListener listener,
+                                                   LatLng currentLocation, double radius_km) {
+        intentContext = context;
+        authExceptionlistener = listener;
         Intent intent = new Intent(context, SkooziQnARequestService.class);
         intent.setAction(ACTION_GET_QUESTIONS_LIST);
         intent.putExtra(EXTRA_LATITUDE, currentLocation == null ? 0 : currentLocation.latitude);
@@ -73,7 +87,10 @@ public class SkooziQnARequestService extends IntentService {
      * Starts this service to perform action Insert Answer for Question. If
      * the service is already performing a task this action will be queued.
      */
-    public static void startActionInsertAnswer(Context context, String question_key, Answer userAnswer) {
+    public static void startActionInsertAnswer(Context context,  AccountUtil.GoogleAuthTokenExceptionListener listener,
+                                               String question_key, Answer userAnswer) {
+        intentContext = context;
+        authExceptionlistener = listener;
         Intent intent = new Intent(context, SkooziQnARequestService.class);
         intent.setAction(ACTION_INSERT_QUESTION_ANSWER);
         intent.putExtra(EXTRA_QUESTION_KEY, question_key);
@@ -89,7 +106,14 @@ public class SkooziQnARequestService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
+        if (intent == null || SkooziApplication.getUserAccount() == null) {
+            Log.d(TAG, "intent or user account was null");
+            return;
+        }
+        try {
+            SkooziApplication.accessToken = fetchToken();
+            if (SkooziApplication.accessToken  == null) return;
+
             final String action = intent.getAction();
             if (ACTION_GET_THREAD_ANSWERS.equals(action)) {
                 final String key = intent.getStringExtra(EXTRA_QUESTION_KEY);
@@ -104,6 +128,8 @@ public class SkooziQnARequestService extends IntentService {
                 final Answer mAnswer = intent.getParcelableExtra(EXTRA_ANSWER_PARCEL);
                 handleActionInsertAnswer(key, mAnswer);
             }
+        } catch (IOException e) {
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -126,7 +152,10 @@ public class SkooziQnARequestService extends IntentService {
         initializeApiConnection();
         ArrayList<Answer> threadAnswers = null;
         try {
-            CoreModelsAnswerMessageCollection threadRepsonse =  skooziqnaService.question().listAnswers().setId(question_key).execute();
+            CoreModelsAnswerMessageCollection threadRepsonse =  skooziqnaService.question().listAnswers()
+                    .setId(question_key)
+                    .setOauthToken(SkooziApplication.accessToken)
+                    .execute();
             List<CoreModelsAnswerMessage> threadAnswerMessages = threadRepsonse.getAnswers();
             if (threadAnswerMessages != null) {
                 threadAnswers = new ArrayList<>(threadAnswerMessages.size());
@@ -198,13 +227,16 @@ public class SkooziQnARequestService extends IntentService {
             CoreModelsAnswerMessage answerMsg = new CoreModelsAnswerMessage();
 
             answerMsg.setQuestionUrlsafe(question_key);
-            answerMsg.setEmail("response@response.com");
+            answerMsg.setEmail(userAnswer.author);
             answerMsg.setContent(userAnswer.content);
             answerMsg.setLocationLat(userAnswer.locationLat);
             answerMsg.setLocationLon(userAnswer.locationLon);
             answerMsg.setTimestampUnix(userAnswer.timestamp);
 
-            CoreModelsPostResponse insertResponse = skooziqnaService.answer().insert(answerMsg).execute();
+            CoreModelsPostResponse insertResponse = skooziqnaService.answer()
+                    .insert(answerMsg)
+                    .setOauthToken(SkooziApplication.accessToken)
+                    .execute();
             postKey = insertResponse.getPostKey();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
@@ -214,22 +246,19 @@ public class SkooziQnARequestService extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
-    private Activity mActivity;
-    private String mScope;
-    private Account mAccount;
-
     /**
      * Gets an authentication token from Google and handles any
      * GoogleAuthException that may occur.
      */
-    protected String fetchToken() throws IOException {
+    private static String fetchToken() throws IOException {
         try {
-            return GoogleAuthUtil.getToken(mActivity, SkooziApplication.getUserAccount(), mScope);
+            return GoogleAuthUtil.getToken(intentContext, SkooziApplication.getUserAccount(), SCOPE);
         } catch (UserRecoverableAuthException userRecoverableException) {
             // GooglePlayServices.apk is either old, disabled, or not present
             // so we need to show the user some UI in the activity to recover.
-            MainActivity mainActivityRef = (MainActivity) mActivity;
-            mainActivityRef.handleGoogleAuthTokenException(userRecoverableException);
+//            MainActivity mainActivityRef = (MainActivity) intentContext;
+//            mainActivityRef.handleGoogleAuthTokenException(userRecoverableException);
+            authExceptionlistener.handleGoogleAuthException(userRecoverableException);
         } catch (GoogleAuthException fatalException) {
             // Some other type of unrecoverable exception has occurred.
             // Report and log the error as appropriate for your app.

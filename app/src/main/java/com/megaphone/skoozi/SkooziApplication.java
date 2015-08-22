@@ -12,6 +12,7 @@ import com.megaphone.skoozi.util.AccountUtil;
 public class SkooziApplication extends Application {
     private static SkooziApplication singleton;
     private static Account userAccount;
+    public static String accessToken;
 
     // Returns the application instance
     public static SkooziApplication getInstance() {
