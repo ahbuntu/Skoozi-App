@@ -438,7 +438,6 @@ public class MainActivity extends AppCompatActivity
 //region Error Message handlers
     private void displayNetworkErrorMessage() {
         Snackbar.make(mLayoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
-//                .setAction(R.string.snackbar_action_undo, clickListener)
                 .show();
     }
 

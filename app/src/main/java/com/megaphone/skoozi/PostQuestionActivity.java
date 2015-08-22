@@ -1,5 +1,6 @@
 package com.megaphone.skoozi;
 
+import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -37,6 +38,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.megaphone.skoozi.util.AccountUtil;
+import com.megaphone.skoozi.util.ConnectionUtil;
 
 import java.io.IOException;
 
@@ -46,6 +49,8 @@ public class PostQuestionActivity extends AppCompatActivity
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     private static final String TAG = "PostQuestionActivty";
+    public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
+
     Toolbar mToolbar;
     GoogleMap newQuestionMap;
     Location mLastLocation;
@@ -55,8 +60,11 @@ public class PostQuestionActivity extends AppCompatActivity
     private EditText postQuestionText;
     private ProgressBar postQuestionProgress;
     private CoordinatorLayout coordinatorLayout;
+    private Button postQuestionButton;
 
     Question postQuestion;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,15 +77,16 @@ public class PostQuestionActivity extends AppCompatActivity
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.new_question_coordinator_layout);
         postQuestionProgress = (ProgressBar) findViewById(R.id.new_question_progress);
         postQuestionText = (EditText) findViewById(R.id.new_question_content);
-        Button postQuestionButton = (Button) findViewById(R.id.post_new_question);
+        postQuestionButton = (Button) findViewById(R.id.post_new_question);
+        postQuestionButton.setEnabled(false);
         postQuestionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String postContent = postQuestionText.getText().toString().trim();
                 if (validContent(postContent) && postLocation != null) {
                     postQuestion = new Question("test", postContent,
-                            "what's a key", (long)123123,
-                            postLocation.latitude, postLocation.longitude );
+                            "what's a key", (long) 123123,
+                            postLocation.latitude, postLocation.longitude);
                     new InsertQuestionAsyncTask().execute(postQuestion);
                 }
             }
@@ -108,6 +117,7 @@ public class PostQuestionActivity extends AppCompatActivity
         return true;
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -135,9 +145,43 @@ public class PostQuestionActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
-        if (mMapFragment != null) {
-            mMapFragment.getMapAsync(this);
+        try {
+            if (ConnectionUtil.isDeviceOnline()) {
+                if (SkooziApplication.getUserAccount() == null) {
+                    AccountUtil.pickUserAccount(PostQuestionActivity.this, ACTION_NEW_QUESTION);
+                } else {
+                    postQuestionButton.setEnabled(true);
+                }
+
+                MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
+                if (mMapFragment != null) {
+                    mMapFragment.getMapAsync(this);
+                }
+            } else {
+                displayNetworkErrorMessage();
+            }
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
+                if (resultCode == RESULT_OK) {
+                    // Receiving a result from the AccountPicker
+                    SkooziApplication.setUserAccount(this, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
+                    String action = data.getStringExtra(AccountUtil.EXTRA_USER_ACCOUNT_ACTION); //can return null
+                    if (action != null && action.equals(ACTION_NEW_QUESTION)) {
+                        postQuestionButton.setEnabled(true); // ok to proceed
+                    }
+                } else if (resultCode == RESULT_CANCELED) {
+                    // The account picker dialog closed without selecting an account.
+                    postQuestionButton.setEnabled(false);
+                    displayAccountLoginErrorMessage();
+                }
+                break;
         }
     }
 
@@ -220,6 +264,17 @@ public class PostQuestionActivity extends AppCompatActivity
         postQuestionText.setText("");
     }
 
+    private void displayNetworkErrorMessage() {
+        Snackbar.make(coordinatorLayout, R.string.no_network_message, Snackbar.LENGTH_LONG)
+//                .setAction(R.string.snackbar_action_undo, clickListener)
+                .show();
+    }
+
+    private void displayAccountLoginErrorMessage() {
+        Snackbar.make(coordinatorLayout, R.string.no_account_login_message, Snackbar.LENGTH_LONG)
+                .show();
+    }
+
     private class InsertQuestionAsyncTask extends AsyncTask<Question, Void, String> {
         private Skooziqna skooziqnaService;
 
@@ -278,5 +333,6 @@ public class PostQuestionActivity extends AppCompatActivity
         }
 
     }
+
 
 }
