@@ -8,10 +8,13 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 import com.megaphone.skoozi.MainActivity;
+import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.SkooziApplication;
 
 /**
@@ -41,5 +44,10 @@ public class AccountUtil {
             }
         }
         return null;
+    }
+
+    public static void displayAccountLoginErrorMessage(CoordinatorLayout layoutView) {
+        Snackbar.make(layoutView, R.string.no_account_login_message, Snackbar.LENGTH_LONG)
+                .show();
     }
 }

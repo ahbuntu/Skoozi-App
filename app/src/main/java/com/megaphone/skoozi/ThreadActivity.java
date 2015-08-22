@@ -1,5 +1,6 @@
 package com.megaphone.skoozi;
 
+import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -20,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +39,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
 
 import java.util.ArrayList;
@@ -52,6 +55,7 @@ public class ThreadActivity extends AppCompatActivity
     static final String EXTRAS_THREAD_ANSWERS  = "com.megaphone.skoozi.extras.THREAD_ANSWERS";
     static final String BROADCAST_POST_ANSWER_RESULT = "com.megaphone.skoozi.broadcast.POST_ANSWER_RESULT";
     static final String EXTRAS_ANSWER_KEY  = "com.megaphone.skoozi.extras.ANSWER_KEY";
+    public static final String ACTION_THREAD_REPLY = "com.megaphone.skoozi.action.THREAD_REPLY";
 
     CoordinatorLayout mLayoutView;
     private CollapsingToolbarLayout collapsingToolbar;
@@ -110,6 +114,7 @@ public class ThreadActivity extends AppCompatActivity
 
         threadReply = (LinearLayout) findViewById(R.id.thread_reply_container);
         threadReplyFab = (FloatingActionButton) findViewById(R.id.reply_fab);
+        threadReplyFab.setEnabled(false);
         threadReplyFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,13 +178,48 @@ public class ThreadActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.thread_map);
-        if (mMapFragment != null) {
-            mMapFragment.getMapAsync(this);
+        try {
+            if (ConnectionUtil.isDeviceOnline()) {
+                if (SkooziApplication.getUserAccount() == null) {
+                    AccountUtil.pickUserAccount(ThreadActivity.this, ACTION_THREAD_REPLY);
+                } else {
+                    threadReplyFab.setEnabled(true);
+                }
+
+                MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.thread_map);
+                if (mMapFragment != null) {
+                    mMapFragment.getMapAsync(this);
+                }
+                setupLocalBroadcastPair();
+                refreshThreadList();
+            } else {
+                ConnectionUtil.displayNetworkErrorMessage(mLayoutView);
+            }
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
         }
-        setupLocalBroadcastPair();
-        refreshThreadList();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
+                if (resultCode == RESULT_OK) {
+                    // Receiving a result from the AccountPicker
+                    SkooziApplication.setUserAccount(this, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
+                    String action = data.getStringExtra(AccountUtil.EXTRA_USER_ACCOUNT_ACTION); //can return null
+                    if (action != null && action.equals(ACTION_THREAD_REPLY)) {
+                        threadReplyFab.setEnabled(true); // ok to proceed
+                    }
+                } else if (resultCode == RESULT_CANCELED) {
+                    // The account picker dialog closed without selecting an account.
+                    threadReplyFab.setEnabled(false);
+                    AccountUtil.displayAccountLoginErrorMessage(mLayoutView);
+                }
+                break;
+        }
+    }
+
 
     private void setupLocalBroadcastPair() {
         IntentFilter mIntentFilter = new IntentFilter();
@@ -310,7 +350,6 @@ public class ThreadActivity extends AppCompatActivity
                                 .setListener(mEndRevealListener)
                                 .setDuration(ANIMATION_DURATION);
 
-
                         mRevealFlag = true;
                     }
                 }
@@ -367,4 +406,5 @@ public class ThreadActivity extends AppCompatActivity
         else
             threadReplyFab.setTranslationY(newLoc.mY);
     }
+
 }

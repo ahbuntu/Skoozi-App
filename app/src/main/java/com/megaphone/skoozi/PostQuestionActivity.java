@@ -158,7 +158,7 @@ public class PostQuestionActivity extends AppCompatActivity
                     mMapFragment.getMapAsync(this);
                 }
             } else {
-                displayNetworkErrorMessage();
+                ConnectionUtil.displayNetworkErrorMessage(coordinatorLayout);
             }
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
@@ -179,7 +179,7 @@ public class PostQuestionActivity extends AppCompatActivity
                 } else if (resultCode == RESULT_CANCELED) {
                     // The account picker dialog closed without selecting an account.
                     postQuestionButton.setEnabled(false);
-                    displayAccountLoginErrorMessage();
+                    AccountUtil.displayAccountLoginErrorMessage(coordinatorLayout);
                 }
                 break;
         }
@@ -262,17 +262,6 @@ public class PostQuestionActivity extends AppCompatActivity
             Toast.makeText(this, "Looks like there was an error :(", Toast.LENGTH_SHORT).show();
         }
         postQuestionText.setText("");
-    }
-
-    private void displayNetworkErrorMessage() {
-        Snackbar.make(coordinatorLayout, R.string.no_network_message, Snackbar.LENGTH_LONG)
-//                .setAction(R.string.snackbar_action_undo, clickListener)
-                .show();
-    }
-
-    private void displayAccountLoginErrorMessage() {
-        Snackbar.make(coordinatorLayout, R.string.no_account_login_message, Snackbar.LENGTH_LONG)
-                .show();
     }
 
     private class InsertQuestionAsyncTask extends AsyncTask<Question, Void, String> {

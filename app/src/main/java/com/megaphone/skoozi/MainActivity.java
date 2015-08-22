@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 } else if (resultCode == RESULT_CANCELED) {
                     // The account picker dialog closed without selecting an account.
-                    displayAccountLoginErrorMessage();
+                    AccountUtil.displayAccountLoginErrorMessage(mLayoutView);
                 }
                 break;
             case AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR:
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity
                         mLastLocation == null ? DEFAULT_LOCATION : new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()),
                         (long) DEFAULT_RADIUS_METRES/1000);
             } else {
-                displayNetworkErrorMessage();
+                ConnectionUtil.displayNetworkErrorMessage(mLayoutView);
             }
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
@@ -436,15 +436,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 //region Error Message handlers
-    private void displayNetworkErrorMessage() {
-        Snackbar.make(mLayoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
-                .show();
-    }
-
-    private void displayAccountLoginErrorMessage() {
-        Snackbar.make(mLayoutView, R.string.no_account_login_message, Snackbar.LENGTH_LONG)
-                .show();
-    }
 
     private void displayGpsErrorMessage() {
         Snackbar.make(mLayoutView, R.string.no_gps_message, Snackbar.LENGTH_LONG)
