@@ -58,6 +58,13 @@
     </FrameLayout>
 
 
+    <include layout="@layout/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:layout_anchor="@+id/main_fragment_container"
+        app:layout_anchorGravity="top" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/nearby_fabBtn"
         android:src="@mipmap/ic_create_white_24dp"

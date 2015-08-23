@@ -2,6 +2,7 @@ package com.megaphone.skoozi;
 
 import android.accounts.AccountManager;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -54,6 +55,8 @@ public class PostQuestionActivity extends AppCompatActivity
 
     private static final String TAG = "PostQuestionActivty";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
+    public static final String BROADCAST_POST_QUESTION_RESULT = "com.megaphone.skoozi.broadcast.POST_QUESTION_RESULT";
+    public static final String EXTRA_QUESTION_KEY  = "com.megaphone.skoozi.extra.QUESTION_KEY";
 
     Toolbar mToolbar;
     GoogleMap newQuestionMap;
@@ -68,6 +71,34 @@ public class PostQuestionActivity extends AppCompatActivity
 
     Question postQuestion;
 
+    private BroadcastReceiver questionInsertReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(PostQuestionActivity.BROADCAST_POST_QUESTION_RESULT)) {
+                String questionKey = intent.getStringExtra(PostQuestionActivity.EXTRA_QUESTION_KEY);
+                if (questionKey == null) {
+                    //TODO: use a Snackbar here with option to retry :)
+                    Toast.makeText(context, "Looks like there was an error. Please try again.", Toast.LENGTH_SHORT).show();
+                } else {
+                    showThread(questionKey);
+                }
+            }
+        }
+    };
+
+    private AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
+        @Override
+        public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
+            // Because this call comes from the IntentService, we must ensure that the following
+            // code instead executes on the UI thread.
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AccountUtil.resolveAuthExceptionError(PostQuestionActivity.this, exception);
+                }
+            });
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,9 +120,10 @@ public class PostQuestionActivity extends AppCompatActivity
                 String postContent = postQuestionText.getText().toString().trim();
                 if (validContent(postContent) && postLocation != null) {
                     postQuestion = new Question(SkooziApplication.getUserAccount().name, postContent,
-                            "what's a key", (long) 123123,
+                            null, System.currentTimeMillis() / 1000L,
                             postLocation.latitude, postLocation.longitude);
-                    new InsertQuestionAsyncTask().execute(postQuestion);
+                    SkooziQnARequestService.startActionInsertNewQuestion(PostQuestionActivity.this, tokenListener,
+                            postQuestion);
                 } else {
                     //todo: need to add in display error message for disabled GPS/location
                     //ie. postLocation == null condition

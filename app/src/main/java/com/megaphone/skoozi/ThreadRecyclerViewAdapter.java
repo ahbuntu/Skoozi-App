@@ -103,6 +103,17 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
     public int getItemViewType(int position) {
         return threadAnswers == null ? ROW_EMPTY_TYPE : ROW_ANSWER_TYPE;
     }
+
+    public void add(int position, Answer item) {
+        threadAnswers.add(position, item);
+        notifyItemInserted(position);
+    }
+
+    public void remove(Answer item) {
+        int position = threadAnswers.indexOf(item);
+        threadAnswers.remove(position);
+        notifyItemRemoved(position);
+    }
     //endregion
 
 }

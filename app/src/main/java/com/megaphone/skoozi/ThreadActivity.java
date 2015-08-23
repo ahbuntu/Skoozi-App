@@ -25,7 +25,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -64,6 +63,8 @@ public class ThreadActivity extends AppCompatActivity
     private Question threadQuestion;
     private List<Answer> threadAnswers; //null value is good and well
     private RecyclerView threadAnswerRecycler;
+    private ThreadRecyclerViewAdapter mAdapter;
+    private Answer latestThreadAnswer;
     private LinearLayout threadReply;
     private EditText answerContent;
     private FloatingActionButton threadReplyFab;
@@ -79,7 +80,13 @@ public class ThreadActivity extends AppCompatActivity
                         //TODO: use a Snackbar here with option to retry :)
                         Toast.makeText(context, "Looks like there was an error. Please try again.", Toast.LENGTH_SHORT).show();
                     } else {
-                        refreshThreadList();
+//                        refreshThreadList();
+                        if (mAdapter == null || latestThreadAnswer == null) return;
+                        //todo: need to see if there's a better way to verify that this answer_key correspnds to the
+                        //one that i sent out
+                        //one approach could be to generate a local guid and match that one to figure out if this is the right one
+                        mAdapter.add(0, latestThreadAnswer);
+                        latestThreadAnswer = null;
                     }
                     break;
                 case ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT:
@@ -259,13 +266,13 @@ public class ThreadActivity extends AppCompatActivity
      */
     public void insertSkooziServiceAnswer(String content) {
         if (ConnectionUtil.isDeviceOnline()) {
-            Answer mAnswer = new Answer(threadQuestion.key,
+            latestThreadAnswer = new Answer(threadQuestion.key,
                     SkooziApplication.getUserAccount().name, //TODO: this needs to be fixed once OAuth is setup
                     content,
                     System.currentTimeMillis() / 1000L,
                     12,//TODO: need to figure out the current location
                     12);
-            SkooziQnARequestService.startActionInsertAnswer(this, tokenListener, threadQuestion.key, mAnswer);
+            SkooziQnARequestService.startActionInsertAnswer(this, tokenListener, threadQuestion.key, latestThreadAnswer);
         } else {
             displayNetworkErrorMessage();
         }
@@ -300,7 +307,7 @@ public class ThreadActivity extends AppCompatActivity
      * This method is called after the API request to get answers for the question has been made
      */
     private void updateThreadAnswerList() {
-        ThreadRecyclerViewAdapter mAdapter = new ThreadRecyclerViewAdapter(this, threadAnswers);
+        mAdapter = new ThreadRecyclerViewAdapter(this, threadAnswers);
 
         List<ThreadSectionedAdapter.Section> sections = new ArrayList<>();
         //Sections

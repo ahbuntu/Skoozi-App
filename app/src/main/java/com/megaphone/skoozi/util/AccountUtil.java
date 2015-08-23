@@ -56,6 +56,11 @@ public class AccountUtil {
     }
 
 
+    public static String getDisplayName() {
+        //todo: this should be changed so that the @ symbol is stripped out
+        return SkooziApplication.getUserAccount().name;
+    }
+
     /**
      * This method is a hook for background threads and async tasks that need to
      * provide the user a response UI when an exception occurs.
