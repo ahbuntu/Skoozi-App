@@ -4,6 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- Main Nearby Fragment definitions-->
+    <dimen name="nearby_radius_header_height">32dp</dimen>
     <dimen name="nearby_map_height">250dp</dimen>
     <dimen name="nearby_list_row_vertical_margin">8dp</dimen>
     <dimen name="nearby_list_row_horizontal_margin">4dp</dimen>

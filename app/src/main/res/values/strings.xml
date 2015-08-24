@@ -3,8 +3,13 @@
     <string name="app_api_url">https:skoozi-959.appspot.com/_ah/api</string>
 
     <string name="title_section1">NEARBY</string>
-    <string name="nearby_section_label">Showing all activity within a 100 km radius</string>
-    <string name="title_section2">MINE</string>
+    <string name="nearby_section_label">Showing all questions within a radius of  </string>
+    <string-array name="nearby_radius_options">
+        <item> 1 KM </item>
+        <item> 5 KM </item>
+        <item> 10 KM </item>
+        <item> 25 KM </item>
+    </string-array>
 
     <!-- menu items -->
     <string name="action_home">Home</string>

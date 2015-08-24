@@ -26,6 +26,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
@@ -161,11 +163,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         RADIUS_COLOR_RGB = getResources().getColor(R.color.accent_material_light);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupToolbar();
+
         mLayoutView = (CoordinatorLayout) findViewById(R.id.main_coordinator_layout);
+
+        Spinner radiusSelector = (Spinner) findViewById(R.id.radius_spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.nearby_radius_options, R.layout.main_radius_spinner);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        radiusSelector.setAdapter(adapter);
 
         if (findViewById(R.id.main_fragment_container) != null) {
             // However, if we're being restored from a previous state,
@@ -174,9 +185,7 @@ public class MainActivity extends AppCompatActivity
             if (savedInstanceState != null) {
                 return;
             }
-
             nearbyFragment = NearbyFragment.newInstance(this);
-
             // Add the fragment to the 'fragment_container' FrameLayout
             getFragmentManager().beginTransaction()
                     .add(R.id.main_fragment_container, nearbyFragment).commit();
