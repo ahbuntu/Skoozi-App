@@ -6,6 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <FrameLayout
+        android:id="@+id/thread_list_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/nearby_list_user_vertical_margin"
+        android:layout_marginEnd="@dimen/nearby_list_user_vertical_margin">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/thread_list_profile_image"
@@ -15,16 +22,23 @@
         android:layout_width="@dimen/thread_list_user_diameter"
         android:layout_height="@dimen/thread_list_user_diameter"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/nearby_list_user_vertical_margin"/>
+        android:layout_marginTop="@dimen/nearby_list_user_vertical_margin"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
+        <ImageView
+            android:id="@+id/thread_list_name_image"
+            android:layout_width="@dimen/nearby_list_user_diameter"
+            android:layout_height="@dimen/nearby_list_user_diameter"
+            android:visibility="gone"/>
+    </FrameLayout>
     <TextView
         android:id="@+id/thread_answer_profile_name"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textStyle="bold"
-        android:layout_toEndOf="@+id/thread_list_profile_image"
+        android:layout_toEndOf="@+id/thread_list_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/thread_list_row_vertical_margin"
         android:layout_marginBottom="@dimen/thread_list_row_vertical_margin"
         tools:text="FirstName"/>
@@ -48,8 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/thread_answer_profile_name"
-        android:layout_toEndOf="@+id/thread_list_profile_image"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_toEndOf="@+id/thread_list_image"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/thread_list_row_vertical_margin"
         tools:text="This is where the text of the question will be. This is a very long and elaborate example of what a question may look like."/>
