@@ -4,4 +4,5 @@
     android:id="@+id/nearby_recycler"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="@dimen/nearby_radius_header_height"
     />

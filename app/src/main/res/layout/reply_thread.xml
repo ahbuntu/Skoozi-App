@@ -18,9 +18,8 @@
         android:layout_gravity="start|center_vertical"
         android:layout_weight="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Small.Inverse"
-        android:paddingLeft="@dimen/nearby_list_row_start_margin"
-        android:paddingStart="@dimen/nearby_list_row_start_margin"
-        android:paddingRight="@dimen/nearby_list_row_start_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
         tools:text="this is the REPLY CONTENT and how it will be displayed"/>
 
     <ImageButton

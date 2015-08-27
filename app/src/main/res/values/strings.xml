@@ -5,9 +5,9 @@
     <string name="title_section1">NEARBY</string>
     <string name="nearby_section_label">Showing all questions within a radius of  </string>
     <string-array name="nearby_radius_options">
+        <item> 10 KM </item>
         <item> 1 KM </item>
         <item> 5 KM </item>
-        <item> 10 KM </item>
         <item> 25 KM </item>
     </string-array>
 

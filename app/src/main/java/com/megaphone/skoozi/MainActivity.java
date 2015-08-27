@@ -67,13 +67,14 @@ public class MainActivity extends AppCompatActivity
     public static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
     public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
+    private static int RADIUS_COLOR_RGB;
 
     private static final int GOOGLE_API_REQUEST_RESOLVE_ERROR = 1001; // Request code to use when launching the resolution activity
     public final static int DEFAULT_RADIUS_METRES = 10000;
     private static final LatLng DEFAULT_LOCATION = new LatLng(43.6532,-79.3832);
-    private static final int DEFAULT_ZOOM = 10;
-    private static final int RADIUS_TRANSPARENCY = 64; //75%
+    private static final int DEFAULT_ZOOM = 11;
 
+    private static final int RADIUS_TRANSPARENCY = 64; //75%
     private CoordinatorLayout mLayoutView;
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity
     private static final String DIALOG_ERROR = "dialog_error"; // Unique tag for the error dialog fragment
     private boolean mResolvingError = false;// Bool to track whether the app is already resolving an error
     private Location mLastLocation;
-    private static int RADIUS_COLOR_RGB;
     private Marker defaultMarker;
 
 
@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity
                 //fail silently
                 //todo: determine if there's a better approach to this
                 return;
-
             Log.d(TAG, String.valueOf(questions.size()));
             updateNearbyList(questions);
         }

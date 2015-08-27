@@ -50,11 +50,11 @@ public class ThreadActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     private static final String TAG = "ThreadActivity";
-    static final String EXTRA_QUESTION = "com.megaphone.skoozi.extras.question_parcel";
-    static final String BROADCAST_THREAD_ANSWERS_RESULT = "com.megaphone.skoozi.broadcast.THREAD_ANSWERS_RESULT";
-    static final String EXTRAS_THREAD_ANSWERS  = "com.megaphone.skoozi.extras.THREAD_ANSWERS";
-    static final String BROADCAST_POST_ANSWER_RESULT = "com.megaphone.skoozi.broadcast.POST_ANSWER_RESULT";
-    static final String EXTRAS_ANSWER_KEY  = "com.megaphone.skoozi.extras.ANSWER_KEY";
+    public static final String EXTRA_QUESTION = "com.megaphone.skoozi.extra.question_parcel";
+    public static final String EXTRA_THREAD_ANSWERS = "com.megaphone.skoozi.extra.THREAD_ANSWERS";
+    public static final String EXTRA_ANSWER_KEY = "com.megaphone.skoozi.extra.ANSWER_KEY";
+    public static final String BROADCAST_THREAD_ANSWERS_RESULT = "com.megaphone.skoozi.broadcast.THREAD_ANSWERS_RESULT";
+    public static final String BROADCAST_POST_ANSWER_RESULT = "com.megaphone.skoozi.broadcast.POST_ANSWER_RESULT";
     public static final String ACTION_THREAD_REPLY = "com.megaphone.skoozi.action.THREAD_REPLY";
 
     CoordinatorLayout mLayoutView;
@@ -75,7 +75,7 @@ public class ThreadActivity extends AppCompatActivity
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case ThreadActivity.BROADCAST_POST_ANSWER_RESULT:
-                    String answer_key = intent.getStringExtra(ThreadActivity.EXTRAS_ANSWER_KEY);
+                    String answer_key = intent.getStringExtra(ThreadActivity.EXTRA_ANSWER_KEY);
                     if (answer_key == null) {
                         //TODO: use a Snackbar here with option to retry :)
                         Toast.makeText(context, "Looks like there was an error. Please try again.", Toast.LENGTH_SHORT).show();
@@ -91,13 +91,12 @@ public class ThreadActivity extends AppCompatActivity
                     break;
                 case ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT:
                 default:
-                    threadAnswers = intent.getParcelableArrayListExtra(ThreadActivity.EXTRAS_THREAD_ANSWERS);
+                    threadAnswers = intent.getParcelableArrayListExtra(ThreadActivity.EXTRA_THREAD_ANSWERS);
                     updateThreadAnswerList();
                     break;
             }
         }
     };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +157,7 @@ public class ThreadActivity extends AppCompatActivity
     private void setActivityTitle(String title) {
         collapsingToolbar.setTitle(title);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the toolbar menu
@@ -173,14 +173,23 @@ public class ThreadActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+            startMainActivity();
             return true;
         } else if (id == R.id.action_my_activity) {
             Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        startMainActivity();
+    }
+
+    private void startMainActivity(){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -227,7 +236,6 @@ public class ThreadActivity extends AppCompatActivity
                 break;
         }
     }
-
 
     private void setupLocalBroadcastPair() {
         IntentFilter mIntentFilter = new IntentFilter();

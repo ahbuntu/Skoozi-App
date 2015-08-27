@@ -2,6 +2,7 @@
 <!--TODO: delete this when no longer used-->
 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/thread_answer_card"
     android:layout_gravity="center"
     android:layout_width="match_parent"
@@ -19,38 +20,37 @@
             android:src="@drawable/profile"
             app:border_width="0dp"
             app:border_color="?attr/colorAccent"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-            android:layout_marginStart="@dimen/nearby_list_row_start_margin"
-            android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"/>
+            android:layout_width="@dimen/thread_list_user_diameter"
+            android:layout_height="@dimen/thread_list_user_diameter"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/thread_list_row_vertical_margin"/>
 
         <TextView
             android:id="@+id/thread_answer_profile_name"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_toRightOf="@+id/thread_answer_profile_image"
+            android:layout_toEndOf="@+id/thread_answer_profile_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-            android:layout_marginStart="@dimen/nearby_list_row_start_margin"
-            android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
-            android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/thread_list_row_vertical_margin"
+            android:layout_marginBottom="@dimen/thread_list_row_vertical_margin"
+            tools:text="full name"/>
 
         <TextView
             android:id="@+id/thread_answer_timestamp"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:gravity="right"
-            android:layout_toRightOf="@+id/thread_answer_profile_name"
-            android:layout_alignParentRight="true"
+            android:layout_toEndOf="@+id/thread_answer_profile_name"
+            android:layout_alignParentEnd="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/nearby_list_row_start_margin"
-            android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
-            android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/thread_list_row_vertical_margin"
+            android:layout_marginBottom="@dimen/thread_list_row_vertical_margin"
+            tools:text="3d"/>
 
         <TextView
             android:id="@+id/thread_answer_content"
-            android:text="This is where the text of the question will be. This is a very long and elaborate example of what a question may look like."
             android:lines="3"
             android:maxLines="3"
             android:ellipsize="end"
@@ -58,12 +58,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/thread_answer_profile_name"
             android:layout_toEndOf="@+id/thread_answer_profile_image"
-            android:layout_toRightOf="@+id/thread_answer_profile_image"
-            android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-            android:layout_marginStart="@dimen/nearby_list_row_start_margin"
-            android:layout_marginRight="@dimen/nearby_list_row_start_margin"
-            android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
-            android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/thread_list_row_vertical_margin"
+            tools:text="This is where the text of the question will be. This is a very long and elaborate example of what a question may look like."/>
 
     </RelativeLayout>
 

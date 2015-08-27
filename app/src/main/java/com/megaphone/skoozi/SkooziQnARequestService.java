@@ -1,11 +1,8 @@
 package com.megaphone.skoozi;
 
-import android.accounts.Account;
-import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
-import android.location.Location;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -193,7 +190,7 @@ public class SkooziQnARequestService extends IntentService {
             Log.e(TAG, e.getMessage());
         }
         Intent localIntent = new Intent(ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT)
-                .putParcelableArrayListExtra(ThreadActivity.EXTRAS_THREAD_ANSWERS, threadAnswers);
+                .putParcelableArrayListExtra(ThreadActivity.EXTRA_THREAD_ANSWERS, threadAnswers);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
@@ -261,7 +258,7 @@ public class SkooziQnARequestService extends IntentService {
             Log.e(TAG, e.getMessage());
         }
         Intent localIntent = new Intent(ThreadActivity.BROADCAST_POST_ANSWER_RESULT)
-                .putExtra(ThreadActivity.EXTRAS_ANSWER_KEY, postKey);
+                .putExtra(ThreadActivity.EXTRA_ANSWER_KEY, postKey);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
