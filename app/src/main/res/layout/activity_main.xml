@@ -25,8 +25,6 @@
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
             >
-            <!--app:layout_scrollFlags="scroll|exitUntilCollapsed"-->
-
 
             <fragment android:name="com.google.android.gms.maps.MapFragment"
                 android:id="@+id/nearby_map"
@@ -72,6 +70,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/fab_margin_bottom"
         android:layout_marginEnd="@dimen/fab_margin_right"
+        android:layout_marginRight="@dimen/fab_margin_right"
         app:layout_behavior="com.megaphone.skoozi.FloatingActionButtonScrollBehavior"
         app:layout_anchor="@+id/main_fragment_container"
         app:layout_anchorGravity="bottom|right|end"

@@ -213,15 +213,17 @@ public class SkooziQnARequestService extends IntentService {
             }
 
             List<CoreModelsQuestionMessage> questionMessages =  questionsListResponse.getQuestions();
-            questionList = new ArrayList<>(questionMessages.size());
-            for (CoreModelsQuestionMessage questionMessage: questionMessages) {
-                questionList.add(new Question(
-                        questionMessage.getEmail(),
-                        questionMessage.getContent(),
-                        questionMessage.getIdUrlsafe(),
-                        questionMessage.getTimestampUnix(),
-                        questionMessage.getLocationLat(),
-                        questionMessage.getLocationLon()));
+            if (questionMessages != null) {
+                questionList = new ArrayList<>(questionMessages.size());
+                for (CoreModelsQuestionMessage questionMessage : questionMessages) {
+                    questionList.add(new Question(
+                            questionMessage.getEmail(),
+                            questionMessage.getContent(),
+                            questionMessage.getIdUrlsafe(),
+                            questionMessage.getTimestampUnix(),
+                            questionMessage.getLocationLat(),
+                            questionMessage.getLocationLon()));
+                }
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());

@@ -2,13 +2,11 @@ package com.megaphone.skoozi;
 
 import android.accounts.AccountManager;
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -25,7 +23,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
+import android.view.ViewAnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -46,8 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ThreadActivity extends AppCompatActivity
-        implements OnMapReadyCallback {
+public class ThreadActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String TAG = "ThreadActivity";
     public static final String EXTRA_QUESTION = "com.megaphone.skoozi.extra.question_parcel";
@@ -68,7 +66,6 @@ public class ThreadActivity extends AppCompatActivity
     private LinearLayout threadReply;
     private EditText answerContent;
     private FloatingActionButton threadReplyFab;
-    private float mFabSize;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -80,13 +77,7 @@ public class ThreadActivity extends AppCompatActivity
                         //TODO: use a Snackbar here with option to retry :)
                         Toast.makeText(context, "Looks like there was an error. Please try again.", Toast.LENGTH_SHORT).show();
                     } else {
-//                        refreshThreadList();
-                        if (mAdapter == null || latestThreadAnswer == null) return;
-                        //todo: need to see if there's a better way to verify that this answer_key correspnds to the
-                        //one that i sent out
-                        //one approach could be to generate a local guid and match that one to figure out if this is the right one
-                        mAdapter.add(0, latestThreadAnswer);
-                        latestThreadAnswer = null;
+                        handleResponseSuccessful();
                     }
                     break;
                 case ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT:
@@ -125,7 +116,7 @@ public class ThreadActivity extends AppCompatActivity
         threadReplyFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onFabPressed();
+                prepareResponse();
             }
         });
     }
@@ -143,15 +134,6 @@ public class ThreadActivity extends AppCompatActivity
             ab.setDisplayHomeAsUpEnabled(true);
         }
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-    }
-
-    private boolean validContent(String value) {
-        if (TextUtils.isEmpty(value)) {
-            Snackbar.make(mLayoutView, R.string.reply_error_message, Snackbar.LENGTH_SHORT)
-                    .show();
-            return false;
-        }
-        return true;
     }
 
     private void setActivityTitle(String title) {
@@ -312,6 +294,39 @@ public class ThreadActivity extends AppCompatActivity
     }
 
     /**
+     * displays the response container and sets up the click listeners
+     */
+    private void prepareResponse() {
+        ImageButton postAnswer = (ImageButton) findViewById(R.id.thread_reply_post);
+        answerContent = (EditText) findViewById(R.id.thread_reply_content);
+        postAnswer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isValidContent(answerContent.getText().toString())) {
+                    ((ThreadActivity) v.getContext()).insertSkooziServiceAnswer(answerContent.getText().toString());
+                }
+            }
+        });
+        animateFabDisappear();
+    }
+
+    /**
+     * method invoked once a response has been SUCCESSFULLY provided and inserted
+     */
+    private void handleResponseSuccessful() {
+        if (mAdapter == null || latestThreadAnswer == null) return;
+        //todo: need to see if there's a better way to verify that this answer_key correspnds to the
+        //one that i sent out
+        //one approach could be to generate a local guid and match that one to figure out if this is the right one
+        mAdapter.add(0, latestThreadAnswer);
+        answerContent = (EditText) findViewById(R.id.thread_reply_content);
+        answerContent.setText("");
+        hideKeyboard();
+        animateFabAppear();
+        latestThreadAnswer = null;
+    }
+
+    /**
      * This method is called after the API request to get answers for the question has been made
      */
     private void updateThreadAnswerList() {
@@ -319,7 +334,7 @@ public class ThreadActivity extends AppCompatActivity
 
         List<ThreadSectionedAdapter.Section> sections = new ArrayList<>();
         //Sections
-        sections.add(new ThreadSectionedAdapter.Section(0,threadQuestion));
+        sections.add(new ThreadSectionedAdapter.Section(0, threadQuestion));
 
         ThreadSectionedAdapter mSectionedAdapter = new
                 ThreadSectionedAdapter(this,R.layout.section_thread,
@@ -336,104 +351,50 @@ public class ThreadActivity extends AppCompatActivity
                 .show();
     }
 
-
-    public final static float SCALE_FACTOR      = 13f;
-    public final static int ANIMATION_DURATION  = 300;
-//    public final static int MINIMUN_X_DISTANCE  = 200;
-    public final static int MINIMUN_X_DISTANCE  = 20;
-
-    private boolean mRevealFlag;
-
-    private void onFabPressed() {
-        final float startX = threadReplyFab.getX();
-
-        CurvedAnimatorPath path = new CurvedAnimatorPath();
-        path.moveTo(0, 0);
-//        path.curveTo(-200, 200, -400, 100, -600, 50);
-        path.curveTo(-200, 200, -400, 100, threadReply.getX(), threadReply.getY());
-
-
-
-        final ObjectAnimator anim = ObjectAnimator.ofObject(this, "fabLoc",
-                path.new PathEvaluator(), path.getPoints().toArray());
-
-        anim.setInterpolator(new AccelerateInterpolator());
-        anim.setDuration(ANIMATION_DURATION);
-        anim.start();
-
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-
-                if (Math.abs(startX - threadReplyFab.getX()) > MINIMUN_X_DISTANCE) {
-
-                    if (!mRevealFlag) {
-                        mFabSize = getResources().getDimensionPixelSize(R.dimen.fab_size);
-//                        threadReply.setY(threadReply.getY() + mFabSize / 2);
-                        threadReply.setY(threadReply.getY());
-
-                        threadReplyFab.animate()
-                                .scaleXBy(SCALE_FACTOR)
-                                .scaleYBy(SCALE_FACTOR)
-                                .setListener(mEndRevealListener)
-                                .setDuration(ANIMATION_DURATION);
-
-                        mRevealFlag = true;
-                    }
-                }
-            }
-        });
-    }
-
-    private AnimatorListenerAdapter mEndRevealListener = new AnimatorListenerAdapter() {
-
-        @Override
-        public void onAnimationEnd(Animator animation) {
-
-            super.onAnimationEnd(animation);
-
-            threadReplyFab.setVisibility(View.INVISIBLE);
-//            threadReply.setBackgroundColor(getResources()
-//                    .getColor(R.color.accent));
-            threadReply.setVisibility(View.VISIBLE);
-            ImageButton postAnswer = (ImageButton) findViewById(R.id.thread_reply_post);
-            answerContent = (EditText) findViewById(R.id.thread_reply_content);
-            postAnswer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (validContent(answerContent.getText().toString())) {
-                        ((ThreadActivity) v.getContext()).insertSkooziServiceAnswer(answerContent.getText().toString());
-                    }
-                }
-            });
-
-//            for (int i = 0; i < mControlsContainer.getChildCount(); i++) {
-//
-//                View v = mControlsContainer.getChildAt(i);
-//                ViewPropertyAnimator animator = v.animate()
-//                        .scaleX(1).scaleY(1)
-//                        .setDuration(ANIMATION_DURATION);
-//
-//                animator.setStartDelay(i * 50);
-//                animator.start();
-//            }
+    private boolean isValidContent(String value) {
+        if (TextUtils.isEmpty(value)) {
+            Snackbar.make(mLayoutView, R.string.reply_error_message, Snackbar.LENGTH_SHORT).show();
+            return false;
         }
-    };
-
-    /**
-     * We need this setter to translate between the information the animator
-     * produces (a new "PathPoint" describing the current animated location)
-     * and the information that the button requires (an xy location). The
-     * setter will be called by the ObjectAnimator given the 'fabLoc'
-     * property string.
-     */
-    public void setFabLoc(CurvedAnimatorPath.PathPoint newLoc) {
-        threadReplyFab.setTranslationX(newLoc.mX);
-        if (mRevealFlag)
-            threadReplyFab.setTranslationY(newLoc.mY - (mFabSize / 2));
-        else
-            threadReplyFab.setTranslationY(newLoc.mY);
+        return true;
     }
 
+    private void animateFabDisappear() {
+        int cx = threadReply.getWidth() / 2;
+        int cy = threadReply.getHeight() / 2;
+        int finalRadius = Math.max(threadReply.getWidth(), threadReply.getHeight());
+
+        Animator anim = null;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            anim = ViewAnimationUtils.createCircularReveal(threadReply, cx, cy, 0, finalRadius);
+        }
+
+        threadReply.setVisibility(View.VISIBLE);
+        if (anim!= null) anim.start();
+        threadReplyFab.setVisibility(View.GONE);
+    }
+
+//    https://developer.android.com/training/material/animations.html#Reveal
+    private void animateFabAppear() {
+        int cx = threadReplyFab.getWidth() / 2;
+        int cy = threadReplyFab.getHeight() / 2;
+        int finalRadius = Math.max(threadReplyFab.getWidth(), threadReplyFab.getHeight());
+
+        Animator anim = null;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            anim = ViewAnimationUtils.createCircularReveal(threadReplyFab, cx, cy, 0, finalRadius);
+        }
+
+        threadReplyFab.setVisibility(View.VISIBLE);
+        if (anim!= null) anim.start();
+        threadReply.setVisibility(View.GONE);
+    }
+
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
 }

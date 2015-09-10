@@ -12,6 +12,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.megaphone.skoozi.util.PresentationUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +56,7 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
      */
     public ThreadRecyclerViewAdapter(Context context, List<Answer> answers) {
         mContext = context;
-        threadAnswers = answers;
+        threadAnswers = (answers == null) ? (new ArrayList<Answer>() ) : answers;
     }
 
     //region AnswerViewHolder Lifecycle callbacks
@@ -90,7 +91,6 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
                 holder.threadUserName.setText(answerItem.author);
                 holder.threadContent.setText(answerItem.content);
 
-
                 //todo: decision to display user image or letter should be made here
                 ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
                 // generate random color
@@ -106,7 +106,6 @@ public class ThreadRecyclerViewAdapter extends RecyclerView.Adapter<ThreadRecycl
 
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return threadAnswers == null ? 1 : threadAnswers.size();
