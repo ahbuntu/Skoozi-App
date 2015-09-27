@@ -31,8 +31,6 @@ public class ConnectionUtil {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
-
-
     public static void displayNetworkErrorMessage(CoordinatorLayout layoutView) {
         Snackbar.make(layoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
 //                .setAction(R.string.snackbar_action_undo, clickListener)

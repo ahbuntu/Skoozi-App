@@ -1,8 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/nearby_recycler"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/nearby_radius_header_height"
-    />
+    android:orientation="vertical">
+
+    <include layout="@layout/main_floating_header"
+        android:id="@+id/main_floating_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/nearby_radius_header_height"
+        />
+
+    <ProgressBar
+        android:id="@+id/nearby_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/nearby_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+</LinearLayout>

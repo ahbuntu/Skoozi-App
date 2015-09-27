@@ -165,6 +165,7 @@ public class SkooziQnARequestService extends IntentService {
      * Handle action Get Thread Answers in the background thread with the provided params.
      */
     private void handleActionGetThreadAnswers(String question_key) {
+        Log.d(TAG, String.format("Trying to get all answers for question key %s", question_key));
         initializeApiConnection();
         ArrayList<Answer> threadAnswers = null;
         try {
@@ -198,6 +199,9 @@ public class SkooziQnARequestService extends IntentService {
      * Handle action Get Questions List in the background thread
      */
     private void handleActionGetQuestionsList(double lat, double lon, double radius) {
+        Log.d(TAG, String.format("Trying to get questions for area with radius %f, centred at %f, %f.",
+                radius, lat, lon));
+
         initializeApiConnection();
         ArrayList<Question> questionList = null;
         try {
@@ -239,6 +243,8 @@ public class SkooziQnARequestService extends IntentService {
      * Handle action Insert New Answer in the background thread
      */
     private void handleActionInsertAnswer(String questionKey, Answer userAnswer) {
+        Log.d(TAG, "Trying to post a new answer.");
+
         initializeApiConnection();
         String postKey = null;
         try {
@@ -265,9 +271,10 @@ public class SkooziQnARequestService extends IntentService {
     }
 
     /**
-     * Handle action Insert New Answer in the background thread
+     * Handle action Insert New Question in the background thread
      */
     private void handleActionInsertQuestion(Question userQuestion) {
+        Log.d(TAG, "Trying to post a new question.");
         initializeApiConnection();
         String postKey = null;
         try {
@@ -302,8 +309,6 @@ public class SkooziQnARequestService extends IntentService {
         } catch (UserRecoverableAuthException userRecoverableException) {
             // GooglePlayServices.apk is either old, disabled, or not present
             // so we need to show the user some UI in the activity to recover.
-//            MainActivity mainActivityRef = (MainActivity) intentContext;
-//            mainActivityRef.handleGoogleAuthTokenException(userRecoverableException);
             authExceptionlistener.handleGoogleAuthException(userRecoverableException);
         } catch (GoogleAuthException fatalException) {
             // Some other type of unrecoverable exception has occurred.

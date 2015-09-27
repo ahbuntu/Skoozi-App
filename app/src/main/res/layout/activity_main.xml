@@ -48,31 +48,31 @@
 
     </android.support.design.widget.AppBarLayout>
 
+        <!--<include layout="@layout/main_floating_header"-->
+            <!--android:id="@+id/main_floating_header"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="@dimen/nearby_radius_header_height"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--app:layout_anchor="@+id/main_fragment_container"-->
+            <!--app:layout_anchorGravity="top" />-->
 
-    <include layout="@layout/main_floating_header"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/nearby_radius_header_height"
-        android:layout_alignParentBottom="true"
-        app:layout_anchor="@+id/main_fragment_container"
-        app:layout_anchorGravity="top" />
+        <FrameLayout
+            android:id="@+id/main_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        </FrameLayout>
 
-    <FrameLayout
-        android:id="@+id/main_fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    </FrameLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/nearby_fabBtn"
-        android:src="@mipmap/ic_create_white_24dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/fab_margin_bottom"
-        android:layout_marginEnd="@dimen/fab_margin_right"
-        android:layout_marginRight="@dimen/fab_margin_right"
-        app:layout_behavior="com.megaphone.skoozi.FloatingActionButtonScrollBehavior"
-        app:layout_anchor="@+id/main_fragment_container"
-        app:layout_anchorGravity="bottom|right|end"
-        />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/nearby_fabBtn"
+            android:src="@mipmap/ic_create_white_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fab_margin_bottom"
+            android:layout_marginEnd="@dimen/fab_margin_right"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            app:layout_behavior="com.megaphone.skoozi.FloatingActionButtonScrollBehavior"
+            app:layout_anchor="@+id/main_fragment_container"
+            app:layout_anchorGravity="bottom|right|end"
+            />
 </android.support.design.widget.CoordinatorLayout>

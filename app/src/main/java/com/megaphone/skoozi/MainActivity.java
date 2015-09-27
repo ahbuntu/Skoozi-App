@@ -26,11 +26,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -46,6 +46,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
+import com.megaphone.skoozi.util.SkooziQnAUtil;
 
 /**
  * Material design sliding tab implementation taken from
@@ -76,6 +77,8 @@ public class MainActivity extends AppCompatActivity
 
     private static final int RADIUS_TRANSPARENCY = 64; //75%
     private CoordinatorLayout mLayoutView;
+    private ProgressBar nearbyProgress;
+    private Spinner radiusSpinner;
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
     private GoogleApiClient mGoogleApiClient;
@@ -84,20 +87,8 @@ public class MainActivity extends AppCompatActivity
     private Location mLastLocation;
     private Marker defaultMarker;
 
-
     private CollapsingToolbarLayout collapsingToolbar;
 
-
-    /**
-     * Creating The Toolbar and setting it as the Toolbar for the activity
-     * home as up set to true
-     */
-    private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(this.getString(R.string.app_name));
-    }
 
     @Override
     public void onQuestionSelected(Question mQuestion) {
@@ -112,15 +103,18 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             ArrayList<Question> questions = intent.getParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST);
-            if (questions == null)
-                //fail silently
-                //todo: determine if there's a better approach to this
-                return;
-            Log.d(TAG, String.valueOf(questions.size()));
+            nearbyProgress = (ProgressBar) mLayoutView.findViewById(R.id.nearby_progress);
+            if (nearbyProgress != null) {
+                nearbyProgress.setVisibility(View.GONE);
+            }
+            if (questions == null) {
+                //todo: need to retry with larger search radius
+                SkooziQnAUtil.displayNoQuestionsMessage(mLayoutView);
+//                return;
+            }
             updateNearbyList(questions);
         }
     };
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -168,32 +162,16 @@ public class MainActivity extends AppCompatActivity
 
         mLayoutView = (CoordinatorLayout) findViewById(R.id.main_coordinator_layout);
 
-        Spinner radiusSelector = (Spinner) findViewById(R.id.radius_spinner);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.nearby_radius_options, R.layout.main_radius_spinner);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        radiusSelector.setAdapter(adapter);
-
+        initGoogleApiClient();
         if (findViewById(R.id.main_fragment_container) != null) {
-            // However, if we're being restored from a previous state,
-            // then we don't need to do anything and should return or else
-            // we could end up with overlapping fragments.
-            if (savedInstanceState != null) {
+            if (savedInstanceState == null) {
+                nearbyFragment = NearbyFragment.newInstance();
+                // Add the fragment to the 'fragment_container' FrameLayout
+                getFragmentManager().beginTransaction()
+                        .add(R.id.main_fragment_container, nearbyFragment).commit();
+            } else {
                 return;
             }
-            nearbyFragment = NearbyFragment.newInstance(this);
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getFragmentManager().beginTransaction()
-                    .add(R.id.main_fragment_container, nearbyFragment).commit();
-        }
-
-        if (ConnectionUtil.isGPSEnabled(this)) {
-            buildGoogleApiClient();
-        } else {
-            displayGpsErrorMessage();
         }
     }
 
@@ -211,37 +189,74 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
+    private void setSpinnerListener() {
+        if (radiusSpinner == null) return;
+        if (spinnerListening) return;
+
+        radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                nearbyProgress = (ProgressBar) mLayoutView.findViewById(R.id.nearby_progress);
+                if (nearbyProgress != null) {
+                    nearbyProgress.setVisibility(View.VISIBLE);
+                }
+                updateSearchRadiusCircle();
+                getQuestionsFromApi(parseSearchRadiusKm(parentView.getSelectedItem().toString()));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+    }
+
+    private int parseSearchRadiusKm(String radiusSpinnerSelectedText) {
+        try {
+            int radiusKm = Integer.parseInt(radiusSpinnerSelectedText.split("\\s+")[0]);
+            return radiusKm; //need to return radius in metres
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Error while trying to extract radius from spinner. " );
+            e.printStackTrace();
+        }
+        return DEFAULT_RADIUS_METRES/1000;
+    }
+
+    private void getQuestionsFromApi(int radiusKm) {
+        IntentFilter mIntentFilter = new IntentFilter(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
+        SkooziQnARequestService.startActionGetQuestionsList(this, tokenListener
+                , mLastLocation == null ? DEFAULT_LOCATION : new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())
+                , (long) radiusKm);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        radiusSpinner = (Spinner) mLayoutView.findViewById(R.id.radius_spinner);
+
         try {
             if (ConnectionUtil.isDeviceOnline()) {
-                if (SkooziApplication.getUserAccount() == null) {
-                    AccountUtil.pickUserAccount(MainActivity.this, null);
-                }
-
-                IntentFilter mIntentFilter = new IntentFilter(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT);
-                LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mIntentFilter);
-                SkooziQnARequestService.startActionGetQuestionsList(this, tokenListener,
-                        mLastLocation == null ? DEFAULT_LOCATION : new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()),
-                        (long) DEFAULT_RADIUS_METRES/1000);
+                if (SkooziApplication.getUserAccount() == null) AccountUtil.pickUserAccount(MainActivity.this, null);
             } else {
                 ConnectionUtil.displayNetworkErrorMessage(mLayoutView);
             }
         } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
+            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
         }
 
         FloatingActionButton nearby_fab = (FloatingActionButton) findViewById(R.id.nearby_fabBtn);
-        nearby_fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tryNewQuestion();
+            nearby_fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tryNewQuestion();
             }
         });
 
         if (ConnectionUtil.isGPSEnabled(this) && !mResolvingError) {
-            mGoogleApiClient.connect();
+            if (mGoogleApiClient != null) {
+                mGoogleApiClient.connect();
+            }
         }
     }
 
@@ -274,21 +289,39 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         if (id == R.id.action_my_activity) {
             Toast.makeText(MainActivity.this,"my activity",Toast.LENGTH_SHORT).show();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 //endregion
 
+
+    /**
+     * Creating The Toolbar and setting it as the Toolbar for the activity
+     * home as up set to true
+     */
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(this.getString(R.string.app_name));
+    }
+
+
 //region GoogleApi calls
+
+    private void initGoogleApiClient() {
+        if (mGoogleApiClient == null) {
+            if (ConnectionUtil.isGPSEnabled(this)) {
+                buildGoogleApiClient();
+            } else {
+                displayGpsErrorMessage();
+            }
+        }
+    }
 
     /**
      * https://developers.google.com/android/guides/api-client
@@ -311,8 +344,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onConnectionSuspended (int cause) {
-        // The connection has been interrupted.
-        // Disable any UI components that depend on Google APIs
+        // The connection has been interrupted. Disable any UI components that depend on Google APIs
         // until onConnected() is called.
         Log.d(TAG, "connection to Google API suspended" + cause);
     }
@@ -341,8 +373,33 @@ public class MainActivity extends AppCompatActivity
     }
 //endregion
 
+    private void updateSearchRadiusCircle() {
+        if (nearbyMap != null && mLastLocation != null) {
+            nearbyMap.clear();
+            // Instantiates a new CircleOptions object and defines the center and radius
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
+                    .fillColor(Color.argb(RADIUS_TRANSPARENCY,
+                            Color.red(RADIUS_COLOR_RGB),
+                            Color.green(RADIUS_COLOR_RGB),
+                            Color.blue(RADIUS_COLOR_RGB)))
+                    .radius(radiusSpinner == null
+                            ? DEFAULT_RADIUS_METRES
+                            : 1000 * parseSearchRadiusKm(radiusSpinner.getSelectedItem().toString())); // need this in metres
+            nearbyMap.addCircle(circleOptions);
+        }
+    }
+
+    boolean spinnerListening = false;
     private void updateCurrentLocation() {
         if (nearbyMap != null) {
+
+            setSpinnerListener();
+            if (radiusSpinner != null) {
+//                    getQuestionsFromApi(parseSearchRadiusKm(radiusSpinner.getSelectedItem().toString()));
+            }
+
+
             if (defaultMarker != null) {
                 defaultMarker.remove();
             }
@@ -354,34 +411,30 @@ public class MainActivity extends AppCompatActivity
                     .title("Current location"));
             nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, DEFAULT_ZOOM));
 
-            // Instantiates a new CircleOptions object and defines the center and radius
-            CircleOptions circleOptions = new CircleOptions()
-                    .center(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
-                    .fillColor(Color.argb(RADIUS_TRANSPARENCY,
-                            Color.red(RADIUS_COLOR_RGB),
-                            Color.green(RADIUS_COLOR_RGB),
-                            Color.blue(RADIUS_COLOR_RGB)))
-                    .radius(DEFAULT_RADIUS_METRES);
-            nearbyMap.addCircle(circleOptions);
+            updateSearchRadiusCircle();
         }
     }
 
     @Override
     public void onMapReady(GoogleMap map) {
         nearbyMap = map;
+
         if (mLastLocation != null) {
             updateCurrentLocation();
-        } else {
-            // Move the camera instantly to Toronto
-            defaultMarker = nearbyMap.addMarker(new MarkerOptions()
-                    .position(DEFAULT_LOCATION)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .title("Default location"));
-            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, DEFAULT_ZOOM));
-            nearbyMap.getUiSettings().setZoomControlsEnabled(true);
         }
+        //todo: nned to determine when/why/how to handle the scenario where mLastLocation = null
+//        else {
+//            // Move the camera instantly to Toronto
+//            defaultMarker = nearbyMap.addMarker(new MarkerOptions()
+//                    .position(DEFAULT_LOCATION)
+//                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+//                    .title("Default location"));
+//            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, DEFAULT_ZOOM));
+//            nearbyMap.getUiSettings().setZoomControlsEnabled(true);
+//        }
     }
 
+    //todo: this method is likely not being used. Investigate if it can be removed.
     @Override
     public void onMapQuestion(double lat, double lon) {
         LatLng questionLocation = new LatLng(lat,lon);
@@ -389,7 +442,6 @@ public class MainActivity extends AppCompatActivity
             nearbyMap.addMarker(new MarkerOptions()
                     .position(questionLocation));
         }
-
     }
 
     private void updateNearbyList(List<Question> questions) {
@@ -397,26 +449,6 @@ public class MainActivity extends AppCompatActivity
             nearbyFragment.updateNearbyQuestions(questions, nearbyMap);
         }
     }
-
-
-
-    /**
-     * Attempts to retrieve the username.
-     * If the account is not yet known, invoke the picker. Once the account is known,
-     * start an instance of the AsyncTask to get the auth token and do work with it.
-     */
-//    private void getUsername() {
-//
-//        if (mEmail == null) {
-//            AccountUtil.pickUserAccount(MainActivity.this);
-//        } else {
-//            if (ConnectionUtil.isDeviceOnline()) {
-//                new GetUsernameTask(this, mEmail, SCOPE).execute();
-//            } else {
-//                displayNetworkErrorMessage();
-//            }
-//        }
-//    }
 
 //region Error Message handlers
 
