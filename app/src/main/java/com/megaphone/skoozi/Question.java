@@ -7,18 +7,18 @@ import android.os.Parcelable;
  * Created by ahmadul.hassan on 2015-05-02.
  */
 public class Question implements Parcelable {
-    private String author;
-    private String content;
-    private String key;
-    private String timestamp;
-    private double locationLat;
-    private double locationLon;
+    public String author;
+    public String content;
+    public String key;
+    public Long timestamp;
+    public double locationLat;
+    public double locationLon;
 
     public Question() {
 
     }
 
-    public Question(String author, String content, String key, String timestamp, double locationLat, double locationLon) {
+    public Question(String author, String content, String key, Long timestamp, double locationLat, double locationLon) {
         this.author = author;
         this.content = content;
         this.key = key;
@@ -27,55 +27,7 @@ public class Question implements Parcelable {
         this.locationLon = locationLon;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public double getLocationLat() {
-        return locationLat;
-    }
-
-    public void setLocationLat(double locationLat) {
-        this.locationLat = locationLat;
-    }
-
-    public double getLocationLon() {
-        return locationLon;
-    }
-
-    public void setLocationLon(double locationLon) {
-        this.locationLon = locationLon;
-    }
-
-    //region IParcelable implementation
+    //region Parcelable implementation
 
     /**
      * generate instances of the Question class from a Parcel
@@ -108,12 +60,12 @@ public class Question implements Parcelable {
      * @param in the parcel used to construct the Question object
      */
     public void readFromParcel(Parcel in) {
-        setAuthor(in.readString());
-        setContent(in.readString());
-        setKey(in.readString());
-        setTimestamp(in.readString());
-        setLocationLat(in.readDouble());
-        setLocationLon(in.readDouble());
+        this.author = (in.readString());
+        this.content = (in.readString());
+        this.key = (in.readString());
+        this.timestamp = in.readLong();
+        this.locationLat = (in.readDouble());
+        this.locationLon = (in.readDouble());
     }
 
     /**
@@ -124,12 +76,12 @@ public class Question implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(getAuthor());
-        dest.writeString(getContent());
-        dest.writeString(getKey());
-        dest.writeString(getTimestamp());
-        dest.writeDouble(getLocationLat());
-        dest.writeDouble(getLocationLon());
+        dest.writeString(this.author);
+        dest.writeString(this.content);
+        dest.writeString(this.key);
+        dest.writeLong(this.timestamp);
+        dest.writeDouble(this.locationLat);
+        dest.writeDouble(this.locationLon);
     }
 
     //endregion

@@ -1,63 +1,72 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/thread_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/new_toolbar"
-        layout="@layout/toolbar"
-        android:layout_height="wrap_content"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        />
+        android:layout_height="192dp"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <fragment android:name="com.google.android.gms.maps.MapFragment"
-        android:id="@+id/thread_map"
-        android:layout_below="@+id/new_toolbar"
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginBottom="32dp"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <fragment android:name="com.google.android.gms.maps.MapFragment"
+                android:id="@+id/thread_map"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nearby_map_height"
+                app:layout_collapseMode="parallax"/>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:elevation="2dp"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:layout_collapseMode="pin"/>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <!-- Scrollable content here -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/thread_answer_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/nearby_map_height"/>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <com.megaphone.skoozi.CircularImageView
-        android:id="@+id/thread_image"
-        android:src="@drawable/profile"
-        app:border_color="@color/accent"
-        app:border_width="1dp"
-        android:layout_below="@+id/thread_map"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-        android:layout_marginStart="@dimen/nearby_list_row_start_margin"
-        android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"/>
+    <include layout="@layout/reply_thread"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/thread_reply_container"
+        android:layout_alignParentBottom="true"
+        app:layout_anchor="@+id/thread_answer_recycler"
+        app:layout_anchorGravity="bottom" />
 
-
-    <TextView
-        android:id="@+id/thread_profile_name"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="FirstName"
-        android:textStyle="bold"
-        android:layout_below="@id/thread_map"
-        android:layout_toRightOf="@+id/thread_image"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/reply_fab"
+        android:src="@mipmap/ic_create_white_24dp"
+        app:fabSize="normal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-        android:layout_marginStart="@dimen/nearby_list_row_start_margin"
-        android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
-        android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
-
-
-    <TextView
-        android:id="@+id/thread_question_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_below="@+id/thread_image"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/new_question_horizontal_margin"
+        android:layout_marginBottom="@dimen/fab_margin_bottom"
+        android:layout_marginRight="@dimen/fab_margin_right"
+        app:layout_anchor="@+id/thread_answer_recycler"
+        app:layout_anchorGravity="bottom|right|end"
         />
 
+</android.support.design.widget.CoordinatorLayout>
 
-    <ListView
-        android:id="@+id/thread_answer_list"
-        android:layout_below="@+id/thread_question_content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-</RelativeLayout>

@@ -25,17 +25,31 @@
     <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
 
     <application
+        android:name=".SkooziApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/MyTheme" >
+        <!--android:theme="@style/AppTheme"-->
+
         <activity android:name=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".PostQuestionActivity" >
+        </activity>
+
+        <!--http://stackoverflow.com/questions/30801379/coordinatorlayout-with-collapsingtoolbarlayout-breaks-with-keyboard-in-dialog-fr-->
+        <activity android:name=".ThreadActivity"
+            android:windowSoftInputMode="adjustPan">
+        </activity>
+
+        <service
+            android:name=".SkooziQnARequestService"
+            android:exported="false" /> <!--ensure service only available to this app.-->
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -44,14 +58,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAUisAnCzjGu0XoqThYtVFtVuGTS1IluL0" />
 
-        <activity android:name=".PostQuestionActivity" >
-        </activity>
-        <activity android:name=".ThreadActivity" >
-        </activity>
-
-        <service
-            android:name=".SkooziQnARequestService"
-            android:exported="false" /> <!--ensure service only available to this app.-->
     </application>
 
 </manifest>
