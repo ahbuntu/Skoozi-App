@@ -236,6 +236,7 @@ public class MainActivity extends AppCompatActivity
 
         try {
             if (ConnectionUtil.isDeviceOnline()) {
+                getQuestionsFromApi(parseSearchRadiusKm(radiusSpinner.getSelectedItem().toString()));
                 if (SkooziApplication.getUserAccount() == null) AccountUtil.pickUserAccount(MainActivity.this, null);
             } else {
                 ConnectionUtil.displayNetworkErrorMessage(mLayoutView);
@@ -399,7 +400,6 @@ public class MainActivity extends AppCompatActivity
 //                    getQuestionsFromApi(parseSearchRadiusKm(radiusSpinner.getSelectedItem().toString()));
             }
 
-
             if (defaultMarker != null) {
                 defaultMarker.remove();
             }
@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity
         if (mLastLocation != null) {
             updateCurrentLocation();
         }
-        //todo: nned to determine when/why/how to handle the scenario where mLastLocation = null
+        //todo: need to determine when/why/how to handle the scenario where mLastLocation = null
 //        else {
 //            // Move the camera instantly to Toronto
 //            defaultMarker = nearbyMap.addMarker(new MarkerOptions()

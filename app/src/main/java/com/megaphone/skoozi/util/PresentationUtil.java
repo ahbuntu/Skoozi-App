@@ -62,7 +62,7 @@ public class PresentationUtil {
         } else if (delta/TimestampSeconds.SECONDS_IN_MIN != 0) {
             return delta/TimestampSeconds.SECONDS_IN_MIN + " m";
         } else {
-            return delta + " sec";
+            return delta + " s";
         }
     }
 
