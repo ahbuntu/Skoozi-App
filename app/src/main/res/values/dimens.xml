@@ -4,17 +4,25 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- Main Nearby Fragment definitions-->
+    <dimen name="nearby_radius_header_height">40dp</dimen>
+    <dimen name="nearby_list_padding">20dp</dimen>
     <dimen name="nearby_map_height">250dp</dimen>
-    <dimen name="nearby_list_row_vertical_margin">8dp</dimen>
-    <dimen name="nearby_list_row_horizontal_margin">4dp</dimen>
-    <dimen name="nearby_list_row_start_margin">8dp</dimen>
+    <dimen name="nearby_list_user_diameter">40dp</dimen>
+    <dimen name="nearby_list_user_vertical_margin">8dp</dimen>
+    <dimen name="nearby_list_row_vertical_margin">4dp</dimen>
 
     <!-- New Question definitions-->
     <dimen name="new_question_horizontal_margin">4dp</dimen>
     <dimen name="new_question_vertical_margin">8dp</dimen>
 
+    <!-- Thread definitions-->
+    <dimen name="thread_reply_container">100dp</dimen>
+    <dimen name="thread_list_user_diameter">40dp</dimen>
+    <dimen name="thread_list_user_vertical_margin">8dp</dimen>
+    <dimen name="thread_list_row_vertical_margin">4dp</dimen>
     <!-- FAB button-->
     <dimen name="fab_margin_right">0dp</dimen>
     <dimen name="fab_margin_bottom">0dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
 
 </resources>

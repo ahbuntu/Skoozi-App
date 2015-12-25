@@ -1,60 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?android:attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <FrameLayout
+        android:id="@+id/nearby_list_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/nearby_list_user_vertical_margin"
+        android:layout_marginEnd="@dimen/nearby_list_user_vertical_margin"
+        android:layout_marginRight="@dimen/nearby_list_user_vertical_margin" >
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/nearby_list_profile_image"
-        android:src="@drawable/profile"
-        app:border_width="0dp"
-        app:border_color="?attr/colorAccent"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-        android:layout_marginStart="@dimen/nearby_list_row_start_margin"
-        android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"/>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/nearby_list_profile_image"
+            android:src="@drawable/profile"
+            app:border_width="0dp"
+            app:border_color="?attr/colorAccent"
+            android:layout_width="@dimen/nearby_list_user_diameter"
+            android:layout_height="@dimen/nearby_list_user_diameter"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+        <ImageView
+            android:id="@+id/nearby_list_name_image"
+            android:layout_width="@dimen/nearby_list_user_diameter"
+            android:layout_height="@dimen/nearby_list_user_diameter"
+            android:visibility="gone"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/nearby_list_profile_name"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="FirstName"
         android:textStyle="bold"
-        android:layout_toRightOf="@+id/nearby_list_profile_image"
+        android:layout_toEndOf="@+id/nearby_list_image"
+        android:layout_toRightOf="@+id/nearby_list_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-        android:layout_marginStart="@dimen/nearby_list_row_start_margin"
         android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
-        android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
+        android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"
+        tools:text="FirstName"/>
 
 
     <TextView
         android:id="@+id/nearby_list_question_duration"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:gravity="right"
+        android:gravity="end"
+        android:layout_toEndOf="@+id/nearby_list_profile_name"
         android:layout_toRightOf="@+id/nearby_list_profile_name"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="@dimen/nearby_list_row_start_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
-        android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
-
-    <!--<TextView-->
-        <!--android:id="@+id/nearby_list_question_state"-->
-        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
-        <!--android:text="Expired"-->
-        <!--android:gravity="right"-->
-        <!--android:layout_toRightOf="@+id/nearby_list_profile_name"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginRight="@dimen/nearby_list_row_start_margin"-->
-        <!--android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"-->
-        <!--android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>-->
+        android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"
+        tools:text="3d"/>
 
     <TextView
         android:id="@+id/nearby_list_question"
@@ -65,12 +71,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/nearby_list_profile_name"
-        android:layout_toEndOf="@+id/nearby_list_profile_image"
-        android:layout_toRightOf="@+id/nearby_list_profile_image"
-        android:layout_marginLeft="@dimen/nearby_list_row_start_margin"
-        android:layout_marginStart="@dimen/nearby_list_row_start_margin"
-        android:layout_marginRight="@dimen/nearby_list_row_start_margin"
-        android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
+        android:layout_toEndOf="@+id/nearby_list_image"
+        android:layout_toRightOf="@+id/nearby_list_image"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/nearby_list_row_vertical_margin"/>
 
 </RelativeLayout>

@@ -49,22 +49,24 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabBtn"
-        android:src="@mipmap/ic_place_black_24dp"
-        app:fabSize="mini"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_anchor="@+id/appbar"
-        app:layout_anchorGravity="bottom|right|end"
-        />
-
     <include layout="@layout/reply_thread"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="@dimen/thread_reply_container"
         android:layout_alignParentBottom="true"
         app:layout_anchor="@+id/thread_answer_recycler"
-        app:layout_anchorGravity="bottom"/>
+        app:layout_anchorGravity="bottom" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/reply_fab"
+        android:src="@mipmap/ic_create_white_24dp"
+        app:fabSize="normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/fab_margin_bottom"
+        android:layout_marginRight="@dimen/fab_margin_right"
+        app:layout_anchor="@+id/thread_answer_recycler"
+        app:layout_anchorGravity="bottom|right|end"
+        />
 
 </android.support.design.widget.CoordinatorLayout>
 

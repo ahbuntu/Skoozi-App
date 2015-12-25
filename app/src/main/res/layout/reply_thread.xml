@@ -2,10 +2,15 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/thread_reply_container"
     android:background="?attr/colorAccent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:orientation="horizontal"
+    android:visibility="gone"
+    tools:visibility="visible">
 
     <EditText
         android:id="@+id/thread_reply_content"
@@ -14,10 +19,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start|center_vertical"
         android:layout_weight="1"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small.Inverse"
-        android:paddingLeft="@dimen/nearby_list_row_start_margin"
-        android:paddingStart="@dimen/nearby_list_row_start_margin"
-        android:paddingRight="@dimen/nearby_list_row_start_margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textCursorDrawable="@null"
+        android:textColor="@android:color/white"
         tools:text="this is the REPLY CONTENT and how it will be displayed"/>
 
     <ImageButton

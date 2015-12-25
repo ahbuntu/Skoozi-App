@@ -1,13 +1,15 @@
 package com.megaphone.skoozi;
 
+import android.accounts.AccountManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,9 +24,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.appspot.skoozi_959.skooziqna.Skooziqna;
-import com.appspot.skoozi_959.skooziqna.model.CoreModelsPostResponse;
-import com.appspot.skoozi_959.skooziqna.model.CoreModelsQuestionMessage;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -35,18 +35,19 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-
-import java.io.IOException;
+import com.megaphone.skoozi.util.AccountUtil;
+import com.megaphone.skoozi.util.ConnectionUtil;
 
 
 public class PostQuestionActivity extends AppCompatActivity
         implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "PostQuestionActivty";
-    Toolbar mToolbar;
+    public static final String BROADCAST_POST_QUESTION_RESULT = "com.megaphone.skoozi.broadcast.POST_QUESTION_RESULT";
+    public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
+    public static final String EXTRA_QUESTION_KEY  = "com.megaphone.skoozi.extra.QUESTION_KEY";
+
     GoogleMap newQuestionMap;
     Location mLastLocation;
     LatLng postLocation;
@@ -55,8 +56,39 @@ public class PostQuestionActivity extends AppCompatActivity
     private EditText postQuestionText;
     private ProgressBar postQuestionProgress;
     private CoordinatorLayout coordinatorLayout;
+    private Button postQuestionButton;
 
     Question postQuestion;
+
+    private BroadcastReceiver questionInsertReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(PostQuestionActivity.BROADCAST_POST_QUESTION_RESULT)) {
+                String questionKey = intent.getStringExtra(PostQuestionActivity.EXTRA_QUESTION_KEY);
+                if (questionKey == null) {
+                    //TODO: use a Snackbar here with option to retry :)
+                    Toast.makeText(context, "Looks like there was an error. Please try again.", Toast.LENGTH_SHORT).show();
+                } else {
+                    showThread(questionKey);
+                }
+            }
+        }
+    };
+
+    private AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
+        @Override
+        public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
+            // Because this call comes from the IntentService, we must ensure that the following
+            // code instead executes on the UI thread.
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AccountUtil.resolveAuthExceptionError(PostQuestionActivity.this, exception);
+                }
+            });
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,16 +101,22 @@ public class PostQuestionActivity extends AppCompatActivity
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.new_question_coordinator_layout);
         postQuestionProgress = (ProgressBar) findViewById(R.id.new_question_progress);
         postQuestionText = (EditText) findViewById(R.id.new_question_content);
-        Button postQuestionButton = (Button) findViewById(R.id.post_new_question);
+        postQuestionButton = (Button) findViewById(R.id.post_new_question);
+        postQuestionButton.setEnabled(false);
         postQuestionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String postContent = postQuestionText.getText().toString().trim();
-                if (validContent(postContent) && postLocation != null) {
-                    postQuestion = new Question("test", postContent,
-                            "what's a key", (long)123123,
-                            postLocation.latitude, postLocation.longitude );
-                    new InsertQuestionAsyncTask().execute(postQuestion);
+                if (isContentValid(postContent) && postLocation != null) {
+                    postQuestion = new Question(SkooziApplication.getUserAccount().name, postContent,
+                            null, System.currentTimeMillis() / 1000L,
+                            postLocation.latitude, postLocation.longitude);
+                    SkooziQnARequestService.startActionInsertNewQuestion(PostQuestionActivity.this, tokenListener,
+                            postQuestion);
+                    hideKeyboard();
+                } else {
+                    //todo: need to add in display error message for disabled GPS/location
+                    //ie. postLocation == null condition
                 }
             }
         });
@@ -91,7 +129,6 @@ public class PostQuestionActivity extends AppCompatActivity
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Show menu icon
         final ActionBar ab = getSupportActionBar();
 //        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         if (ab != null) {
@@ -99,10 +136,9 @@ public class PostQuestionActivity extends AppCompatActivity
         }
     }
 
-    private boolean validContent(String value) {
+    private boolean isContentValid(String value) {
         if (TextUtils.isEmpty(value)) {
-            Snackbar.make(coordinatorLayout, R.string.new_question_error_message, Snackbar.LENGTH_SHORT)
-                    .show();
+            Snackbar.make(coordinatorLayout, R.string.new_question_error_message, Snackbar.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -132,12 +168,55 @@ public class PostQuestionActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
+    private void setupLocalBroadcastPair() {
+        IntentFilter mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(PostQuestionActivity.BROADCAST_POST_QUESTION_RESULT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(questionInsertReceiver, mIntentFilter);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
-        if (mMapFragment != null) {
-            mMapFragment.getMapAsync(this);
+        try {
+            if (ConnectionUtil.isDeviceOnline()) {
+                if (SkooziApplication.getUserAccount() == null) {
+                    AccountUtil.pickUserAccount(PostQuestionActivity.this, ACTION_NEW_QUESTION);
+                } else {
+                    postQuestionButton.setEnabled(true);
+                }
+
+                MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
+                if (mMapFragment != null) {
+                    mMapFragment.getMapAsync(this);
+                }
+
+                setupLocalBroadcastPair();
+            } else {
+                ConnectionUtil.displayNetworkErrorMessage(coordinatorLayout);
+            }
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
+                if (resultCode == RESULT_OK) {
+                    // Receiving a result from the AccountPicker
+                    SkooziApplication.setUserAccount(this, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
+                    String action = data.getStringExtra(AccountUtil.EXTRA_USER_ACCOUNT_ACTION); //can return null
+                    if (action != null && action.equals(ACTION_NEW_QUESTION)) {
+                        postQuestionButton.setEnabled(true); // ok to proceed
+                    }
+                } else if (resultCode == RESULT_CANCELED) {
+                    // The account picker dialog closed without selecting an account.
+                    postQuestionButton.setEnabled(false);
+                    AccountUtil.displayAccountLoginErrorMessage(coordinatorLayout);
+                }
+                break;
         }
     }
 
@@ -220,63 +299,11 @@ public class PostQuestionActivity extends AppCompatActivity
         postQuestionText.setText("");
     }
 
-    private class InsertQuestionAsyncTask extends AsyncTask<Question, Void, String> {
-        private Skooziqna skooziqnaService;
-
-        @Override
-        protected void onPreExecute() {
-            postQuestionProgress.setVisibility(View.VISIBLE);
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(postQuestionText.getWindowToken(), 0);
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
-
-        /**
-         * Calls REST API to insert question
-         */
-        @Override
-        protected String doInBackground(Question... params) {
-            String postKey = null;
-            if (skooziqnaService == null) { // do this once
-                Skooziqna.Builder builder = new Skooziqna.Builder(AndroidHttp.newCompatibleTransport(),
-                        new AndroidJsonFactory(), null)
-                        .setRootUrl(getString(R.string.app_api_url))
-                        // turn off compression when running against local devappserver (via emulator)
-//                    .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-//                        @Override
-//                        public void initialize(AbstractGoogleClientRequest<?> request) throws IOException {
-//                            request.setDisableGZipContent(true);
-//                        }
-//                    })
-                        ; //end devserver options
-                skooziqnaService = builder.build();
-            }
-            Question userQuestion = params[0];
-            try {
-                CoreModelsQuestionMessage question = new CoreModelsQuestionMessage();
-
-                question.setEmail("proper@proper.com");
-                question.setContent(userQuestion.content);
-                question.setLocationLat(userQuestion.locationLat);
-                question.setLocationLon(userQuestion.locationLon);
-                question.setTimestampUnix(System.currentTimeMillis() / 1000L);
-
-                CoreModelsPostResponse insertResponse = skooziqnaService.question().insert(question).execute();
-                //TODO: figure out if I need to do anything with this
-                postKey = insertResponse.getPostKey();
-
-            } catch (IOException e) {
-                // TODO: Check for network connectivity before starting the AsyncTask.
-                Log.e(TAG, e.getMessage());
-            }
-            return postKey;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            postQuestionProgress.setVisibility(View.INVISIBLE);
-            showThread(result);
-        }
-
     }
-
 }

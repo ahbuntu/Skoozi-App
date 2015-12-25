@@ -36,7 +36,6 @@ public class GetUsernameTask extends AsyncTask<Void, Void, Void> {
         try {
             String token = fetchToken();
             if (token != null) {
-                // **Insert the good stuff here.**
                 // Use the token to access the user's Google data.
                 Log.d(TAG, "Received token");
             }
@@ -58,8 +57,8 @@ public class GetUsernameTask extends AsyncTask<Void, Void, Void> {
         } catch (UserRecoverableAuthException userRecoverableException) {
             // GooglePlayServices.apk is either old, disabled, or not present
             // so we need to show the user some UI in the activity to recover.
-            MainActivity mainActivityRef = (MainActivity) mActivity;
-            mainActivityRef.handleGoogleAuthTokenException(userRecoverableException);
+//            MainActivity mainActivityRef = (MainActivity) mActivity;
+//            mainActivityRef.handleGoogleAuthTokenException(userRecoverableException);
         } catch (GoogleAuthException fatalException) {
             // Some other type of unrecoverable exception has occurred.
             // Report and log the error as appropriate for your app.
