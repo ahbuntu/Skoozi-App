@@ -1,10 +1,28 @@
-.gradle
+
+# application files
+*.apk
+
+# generated files
+bin/
+target/
+
+## gradle folders
+build/
+.gradle/
+
+# IntelliJ files and folders
+*.iml
+*.ipr
+*.iws
 .idea/
 
+# local config
 /local.properties
+
+# miscellaneous
 # /.idea/workspace.xml
 # /.idea/libraries
 .DS_Store
-/build
+
 /captures
 *.db
