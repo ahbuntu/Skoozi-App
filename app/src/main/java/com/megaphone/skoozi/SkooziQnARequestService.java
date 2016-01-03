@@ -180,7 +180,8 @@ public class SkooziQnARequestService extends IntentService {
                     threadAnswers.add(new Answer(
                             answerMessage.getIdUrlsafe(),
                             question_key,
-                            answerMessage.getEmail(),
+                            "dummy static value", // FIXME: 2016-01-02 figure out right values
+//                            answerMessage.getEmail(),
                             answerMessage.getContent(),
                             answerMessage.getTimestampUnix(),
                             answerMessage.getLocationLat(),
@@ -221,7 +222,8 @@ public class SkooziQnARequestService extends IntentService {
                 questionList = new ArrayList<>(questionMessages.size());
                 for (CoreModelsQuestionMessage questionMessage : questionMessages) {
                     questionList.add(new Question(
-                            questionMessage.getEmail(),
+                            "dummy static value", // FIXME: 2016-01-02 figure out right values
+//                            questionMessage.getEmail(),
                             questionMessage.getContent(),
                             questionMessage.getIdUrlsafe(),
                             questionMessage.getTimestampUnix(),
@@ -251,7 +253,7 @@ public class SkooziQnARequestService extends IntentService {
             CoreModelsAnswerMessage answerMsg = new CoreModelsAnswerMessage();
 
             answerMsg.setQuestionUrlsafe(questionKey);
-            answerMsg.setEmail(userAnswer.author);
+//            answerMsg.setEmail(userAnswer.author); // FIXME: 2016-01-02 figure out right values
             answerMsg.setContent(userAnswer.content);
             answerMsg.setLocationLat(userAnswer.locationLat);
             answerMsg.setLocationLon(userAnswer.locationLon);
@@ -280,7 +282,8 @@ public class SkooziQnARequestService extends IntentService {
         try {
             CoreModelsQuestionMessage questionMsg = new CoreModelsQuestionMessage();
 
-            questionMsg.setEmail(userQuestion.author);
+            // FIXME: 2016-01-02 figure out right values
+//            questionMsg.setEmail(userQuestion.author);
             questionMsg.setContent(userQuestion.content);
             questionMsg.setLocationLat(userQuestion.locationLat);
             questionMsg.setLocationLon(userQuestion.locationLon);
