@@ -16,6 +16,10 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true // Enabling multidex support
+    }
+    dexOptions {
+        javaMaxHeapSize "4g"
     }
     buildTypes {
         release {
@@ -25,6 +29,8 @@ android {
     }
 }
 dependencies {
+    compile 'com.android.support:multidex:1.0.0'
+
     /**
      * Look at the comment by 'Jamie Nhu'
      * http://stackoverflow.com/questions/24548032/how-do-i-match-a-google-play-services-revision-with-an-install-version
@@ -35,7 +41,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
 
-    compile 'com.google.android.gms:play-services:8.4.0' 
+    compile 'com.google.android.gms:play-services:8.4.0'
 
     compile ([group: 'com.appspot.skoozi_959', name: 'skooziqna', version: 'v0.1-1.21.0-SNAPSHOT'])
     compile ([group: 'com.google.api-client', name: 'google-api-client-android', version: '1.21.0'])
