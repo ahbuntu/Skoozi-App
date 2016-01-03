@@ -48,6 +48,7 @@ import com.megaphone.skoozi.api.SkooziQnARequestService;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
+import com.megaphone.skoozi.util.GoogleApiClientBroker;
 import com.megaphone.skoozi.util.SkooziQnAUtil;
 
 /**
@@ -63,8 +64,8 @@ import com.megaphone.skoozi.util.SkooziQnAUtil;
  * http://stackoverflow.com/questions/26449454/extending-activity-or-actionbaractivity
  */
 public class MainActivity extends AppCompatActivity
-                            implements OnMapReadyCallback, NearbyFragment.OnMapQuestionsCallback, NearbyRecyclerViewAdapter.OnQuestionItemSelected,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements OnMapReadyCallback, NearbyFragment.OnMapQuestionsCallback,
+        NearbyRecyclerViewAdapter.OnQuestionItemSelected {
 
     private static final String TAG = "MainActivity";
     public static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
@@ -78,13 +79,16 @@ public class MainActivity extends AppCompatActivity
     private static final int DEFAULT_ZOOM = 11;
 
     private static final int RADIUS_TRANSPARENCY = 64; //75%
+
+    private GoogleApiClientBroker googleApiBroker;
+    private GoogleApiClient googleApiClient;
+
     private CoordinatorLayout mLayoutView;
     private ProgressBar nearbyProgress;
     private Spinner radiusSpinner;
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
-    private GoogleApiClient mGoogleApiClient;
-    private static final String DIALOG_ERROR = "dialog_error"; // Unique tag for the error dialog fragment
+
     private boolean mResolvingError = false;// Bool to track whether the app is already resolving an error
     private Location mLastLocation;
     private Marker defaultMarker;
@@ -144,9 +148,9 @@ public class MainActivity extends AppCompatActivity
                 mResolvingError = false;
                 if (resultCode == RESULT_OK) {
                     // Make sure the app is not already connected or attempting to connect
-                    if (!mGoogleApiClient.isConnecting() &&
-                            !mGoogleApiClient.isConnected()) {
-                        mGoogleApiClient.connect();
+                    if (!googleApiClient.isConnecting() &&
+                            !googleApiClient.isConnected()) {
+                        googleApiClient.connect();
                     }
                 }
                 break;
@@ -164,7 +168,9 @@ public class MainActivity extends AppCompatActivity
 
         mLayoutView = (CoordinatorLayout) findViewById(R.id.main_coordinator_layout);
 
+        googleApiBroker = new GoogleApiClientBroker(this);
         initGoogleApiClient();
+
         if (findViewById(R.id.main_fragment_container) != null) {
             if (savedInstanceState == null) {
                 nearbyFragment = NearbyFragment.newInstance();
@@ -253,12 +259,12 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick(View v) {
                     tryNewQuestion();
-            }
-        });
+                }
+            });
 
         if (ConnectionUtil.isGPSEnabled(this) && !mResolvingError) {
-            if (mGoogleApiClient != null) {
-                mGoogleApiClient.connect();
+            if (googleApiClient != null) {
+                googleApiClient.connect();
             }
         }
     }
@@ -280,7 +286,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        if (mGoogleApiClient != null) mGoogleApiClient.disconnect();
+        if (googleApiClient != null) googleApiClient.disconnect();
     }
 
     @Override
@@ -313,68 +319,23 @@ public class MainActivity extends AppCompatActivity
         collapsingToolbar.setTitle(this.getString(R.string.app_name));
     }
 
-
-//region GoogleApi calls
-
     private void initGoogleApiClient() {
-        if (mGoogleApiClient == null) {
+        if (googleApiClient == null) {
             if (ConnectionUtil.isGPSEnabled(this)) {
-                buildGoogleApiClient();
+                googleApiClient = googleApiBroker.buildLocationClient(
+                        new GoogleApiClientBroker.BrokerResultListener() {
+                            @Override
+                            public void onConnected() {
+                                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                                if (mLastLocation != null) {
+                                    updateCurrentLocation();
+                                }
+                        }});
             } else {
                 displayGpsErrorMessage();
             }
         }
     }
-
-    /**
-     * https://developers.google.com/android/guides/api-client
-     */
-    private synchronized void buildGoogleApiClient(){
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            updateCurrentLocation();
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended (int cause) {
-        // The connection has been interrupted. Disable any UI components that depend on Google APIs
-        // until onConnected() is called.
-        Log.d(TAG, "connection to Google API suspended" + cause);
-    }
-
-    /**
-     * This callback is important for handling errors that
-     * may occur while attempting to connect with Google.
-     * @param result contains the reason as to why the connection failed
-     */
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.d(TAG, "connection to Google API failed for " + result.toString());
-        if (mResolvingError) {
-            return; // Already attempting to resolve an error.
-        } else if (result.hasResolution()) {
-            try {
-                mResolvingError = true;
-                result.startResolutionForResult(this, GOOGLE_API_REQUEST_RESOLVE_ERROR);
-            } catch (IntentSender.SendIntentException e) {
-                mGoogleApiClient.connect(); // There was an error with the resolution intent. Try again.
-            }
-        } else {
-            mResolvingError = true;
-            displayGoogleApiErrorMessage(result.getErrorCode()); // Show dialog using GooglePlayServicesUtil.getErrorDialog()
-        }
-    }
-//endregion
 
     private void updateSearchRadiusCircle() {
         if (nearbyMap != null && mLastLocation != null) {
@@ -452,8 +413,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-//region Error Message handlers
-
     private void displayGpsErrorMessage() {
         Snackbar.make(mLayoutView, R.string.no_gps_message, Snackbar.LENGTH_LONG)
                 .setAction(R.string.snackbar_enable_gps, new View.OnClickListener() {
@@ -464,41 +423,4 @@ public class MainActivity extends AppCompatActivity
                 })
                 .show();
     }
-
-    /**
-     *  Creates a dialog for an error message about connecting to Google Api
-     */
-    private void displayGoogleApiErrorMessage(int errorCode) {
-        // Create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-        // Pass the error that should be displayed
-        Bundle args = new Bundle();
-        args.putInt(DIALOG_ERROR, errorCode);
-        dialogFragment.setArguments(args);
-        dialogFragment.show(getSupportFragmentManager(), "errordialog");
-    }
-
-    /* Called from ErrorDialogFragment when the dialog is dismissed. */
-    public void onDialogDismissed() {
-        mResolvingError = false;
-    }
-
-    /* A fragment to display an error dialog */
-    public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() { }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Get the error code and retrieve the appropriate dialog
-            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
-            return GooglePlayServicesUtil.getErrorDialog(errorCode,
-                    this.getActivity(), GOOGLE_API_REQUEST_RESOLVE_ERROR);
-        }
-
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            ((MainActivity)getActivity()).onDialogDismissed();
-        }
-    }
-//endregion
 }

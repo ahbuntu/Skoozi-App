@@ -1,6 +1,5 @@
 package com.megaphone.skoozi;
 
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -18,7 +17,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.megaphone.skoozi.model.Question;
 
 import java.util.List;
-
 
 /**
  * Fragment to display all nearby questions and answers
