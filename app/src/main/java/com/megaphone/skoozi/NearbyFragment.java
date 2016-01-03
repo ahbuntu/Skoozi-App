@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.megaphone.skoozi.model.Question;
 
 import java.util.List;
 

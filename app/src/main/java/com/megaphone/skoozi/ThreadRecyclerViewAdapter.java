@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.util.PresentationUtil;
 
 import java.util.ArrayList;

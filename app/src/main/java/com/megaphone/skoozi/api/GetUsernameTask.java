@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.api;
 
 import android.accounts.Account;
 import android.app.Activity;

@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

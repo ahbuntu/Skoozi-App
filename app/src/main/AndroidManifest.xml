@@ -47,7 +47,7 @@
         </activity>
 
         <service
-            android:name=".SkooziQnARequestService"
+            android:name=".api.SkooziQnARequestService"
             android:exported="false" /> <!--ensure service only available to this app.-->
 
         <meta-data

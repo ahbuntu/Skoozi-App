@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.api;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -18,6 +18,13 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.megaphone.skoozi.MainActivity;
+import com.megaphone.skoozi.PostQuestionActivity;
+import com.megaphone.skoozi.R;
+import com.megaphone.skoozi.SkooziApplication;
+import com.megaphone.skoozi.ThreadActivity;
+import com.megaphone.skoozi.model.Answer;
+import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
 
 import java.io.IOException;
