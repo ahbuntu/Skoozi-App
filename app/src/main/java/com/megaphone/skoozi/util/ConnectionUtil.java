@@ -1,11 +1,14 @@
 package com.megaphone.skoozi.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.view.View;
 
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.SkooziApplication;
@@ -33,7 +36,18 @@ public class ConnectionUtil {
 
     public static void displayNetworkErrorMessage(CoordinatorLayout layoutView) {
         Snackbar.make(layoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
-//                .setAction(R.string.snackbar_action_undo, clickListener)
+                .show();
+    }
+
+    public static void displayGpsErrorMessage(CoordinatorLayout layoutView, final Context context) {
+        Snackbar.make(layoutView, R.string.no_gps_message, Snackbar.LENGTH_LONG)
+                .setAction(R.string.snackbar_enable_gps, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        context.startActivity(intent);
+                    }
+                })
                 .show();
     }
 }

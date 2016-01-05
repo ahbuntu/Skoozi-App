@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -49,6 +50,7 @@ import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
+import com.megaphone.skoozi.util.PermissionUtil;
 import com.megaphone.skoozi.util.SkooziQnAUtil;
 
 /**
@@ -73,7 +75,6 @@ public class MainActivity extends AppCompatActivity
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
     private static int RADIUS_COLOR_RGB;
 
-    private static final int GOOGLE_API_REQUEST_RESOLVE_ERROR = 1001; // Request code to use when launching the resolution activity
     public final static int DEFAULT_RADIUS_METRES = 10000;
     private static final LatLng DEFAULT_LOCATION = new LatLng(43.6532,-79.3832);
     private static final int DEFAULT_ZOOM = 11;
@@ -83,27 +84,31 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClientBroker googleApiBroker;
     private GoogleApiClient googleApiClient;
 
+    private CollapsingToolbarLayout collapsingToolbar;
     private CoordinatorLayout mLayoutView;
     private ProgressBar nearbyProgress;
     private Spinner radiusSpinner;
     private GoogleMap nearbyMap;
-    private NearbyFragment nearbyFragment;
 
+    private NearbyFragment nearbyFragment;
     private boolean mResolvingError = false;// Bool to track whether the app is already resolving an error
     private Location mLastLocation;
     private Marker defaultMarker;
 
-    private CollapsingToolbarLayout collapsingToolbar;
 
-
-    @Override
-    public void onQuestionSelected(Question mQuestion) {
-        Intent threadIntent = new Intent(this, ThreadActivity.class);
-        Bundle questionBundle = new Bundle();
-        questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, mQuestion);
-        threadIntent.putExtras(questionBundle);
-        startActivity(threadIntent);
-    }
+    private AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
+        @Override
+        public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
+            // Because this call comes from the AsyncTask, we must ensure that the following
+            // code instead executes on the UI thread.
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AccountUtil.resolveAuthExceptionError(MainActivity.this, exception);
+                }
+            });
+        }
+    };
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity
                     // Receiving a result that follows a GoogleAuthException, try auth again
 //                    getUsername();
                 }
-            case GOOGLE_API_REQUEST_RESOLVE_ERROR:
+            case GoogleApiClientBroker.GOOGLE_API_REQUEST_RESOLVE_ERROR:
                 mResolvingError = false;
                 if (resultCode == RESULT_OK) {
                     // Make sure the app is not already connected or attempting to connect
@@ -157,7 +162,28 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-//region Activity Lifecycle methods
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PermissionUtil.REQUEST_PERMISSION_LOCATION: {
+                if (grantResults.length > 0 // If request is cancelled, result arrays are empty
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLastLocation();
+                } else {
+                    mLastLocation = null;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onQuestionSelected(Question mQuestion) {
+        Intent threadIntent = new Intent(this, ThreadActivity.class);
+        Bundle questionBundle = new Bundle();
+        questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, mQuestion);
+        threadIntent.putExtras(questionBundle);
+        startActivity(threadIntent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,10 +193,6 @@ public class MainActivity extends AppCompatActivity
         setupToolbar();
 
         mLayoutView = (CoordinatorLayout) findViewById(R.id.main_coordinator_layout);
-
-        googleApiBroker = new GoogleApiClientBroker(this);
-        initGoogleApiClient();
-
         if (findViewById(R.id.main_fragment_container) != null) {
             if (savedInstanceState == null) {
                 nearbyFragment = NearbyFragment.newInstance();
@@ -181,41 +203,38 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
         }
+
+        googleApiBroker = new GoogleApiClientBroker(this);
+        initGoogleApiClient();
     }
 
-    private AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
-        @Override
-        public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
-            // Because this call comes from the AsyncTask, we must ensure that the following
-            // code instead executes on the UI thread.
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    AccountUtil.resolveAuthExceptionError(MainActivity.this, exception);
-                }
-            });
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(this.getString(R.string.app_name));
+    }
+
+    private void initGoogleApiClient() {
+        if (googleApiClient == null) {
+            if (ConnectionUtil.isGPSEnabled(this)) {
+                googleApiClient = googleApiBroker.buildLocationClient(
+                        new GoogleApiClientBroker.BrokerResultListener() {
+                            @Override
+                            public void onConnected() {
+                                getLastLocation();
+                            }});
+            } else {
+                ConnectionUtil.displayGpsErrorMessage(mLayoutView, this);
+            }
         }
-    };
+    }
 
-    private void setSpinnerListener() {
-        if (radiusSpinner == null) return;
-        if (spinnerListening) return;
-
-        radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                nearbyProgress = (ProgressBar) mLayoutView.findViewById(R.id.nearby_progress);
-                if (nearbyProgress != null) {
-                    nearbyProgress.setVisibility(View.VISIBLE);
-                }
-                updateSearchRadiusCircle();
-                getQuestionsFromApi(parseSearchRadiusKm(parentView.getSelectedItem().toString()));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
-        });
+    private void getLastLocation() {
+        mLastLocation = PermissionUtil.tryGetLastLocation(MainActivity.this, googleApiClient);
+        if (mLastLocation != null) {
+            updateCurrentLocation();
+        }
     }
 
     private int parseSearchRadiusKm(String radiusSpinnerSelectedText) {
@@ -269,6 +288,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setSpinnerListener() {
+        if (radiusSpinner == null) return;
+        if (spinnerListening) return;
+
+        radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                nearbyProgress = (ProgressBar) mLayoutView.findViewById(R.id.nearby_progress);
+                if (nearbyProgress != null) {
+                    nearbyProgress.setVisibility(View.VISIBLE);
+                }
+                updateSearchRadiusCircle();
+                getQuestionsFromApi(parseSearchRadiusKm(parentView.getSelectedItem().toString()));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+    }
+
     private void tryNewQuestion() {
         if (SkooziApplication.getUserAccount() == null) {
             AccountUtil.pickUserAccount(MainActivity.this, ACTION_NEW_QUESTION);
@@ -276,11 +316,6 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, PostQuestionActivity.class);
             startActivity(intent);
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -304,37 +339,6 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-//endregion
-
-
-    /**
-     * Creating The Toolbar and setting it as the Toolbar for the activity
-     * home as up set to true
-     */
-    private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(this.getString(R.string.app_name));
-    }
-
-    private void initGoogleApiClient() {
-        if (googleApiClient == null) {
-            if (ConnectionUtil.isGPSEnabled(this)) {
-                googleApiClient = googleApiBroker.buildLocationClient(
-                        new GoogleApiClientBroker.BrokerResultListener() {
-                            @Override
-                            public void onConnected() {
-                                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                                if (mLastLocation != null) {
-                                    updateCurrentLocation();
-                                }
-                        }});
-            } else {
-                displayGpsErrorMessage();
-            }
-        }
     }
 
     private void updateSearchRadiusCircle() {
@@ -411,16 +415,5 @@ public class MainActivity extends AppCompatActivity
         if (nearbyFragment != null) {
             nearbyFragment.updateNearbyQuestions(questions, nearbyMap);
         }
-    }
-
-    private void displayGpsErrorMessage() {
-        Snackbar.make(mLayoutView, R.string.no_gps_message, Snackbar.LENGTH_LONG)
-                .setAction(R.string.snackbar_enable_gps, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .show();
     }
 }

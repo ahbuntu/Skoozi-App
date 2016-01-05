@@ -2,7 +2,6 @@ package com.megaphone.skoozi.util;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.os.Bundle;
@@ -19,13 +18,13 @@ import com.google.android.gms.location.LocationServices;
  */
 public class GoogleApiClientBroker {
     private static final String TAG = "GoogleApiClientBroker";
-    private static final int GOOGLE_API_REQUEST_RESOLVE_ERROR = 1001; // Request code to use when launching the resolution activity
     private static final String DIALOG_ERROR = "dialog_error"; // Unique tag for the error dialog fragment
+    public static final int GOOGLE_API_REQUEST_RESOLVE_ERROR = 1001; // Request code to use when launching the resolution activity
 
     private Activity activity;
     private GoogleApiClient googleApiClient;
     private boolean resolvingError = false;// Bool to track whether the app is already resolving an error
-    private BrokerResultListener brokerResultListener;
+    private BrokerResultListener listener;
 
     public interface BrokerResultListener {
         void onConnected();
@@ -39,7 +38,7 @@ public class GoogleApiClientBroker {
             GoogleApiClient.ConnectionCallbacks() {
                 @Override
                 public void onConnected(Bundle bundle) {
-                    if (brokerResultListener != null) brokerResultListener.onConnected();
+                    if (listener != null) listener.onConnected();
                 }
 
                 @Override
@@ -62,17 +61,19 @@ public class GoogleApiClientBroker {
                             resolvingError = true;
                             result.startResolutionForResult(activity, GOOGLE_API_REQUEST_RESOLVE_ERROR);
                         } catch (IntentSender.SendIntentException e) {
-                            googleApiClient.connect(); // There was an error with the resolution intent. Try again.
+                            // There was an error with the resolution intent. Try again.
+                            googleApiClient.connect();
                         }
                     } else {
                         resolvingError = true;
-                        displayGoogleApiErrorMessage(result.getErrorCode());
                         // Show dialog using GooglePlayServicesUtil.getErrorDialog()
+                        displayGoogleApiErrorMessage(result.getErrorCode());
                     }
                 }
             };
 
-    public synchronized GoogleApiClient buildLocationClient(BrokerResultListener listener){
+    public synchronized GoogleApiClient buildLocationClient(BrokerResultListener listener) {
+        this.listener = listener;
         // https://developers.google.com/android/guides/api-client
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(activity)
