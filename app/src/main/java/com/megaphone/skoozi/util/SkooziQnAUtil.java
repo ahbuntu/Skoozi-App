@@ -18,6 +18,7 @@ import com.megaphone.skoozi.api.SkooziQnARequestService;
  * Created by ahmadulhassan on 2015-07-01.
  */
 public class SkooziQnAUtil {
+    private static final LatLng DEFAULT_LOCATION = new LatLng(43.6532,-79.3832);
     public static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
 
     public static void displayNoQuestionsMessage(CoordinatorLayout layoutView) {

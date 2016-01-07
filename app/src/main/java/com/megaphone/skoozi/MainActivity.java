@@ -15,8 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -47,17 +45,12 @@ import com.megaphone.skoozi.util.PermissionUtil;
  * http://stackoverflow.com/questions/26449454/extending-activity-or-actionbaractivity
  */
 public class MainActivity extends AppCompatActivity
-        implements NearbyFragment.OnMapQuestionsCallback,
-        NearbyRecyclerViewAdapter.OnQuestionItemSelected {
+        implements NearbyFragment.OnMapQuestionsCallback, NearbyRecyclerViewAdapter.OnQuestionItemSelected {
 
     private static final String TAG = "MainActivity";
-
     public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
-    private static int RADIUS_COLOR_RGB;
 
-
-    private static final LatLng DEFAULT_LOCATION = new LatLng(43.6532,-79.3832);
     private static final int DEFAULT_ZOOM = 11;
 
     private static final int RADIUS_TRANSPARENCY = 64; //75%
@@ -65,11 +58,8 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClientBroker googleApiBroker;
     private GoogleApiClient googleApiClient;
 
-    private CollapsingToolbarLayout collapsingToolbar;
-    private CoordinatorLayout mLayoutView;
-    private ProgressBar nearbyProgress;
+    private CoordinatorLayout coordinatorLayout;
     private GoogleMap nearbyMap;
-
     private NearbyFragment nearbyFragment;
     private boolean mResolvingError = false;// Bool to track whether the app is already resolving an error
     private Location latestLocation;
@@ -103,7 +93,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 } else if (resultCode == RESULT_CANCELED) {
                     // The account picker dialog closed without selecting an account.
-                    AccountUtil.displayAccountLoginErrorMessage(mLayoutView);
+                    AccountUtil.displayAccountLoginErrorMessage(coordinatorLayout);
                 }
                 break;
             case AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR:
@@ -150,16 +140,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        RADIUS_COLOR_RGB = ContextCompat.getColor(this, R.color.accent_material_light);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         setupToolbar();
 
-        mLayoutView = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
         if (findViewById(R.id.main_fragment_container) != null) {
             if (savedInstanceState == null) {
                 nearbyFragment = NearbyFragment.newInstance();
-                // Add the fragment to the 'fragment_container' FrameLayout
                 getFragmentManager().beginTransaction()
                         .add(R.id.main_fragment_container, nearbyFragment).commit();
             } else {
@@ -174,7 +163,7 @@ public class MainActivity extends AppCompatActivity
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(this.getString(R.string.app_name));
     }
 
@@ -188,7 +177,7 @@ public class MainActivity extends AppCompatActivity
                                 getLatestLocation();
                             }});
             } else {
-                ConnectionUtil.displayGpsErrorMessage(mLayoutView, this);
+                ConnectionUtil.displayGpsErrorMessage(coordinatorLayout, this);
             }
         }
     }
@@ -220,8 +209,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
-
 
     private void tryNewQuestion() {
         if (SkooziApplication.getUserAccount() == null) {
@@ -259,12 +246,13 @@ public class MainActivity extends AppCompatActivity
         if (nearbyMap != null && latestLocation != null) {
             nearbyMap.clear();
             // Instantiates a new CircleOptions object and defines the center and radius
+            int radiusColorRgb = ContextCompat.getColor(this, R.color.accent_material_light);
             CircleOptions circleOptions = new CircleOptions()
                     .center(new LatLng(latestLocation.getLatitude(), latestLocation.getLongitude()))
                     .fillColor(Color.argb(RADIUS_TRANSPARENCY,
-                            Color.red(RADIUS_COLOR_RGB),
-                            Color.green(RADIUS_COLOR_RGB),
-                            Color.blue(RADIUS_COLOR_RGB)))
+                            Color.red(radiusColorRgb),
+                            Color.green(radiusColorRgb),
+                            Color.blue(radiusColorRgb)))
                     .radius(nearbyFragment.getSearchRadiusKm()); // need this in metres
             nearbyMap.addCircle(circleOptions);
         }
