@@ -68,10 +68,11 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
         }
 
         protected void displayOnMap(double locLat, double locLon) {
+            if (nearbyMap == null) return;
+
             nearbyMap.addMarker(new MarkerOptions()
                     .position(new LatLng(locLat, locLon))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
-                    );
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)));
         }
 
     }
@@ -131,4 +132,8 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
     }
     //endregion
 
+    public void updateNearbyQuestions(List<Question> questions) {
+        nearbyQuestions = questions;
+        notifyDataSetChanged();
+    }
 }

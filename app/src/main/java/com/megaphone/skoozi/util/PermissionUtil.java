@@ -20,7 +20,7 @@ public class PermissionUtil {
     public static final int REQUEST_PERMISSION_LOCATION = 919191;
 
     @TargetApi(23)
-    public static Location tryGetLastLocation(Activity activity, GoogleApiClient googleApiClient)
+    public static Location tryGetLatestLocation(Activity activity, GoogleApiClient googleApiClient)
     {
         if (Build.VERSION.SDK_INT < 23) {
             return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
