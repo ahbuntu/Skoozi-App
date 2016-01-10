@@ -41,7 +41,7 @@ public class NearbyFragment extends Fragment {
     private NearbyRecyclerViewAdapter rvListAdapter;
     private Spinner radiusSpinner;
     private ProgressBar progressBar;
-    private Location selfLocation;
+    private Location searchOrigin;
     private NearbyQuestionsListener nearbyListener;
     private IntentFilter quesListIntentFilter;
 
@@ -68,7 +68,7 @@ public class NearbyFragment extends Fragment {
     };
 
     public interface NearbyQuestionsListener {
-        void onSearchAreaUpdated(Location origin, double radius);
+        void onSearchAreaUpdated(Location origin, int radius);
         void onQuestionsAvailable(List<Question> nearbyQuestions);
     }
 
@@ -82,7 +82,7 @@ public class NearbyFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         if (context instanceof MainActivity) {
-            nearbyListener = ((MainActivity) context).requestNearbyListener();
+            initNearbyListener(context);
         }
     }
 
@@ -111,13 +111,17 @@ public class NearbyFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        if (selfLocation != null) tryGetQuestionsFromApi();
+        if (searchOrigin != null) tryGetQuestionsFromApi();
     }
 
     @Override
     public void onPause(){
         super.onResume();
         removeListeners();
+    }
+
+    private void initNearbyListener(Context context) {
+        nearbyListener = ((MainActivity) context).requestNearbyListener();
     }
 
     private void setupRecyclerView() {
@@ -155,10 +159,14 @@ public class NearbyFragment extends Fragment {
     private void tryGetQuestionsFromApi() {
         setupLocalBroadcastPair();
         if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
-            if (selfLocation == null)  return; // can't do anything without a location
+            if (searchOrigin == null)  return; // can't do anything without a location
             progressBar.setVisibility(View.VISIBLE);
             SkooziQnAUtil.quesListRequest(getActivity(), authTokenListener,
-                    selfLocation, getSearchRadiusKm());
+                    searchOrigin, getSearchRadiusKm());
+
+            if (nearbyListener == null) initNearbyListener(getActivity());
+            if (nearbyListener != null)
+                nearbyListener.onSearchAreaUpdated(searchOrigin, getSearchRadiusKm());
         }
     }
 
@@ -173,7 +181,21 @@ public class NearbyFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(skooziApiReceiver);
     }
 
+    private int getSearchRadiusKm() {
+        String spinnerText = radiusSpinner.getSelectedItem().toString();
+        try {
+            return Integer.parseInt(spinnerText.split("\\s+")[0]);
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Error while trying to extract radius from spinner. " );
+        }
+        return DEFAULT_RADIUS_METRES/1000;
+    }
+
     private void displayApiResponse(List<Question> questions) {
+        if (nearbyListener == null) initNearbyListener(getActivity());
+        if (nearbyListener != null)
+            nearbyListener.onQuestionsAvailable(questions);
+
         progressBar.setVisibility(View.GONE);
         if (questions == null) {
             SkooziQnAUtil.displayNoQuestionsMessage(coordinatorLayout);
@@ -185,16 +207,7 @@ public class NearbyFragment extends Fragment {
     // Exposed methods
 
     public void updateSearchOrigin(Location updatedLocation) {
-        selfLocation = updatedLocation;
+        searchOrigin = updatedLocation;
         tryGetQuestionsFromApi();
-    }
-    public int getSearchRadiusKm() {
-        String spinnerText = radiusSpinner.getSelectedItem().toString();
-        try {
-            return Integer.parseInt(spinnerText.split("\\s+")[0]);
-        } catch (NumberFormatException e) {
-            Log.e(TAG, "Error while trying to extract radius from spinner. " );
-        }
-        return DEFAULT_RADIUS_METRES/1000;
     }
 }

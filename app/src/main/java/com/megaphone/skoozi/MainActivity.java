@@ -16,6 +16,8 @@ import android.view.View;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -41,7 +43,8 @@ import java.util.List;
  * Refer to this for backwards compatibility
  * http://stackoverflow.com/questions/26449454/extending-activity-or-actionbaractivity
  */
-public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQuestionsListener {
+public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQuestionsListener,
+        OnMapReadyCallback {
     private static final String TAG = "MainActivity";
     private static final int DEFAULT_ZOOM = 11;
     private static final int RADIUS_TRANSPARENCY = 64; //75%
@@ -57,7 +60,10 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     private NearbyFragment nearbyFragment;
     private boolean resolvingGoogleApiError = false;// Bool to track whether the app is already resolving an error
     private Location latestLocation;
-    private Marker defaultMarker;
+
+    // non-null values indicate pending nearby map redraw
+    private Location searchLocation;
+    private Integer searchRadius;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -74,13 +80,14 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                     // The account picker dialog closed without selecting an account.
                     AccountUtil.displayAccountLoginErrorMessage(coordinatorLayout);
                 }
-                break;
+                return;
             case AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR:
 //            case REQUEST_CODE_RECOVER_FROM_AUTH_ERROR: //todo: figure out HOW/WHEN this is received
                 if (resultCode == RESULT_OK) {
                     // Receiving a result that follows a GoogleAuthException, try auth again
 //                    getUsername();
                 }
+                return;
             case GoogleApiClientBroker.GOOGLE_API_REQUEST_RESOLVE_ERROR:
                 resolvingGoogleApiError = false;
                 if (resultCode == RESULT_OK) {
@@ -89,8 +96,9 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                         googleApiClient.connect();
                     }
                 }
-                break;
+                return;
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -122,14 +130,14 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                 return;
             }
         }
-
-//        googleApiBroker = new GoogleApiClientBroker(this);
-//        initGoogleApiClient();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.nearby_map);
+        if (mapFragment != null)  mapFragment.getMapAsync(this);
 
         FloatingActionButton nearby_fab = (FloatingActionButton) findViewById(R.id.nearby_fabBtn);
         nearby_fab.setOnClickListener(new View.OnClickListener() {
@@ -151,6 +159,70 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (googleApiClient != null) googleApiClient.disconnect();
+    }
+
+    // Interface implementations
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        nearbyMap = map;
+        if (searchLocation == null && searchRadius == null) return;
+
+        // there is an outstanding update
+        nearbyMap.clear(); // important to ensure that everything is cleared
+        updateCurrentLocation(searchLocation);
+        updateSearchRadiusCircle(searchLocation, searchRadius);
+
+        // indicate that map update is finished
+        searchLocation = null; searchRadius = null;
+    }
+
+    /**
+     * This method can set a pending update for the Map if it is currently unavailable
+     * @param origin the location that will be used for the pending update
+     * @param radius the radius that will be used for the pending update
+     * @return
+     */
+    private boolean canUpdateMap(Location origin, int radius) {
+        // todo: should display things on map only if the map is visible
+        if (nearbyMap == null) {
+            // set values so that map will be updated when available
+            searchLocation = origin; searchRadius = radius;
+            return false;
+        } else {
+            searchLocation = null; searchRadius = null;
+            return true;
+        }
+    }
+
+    private boolean canUpdateMap() {
+        return nearbyMap != null;
+    }
+
+    @Override
+    public void onSearchAreaUpdated(Location origin, int radius) {
+        if (canUpdateMap(origin, radius)) {
+            nearbyMap.clear(); // important to ensure that everything is cleared
+            updateCurrentLocation(origin);
+            updateSearchRadiusCircle(origin, radius);
+        }
+    }
+
+    @Override
+    public void onQuestionsAvailable(List<Question> questions) {
+        if (canUpdateMap()) {
+            LatLng questionLocation;
+            for (Question question : questions) {
+                questionLocation = new LatLng(question.locationLat, question.locationLon);
+                nearbyMap.addMarker(new MarkerOptions().position(questionLocation));
+            }
+        }
+    }
+
     private void initGoogleApiClient() {
         if (googleApiClient != null) return;
         if (ConnectionUtil.hasGps(this, coordinatorLayout)){
@@ -169,26 +241,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         if (latestLocation != null) nearbyFragment.updateSearchOrigin(latestLocation);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (googleApiClient != null) googleApiClient.disconnect();
-    }
-
-    @Override
-    public void onSearchAreaUpdated(Location origin, double radius) {
-        // todo: implement update of map in here
-    }
-
-    @Override
-    public void onQuestionsAvailable(List<Question> questions) {
-        if (nearbyMap == null) return;
-        LatLng questionLocation;
-        for (Question question : questions) {
-            questionLocation = new LatLng(question.locationLat, question.locationLon);
-            nearbyMap.addMarker(new MarkerOptions().position(questionLocation));
-        }
-    }
 
 //    @Override
 //    public void onQuestionSelected(Question mQuestion) {
@@ -206,26 +258,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         collapsingToolbar.setTitle(this.getString(R.string.app_name));
     }
 
-//    private void initGoogleApiClient() {
-//        if (googleApiClient == null
-//                && ConnectionUtil.hasGps(getApplicationContext(), coordinatorLayout)) {
-//            googleApiClient = googleApiBroker.buildLocationClient(
-//                    new GoogleApiClientBroker.BrokerResultListener() {
-//                        @Override
-//                        public void onConnected() {
-//                            getLatestLocation();
-//                        }});
-//        }
-//    }
-
-//    private void getLatestLocation() {
-//        latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, googleApiClient);
-//        if (latestLocation != null) {
-//            updateCurrentLocation();
-//            nearbyFragment.updateSelfLocation(latestLocation);
-//        }
-//    }
-
     private void tryNewQuestion() {
         if (SkooziApplication.getUserAccount() == null) {
             AccountUtil.pickUserAccount(MainActivity.this, ACTION_NEW_QUESTION);
@@ -235,38 +267,27 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         }
     }
 
-    private void updateSearchRadiusCircle() {
-        if (nearbyMap != null && latestLocation != null) {
-            nearbyMap.clear();
-            // Instantiates a new CircleOptions object and defines the center and radius
-            int radiusColorRgb = ContextCompat.getColor(this, R.color.accent_material_light);
-            CircleOptions circleOptions = new CircleOptions()
-                    .center(new LatLng(latestLocation.getLatitude(), latestLocation.getLongitude()))
-                    .fillColor(Color.argb(RADIUS_TRANSPARENCY,
-                            Color.red(radiusColorRgb),
-                            Color.green(radiusColorRgb),
-                            Color.blue(radiusColorRgb)))
-                    .radius(nearbyFragment.getSearchRadiusKm()); // need this in metres
-            nearbyMap.addCircle(circleOptions);
-        }
+
+    private void updateCurrentLocation(Location origin) {
+        LatLng searchLocation = new LatLng(origin.getLatitude(), origin.getLongitude());
+        nearbyMap.addMarker(new MarkerOptions()
+                .position(searchLocation)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .title("Current location"));
+        nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(searchLocation, DEFAULT_ZOOM));
     }
 
-    private void updateCurrentLocation() {
-        if (nearbyMap != null) {
-
-            if (defaultMarker != null) {
-                defaultMarker.remove();
-            }
-            nearbyMap.clear(); // important to ensure that everything is cleared
-            LatLng currentLocation = new LatLng(latestLocation.getLatitude(), latestLocation.getLongitude());
-            nearbyMap.addMarker(new MarkerOptions()
-                    .position(currentLocation)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .title("Current location"));
-            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, DEFAULT_ZOOM));
-
-            updateSearchRadiusCircle();
-        }
+    private void updateSearchRadiusCircle(Location origin, int radius) {
+        // Instantiates a new CircleOptions object and defines the center and radius
+        int radiusColorRgb = ContextCompat.getColor(this, R.color.accent_material_light);
+        CircleOptions circleOptions = new CircleOptions()
+                .center(new LatLng(origin.getLatitude(), origin.getLongitude()))
+                .fillColor(Color.argb(RADIUS_TRANSPARENCY,
+                        Color.red(radiusColorRgb),
+                        Color.green(radiusColorRgb),
+                        Color.blue(radiusColorRgb)))
+                .radius(radius*1000); // need this in metres
+        nearbyMap.addCircle(circleOptions);
     }
 
     public NearbyFragment.NearbyQuestionsListener requestNearbyListener() {
