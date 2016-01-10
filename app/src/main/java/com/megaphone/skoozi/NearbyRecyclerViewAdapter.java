@@ -56,7 +56,7 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
             nearbyContent = (TextView) itemView.findViewById(R.id.nearby_list_question);
             nearbyNameImage = (ImageView) itemView.findViewById(R.id.nearby_list_name_image);
 //            this.context = context;
-            mQuestionItemCallback = (OnQuestionItemSelected) context;
+//            mQuestionItemCallback = (OnQuestionItemSelected) context;
             itemView.setOnClickListener(this);
         }
 
@@ -64,7 +64,7 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
         public void onClick(View view) {
             int position = getLayoutPosition(); // gets item position
             Question clickedQuestion = nearbyQuestions.get(position);
-            mQuestionItemCallback.onQuestionSelected(clickedQuestion);
+//            mQuestionItemCallback.onQuestionSelected(clickedQuestion);
         }
 
         protected void displayOnMap(double locLat, double locLon) {

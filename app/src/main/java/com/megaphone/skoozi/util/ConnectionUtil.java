@@ -18,7 +18,23 @@ import com.megaphone.skoozi.SkooziApplication;
  */
 public class ConnectionUtil {
 
-    public static boolean isDeviceOnline() {
+    public static boolean hasNetwork(CoordinatorLayout layout) {
+        if (!isDeviceOnline()) {
+            displayNetworkErrorMessage(layout);
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean hasGps(Context context, CoordinatorLayout layout) {
+        if (!isGPSEnabled(context)) {
+            displayGpsErrorMessage(context, layout);
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean isDeviceOnline() {
         ConnectivityManager connMgr = (ConnectivityManager)
                 SkooziApplication.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -34,12 +50,12 @@ public class ConnectionUtil {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
-    public static void displayNetworkErrorMessage(CoordinatorLayout layoutView) {
+    private static void displayNetworkErrorMessage(CoordinatorLayout layoutView) {
         Snackbar.make(layoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
                 .show();
     }
 
-    public static void displayGpsErrorMessage(CoordinatorLayout layoutView, final Context context) {
+    private static void displayGpsErrorMessage(final Context context, CoordinatorLayout layoutView) {
         Snackbar.make(layoutView, R.string.no_gps_message, Snackbar.LENGTH_LONG)
                 .setAction(R.string.snackbar_enable_gps, new View.OnClickListener() {
                     @Override

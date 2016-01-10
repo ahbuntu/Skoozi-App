@@ -181,7 +181,7 @@ public class ThreadActivity extends AppCompatActivity implements OnMapReadyCallb
     protected void onResume() {
         super.onResume();
         try {
-            if (ConnectionUtil.isDeviceOnline()) {
+            if (ConnectionUtil.hasNetwork(mLayoutView)) {
                 if (SkooziApplication.getUserAccount() == null) {
                     AccountUtil.pickUserAccount(ThreadActivity.this, ACTION_THREAD_REPLY);
                 } else {
@@ -194,8 +194,6 @@ public class ThreadActivity extends AppCompatActivity implements OnMapReadyCallb
                 }
                 setupLocalBroadcastPair();
                 refreshThreadList();
-            } else {
-                ConnectionUtil.displayNetworkErrorMessage(mLayoutView);
             }
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
@@ -246,10 +244,8 @@ public class ThreadActivity extends AppCompatActivity implements OnMapReadyCallb
      * Makes a new call to the SkooziQnA API to get all the answers related to the question
      */
     public void refreshThreadList() {
-        if (ConnectionUtil.isDeviceOnline()) {
+        if (ConnectionUtil.hasNetwork(mLayoutView)) {
             SkooziQnARequestService.startActionGetThreadAnswers(this, tokenListener, threadQuestion.key);
-        } else {
-            displayNetworkErrorMessage();
         }
     }
 
@@ -258,7 +254,7 @@ public class ThreadActivity extends AppCompatActivity implements OnMapReadyCallb
      * @param content
      */
     public void insertSkooziServiceAnswer(String content) {
-        if (ConnectionUtil.isDeviceOnline()) {
+        if (ConnectionUtil.hasNetwork(mLayoutView)) {
             latestThreadAnswer = new Answer(threadQuestion.key,
                     SkooziApplication.getUserAccount().name, //TODO: this needs to be fixed once OAuth is setup
                     content,
@@ -266,8 +262,6 @@ public class ThreadActivity extends AppCompatActivity implements OnMapReadyCallb
                     12,//TODO: need to figure out the current location
                     12);
             SkooziQnARequestService.startActionInsertAnswer(this, tokenListener, threadQuestion.key, latestThreadAnswer);
-        } else {
-            displayNetworkErrorMessage();
         }
     }
 
@@ -347,11 +341,6 @@ public class ThreadActivity extends AppCompatActivity implements OnMapReadyCallb
         mSectionedAdapter.setSections(sections.toArray(dummy));
 
         threadAnswerRecycler.setAdapter(mSectionedAdapter);
-    }
-
-    private void displayNetworkErrorMessage() {
-        Snackbar.make(mLayoutView, R.string.no_network_message, Snackbar.LENGTH_LONG)
-                .show();
     }
 
     private boolean isValidContent(String value) {

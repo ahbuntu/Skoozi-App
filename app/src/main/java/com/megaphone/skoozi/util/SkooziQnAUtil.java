@@ -19,6 +19,7 @@ import com.megaphone.skoozi.api.SkooziQnARequestService;
  */
 public class SkooziQnAUtil {
     private static final LatLng DEFAULT_LOCATION = new LatLng(43.6532,-79.3832);
+    public static final int DEFAULT_RADIUS_METRES = 10000;
     public static final String BROADCAST_QUESTIONS_LIST_RESULT = "com.megaphone.skoozi.broadcast.QUESTIONS_LIST_RESULT";
 
     public static void displayNoQuestionsMessage(CoordinatorLayout layoutView) {

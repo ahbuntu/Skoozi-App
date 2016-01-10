@@ -10,14 +10,9 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,6 +27,8 @@ import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
 import com.megaphone.skoozi.util.PermissionUtil;
 
+import java.util.List;
+
 /**
  * Material design sliding tab implementation taken from
  * http://www.android4devs.com/2015/01/how-to-make-material-design-sliding-tabs.html
@@ -44,16 +41,13 @@ import com.megaphone.skoozi.util.PermissionUtil;
  * Refer to this for backwards compatibility
  * http://stackoverflow.com/questions/26449454/extending-activity-or-actionbaractivity
  */
-public class MainActivity extends AppCompatActivity
-        implements NearbyFragment.OnMapQuestionsCallback, NearbyRecyclerViewAdapter.OnQuestionItemSelected {
-
+public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQuestionsListener {
     private static final String TAG = "MainActivity";
+    private static final int DEFAULT_ZOOM = 11;
+    private static final int RADIUS_TRANSPARENCY = 64; //75%
+
     public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
-
-    private static final int DEFAULT_ZOOM = 11;
-
-    private static final int RADIUS_TRANSPARENCY = 64; //75%
 
     private GoogleApiClientBroker googleApiBroker;
     private GoogleApiClient googleApiClient;
@@ -61,24 +55,9 @@ public class MainActivity extends AppCompatActivity
     private CoordinatorLayout coordinatorLayout;
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
-    private boolean mResolvingError = false;// Bool to track whether the app is already resolving an error
+    private boolean resolvingGoogleApiError = false;// Bool to track whether the app is already resolving an error
     private Location latestLocation;
     private Marker defaultMarker;
-
-
-    private AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
-        @Override
-        public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
-            // Because this call comes from the AsyncTask, we must ensure that the following
-            // code instead executes on the UI thread.
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    AccountUtil.resolveAuthExceptionError(MainActivity.this, exception);
-                }
-            });
-        }
-    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -103,11 +82,10 @@ public class MainActivity extends AppCompatActivity
 //                    getUsername();
                 }
             case GoogleApiClientBroker.GOOGLE_API_REQUEST_RESOLVE_ERROR:
-                mResolvingError = false;
+                resolvingGoogleApiError = false;
                 if (resultCode == RESULT_OK) {
                     // Make sure the app is not already connected or attempting to connect
-                    if (!googleApiClient.isConnecting() &&
-                            !googleApiClient.isConnected()) {
+                    if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
                         googleApiClient.connect();
                     }
                 }
@@ -121,21 +99,10 @@ public class MainActivity extends AppCompatActivity
             case PermissionUtil.REQUEST_PERMISSION_LOCATION: {
                 if (grantResults.length > 0 // If request is cancelled, result arrays are empty
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLatestLocation();
-                } else {
-                    latestLocation = null;
+                    updateLatestLocation();
                 }
             }
         }
-    }
-
-    @Override
-    public void onQuestionSelected(Question mQuestion) {
-        Intent threadIntent = new Intent(this, ThreadActivity.class);
-        Bundle questionBundle = new Bundle();
-        questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, mQuestion);
-        threadIntent.putExtras(questionBundle);
-        startActivity(threadIntent);
     }
 
     @Override
@@ -156,67 +123,50 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        googleApiBroker = new GoogleApiClientBroker(this);
-        initGoogleApiClient();
-    }
-
-    private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(this.getString(R.string.app_name));
-    }
-
-    private void initGoogleApiClient() {
-        if (googleApiClient == null) {
-            if (ConnectionUtil.isGPSEnabled(this)) {
-                googleApiClient = googleApiBroker.buildLocationClient(
-                        new GoogleApiClientBroker.BrokerResultListener() {
-                            @Override
-                            public void onConnected() {
-                                getLatestLocation();
-                            }});
-            } else {
-                ConnectionUtil.displayGpsErrorMessage(coordinatorLayout, this);
-            }
-        }
-    }
-
-    private void getLatestLocation() {
-        latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, googleApiClient);
-        if (latestLocation != null) {
-            updateCurrentLocation();
-            nearbyFragment.updateSelfLocation(latestLocation);
-        }
+//        googleApiBroker = new GoogleApiClientBroker(this);
+//        initGoogleApiClient();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (SkooziApplication.getUserAccount() == null) AccountUtil.pickUserAccount(this, null);
 
         FloatingActionButton nearby_fab = (FloatingActionButton) findViewById(R.id.nearby_fabBtn);
-            nearby_fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    tryNewQuestion();
-                }
-            });
-
-        if (ConnectionUtil.isGPSEnabled(this) && !mResolvingError) {
-            if (googleApiClient != null) {
-                googleApiClient.connect();
+        nearby_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tryNewQuestion();
             }
+        });
+
+        if (ConnectionUtil.hasGps(this, coordinatorLayout) && googleApiBroker == null) {
+            googleApiBroker = new GoogleApiClientBroker(this);
+            // assuming that both googleApiBroker & googleApiClient become null together
+            if (!resolvingGoogleApiError) {
+                initGoogleApiClient();
+                if (googleApiClient != null) googleApiClient.connect();
+            }
+        } else {
+            updateLatestLocation();
         }
     }
 
-    private void tryNewQuestion() {
-        if (SkooziApplication.getUserAccount() == null) {
-            AccountUtil.pickUserAccount(MainActivity.this, ACTION_NEW_QUESTION);
-        } else {
-            Intent intent = new Intent(MainActivity.this, PostQuestionActivity.class);
-            startActivity(intent);
+    private void initGoogleApiClient() {
+        if (googleApiClient != null) return;
+        if (ConnectionUtil.hasGps(this, coordinatorLayout)){
+            googleApiClient = googleApiBroker
+                    .getGoogleApiClient(new GoogleApiClientBroker.BrokerResultListener() {
+                        @Override
+                        public void onConnected() {
+                            updateLatestLocation();
+                        }
+                    });
         }
+    }
+
+    private void updateLatestLocation() {
+        latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, googleApiClient);
+        if (latestLocation != null) nearbyFragment.updateSearchOrigin(latestLocation);
     }
 
     @Override
@@ -226,20 +176,63 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the toolbar menu
-        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
-        return true;
+    public void onSearchAreaUpdated(Location origin, double radius) {
+        // todo: implement update of map in here
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_my_activity) {
-            Toast.makeText(MainActivity.this,"my activity",Toast.LENGTH_SHORT).show();
-            return true;
+    public void onQuestionsAvailable(List<Question> questions) {
+        if (nearbyMap == null) return;
+        LatLng questionLocation;
+        for (Question question : questions) {
+            questionLocation = new LatLng(question.locationLat, question.locationLon);
+            nearbyMap.addMarker(new MarkerOptions().position(questionLocation));
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+//    @Override
+//    public void onQuestionSelected(Question mQuestion) {
+//        Intent threadIntent = new Intent(this, ThreadActivity.class);
+//        Bundle questionBundle = new Bundle();
+//        questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, mQuestion);
+//        threadIntent.putExtras(questionBundle);
+//        startActivity(threadIntent);
+//    }
+
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(this.getString(R.string.app_name));
+    }
+
+//    private void initGoogleApiClient() {
+//        if (googleApiClient == null
+//                && ConnectionUtil.hasGps(getApplicationContext(), coordinatorLayout)) {
+//            googleApiClient = googleApiBroker.buildLocationClient(
+//                    new GoogleApiClientBroker.BrokerResultListener() {
+//                        @Override
+//                        public void onConnected() {
+//                            getLatestLocation();
+//                        }});
+//        }
+//    }
+
+//    private void getLatestLocation() {
+//        latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, googleApiClient);
+//        if (latestLocation != null) {
+//            updateCurrentLocation();
+//            nearbyFragment.updateSelfLocation(latestLocation);
+//        }
+//    }
+
+    private void tryNewQuestion() {
+        if (SkooziApplication.getUserAccount() == null) {
+            AccountUtil.pickUserAccount(MainActivity.this, ACTION_NEW_QUESTION);
+        } else {
+            Intent intent = new Intent(MainActivity.this, PostQuestionActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void updateSearchRadiusCircle() {
@@ -257,7 +250,6 @@ public class MainActivity extends AppCompatActivity
             nearbyMap.addCircle(circleOptions);
         }
     }
-
 
     private void updateCurrentLocation() {
         if (nearbyMap != null) {
@@ -277,14 +269,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //todo: this method is likely not being used. Investigate if it can be removed.
-    @Override
-    public void onMapQuestion(double lat, double lon) {
-        LatLng questionLocation = new LatLng(lat,lon);
-        if (nearbyMap != null) {
-            nearbyMap.addMarker(new MarkerOptions()
-                    .position(questionLocation));
-        }
+    public NearbyFragment.NearbyQuestionsListener requestNearbyListener() {
+        return this;
     }
-
 }

@@ -181,7 +181,7 @@ public class PostQuestionActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         try {
-            if (ConnectionUtil.isDeviceOnline()) {
+            if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
                 if (SkooziApplication.getUserAccount() == null) {
                     AccountUtil.pickUserAccount(PostQuestionActivity.this, ACTION_NEW_QUESTION);
                 } else {
@@ -194,8 +194,6 @@ public class PostQuestionActivity extends AppCompatActivity
                 }
 
                 setupLocalBroadcastPair();
-            } else {
-                ConnectionUtil.displayNetworkErrorMessage(coordinatorLayout);
             }
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());

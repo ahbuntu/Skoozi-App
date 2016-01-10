@@ -21,10 +21,6 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.megaphone.skoozi.api.SkooziQnARequestService;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
@@ -46,7 +42,8 @@ public class NearbyFragment extends Fragment {
     private Spinner radiusSpinner;
     private ProgressBar progressBar;
     private Location selfLocation;
-    private GoogleMap nearbyMap;
+    private NearbyQuestionsListener nearbyListener;
+    private IntentFilter quesListIntentFilter;
 
     private AccountUtil.GoogleAuthTokenExceptionListener authTokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
         @Override
@@ -70,36 +67,23 @@ public class NearbyFragment extends Fragment {
         }
     };
 
-    public interface OnMapQuestionsCallback{
-        void onMapQuestion(double lat, double lon);
+    public interface NearbyQuestionsListener {
+        void onSearchAreaUpdated(Location origin, double radius);
+        void onQuestionsAvailable(List<Question> nearbyQuestions);
     }
-
-    private OnMapReadyCallback mapReadyCallback = new OnMapReadyCallback() {
-        @Override
-        public void onMapReady(GoogleMap googleMap) {
-            nearbyMap = googleMap;
-//
-//            if (mLastLocation != null) {
-//                updateCurrentLocation();
-//            }
-            //todo: need to determine when/why/how to handle the scenario where mLastLocation = null
-//        else {
-//            // Move the camera instantly to Toronto
-//            defaultMarker = nearbyMap.addMarker(new MarkerOptions()
-//                    .position(DEFAULT_LOCATION)
-//                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-//                    .title("Default location"));
-//            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, DEFAULT_ZOOM));
-//            nearbyMap.getUiSettings().setZoomControlsEnabled(true);
-//        }
-        }
-    };
 
     public static NearbyFragment newInstance() {
         NearbyFragment fragment = new NearbyFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        if (context instanceof MainActivity) {
+            nearbyListener = ((MainActivity) context).requestNearbyListener();
+        }
     }
 
     @Override
@@ -124,6 +108,18 @@ public class NearbyFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        if (selfLocation != null) tryGetQuestionsFromApi();
+    }
+
+    @Override
+    public void onPause(){
+        super.onResume();
+        removeListeners();
+    }
+
     private void setupRecyclerView() {
         rvList.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
@@ -132,7 +128,7 @@ public class NearbyFragment extends Fragment {
         rvList.addItemDecoration(mItemDecoration);
 
         //recycler view will display the questions coords on the map, but the search radius needs to be displayed from Main Activity
-        rvListAdapter = new NearbyRecyclerViewAdapter(getActivity(), null, nearbyMap);
+        rvListAdapter = new NearbyRecyclerViewAdapter(getActivity(), null, null);
         rvList.setAdapter(rvListAdapter);
     }
 
@@ -145,7 +141,6 @@ public class NearbyFragment extends Fragment {
         radiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                progressBar.setVisibility(View.VISIBLE);
                 tryGetQuestionsFromApi();
 //                listener.radiusUpdated();
 //                getQuestionsFromApi(parseSearchRadiusKm(parentView.getSelectedItem().toString()));
@@ -157,40 +152,21 @@ public class NearbyFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-//        MapFragment nearbyMap = (MapFragment)  getFragmentManager().findFragmentById(R.id.nearby_map);
-//        if (nearbyMap != null && mCallback != null) {
-//            nearbyMap.getMapAsync(mCallback);
-//        }
-        addListeners();
-        tryGetQuestionsFromApi();
-    }
-
     private void tryGetQuestionsFromApi() {
-        if (ConnectionUtil.isDeviceOnline()) {
-            if (selfLocation == null) {
-                progressBar.setVisibility(View.VISIBLE);
-                ConnectionUtil.displayGpsErrorMessage(coordinatorLayout, getActivity());
-            } else {
-                SkooziQnAUtil.quesListRequest(getActivity(), authTokenListener,
-                        selfLocation, getSearchRadiusKm());
-            }
-        } else {
-            ConnectionUtil.displayNetworkErrorMessage(coordinatorLayout);
+        setupLocalBroadcastPair();
+        if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
+            if (selfLocation == null)  return; // can't do anything without a location
+            progressBar.setVisibility(View.VISIBLE);
+            SkooziQnAUtil.quesListRequest(getActivity(), authTokenListener,
+                    selfLocation, getSearchRadiusKm());
         }
     }
 
-    private void addListeners() {
-        IntentFilter quesListIntentFilter = new IntentFilter(SkooziQnAUtil.BROADCAST_QUESTIONS_LIST_RESULT);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(skooziApiReceiver, quesListIntentFilter);
-    }
-
-    @Override
-    public void onPause(){
-        super.onResume();
-        removeListeners();
+    private void setupLocalBroadcastPair() {
+        if (quesListIntentFilter == null) {
+            quesListIntentFilter = new IntentFilter(SkooziQnAUtil.BROADCAST_QUESTIONS_LIST_RESULT);
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(skooziApiReceiver, quesListIntentFilter);
+        }
     }
 
     private void removeListeners() {
@@ -206,11 +182,12 @@ public class NearbyFragment extends Fragment {
         }
     }
 
-    public void updateSelfLocation(Location latestLocation) {
-        selfLocation = latestLocation;
+    // Exposed methods
+
+    public void updateSearchOrigin(Location updatedLocation) {
+        selfLocation = updatedLocation;
         tryGetQuestionsFromApi();
     }
-
     public int getSearchRadiusKm() {
         String spinnerText = radiusSpinner.getSelectedItem().toString();
         try {

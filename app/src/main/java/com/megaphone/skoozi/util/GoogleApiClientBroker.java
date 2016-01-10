@@ -72,7 +72,7 @@ public class GoogleApiClientBroker {
                 }
             };
 
-    public synchronized GoogleApiClient buildLocationClient(BrokerResultListener listener) {
+    private synchronized GoogleApiClient buildLocationClient(BrokerResultListener listener) {
         this.listener = listener;
         // https://developers.google.com/android/guides/api-client
         if (googleApiClient == null) {
@@ -82,6 +82,11 @@ public class GoogleApiClientBroker {
                  .addApi(LocationServices.API)
                  .build();
         }
+        return googleApiClient;
+    }
+
+    public GoogleApiClient getGoogleApiClient(BrokerResultListener listener) {
+        if (googleApiClient == null)  return (buildLocationClient(listener));
         return googleApiClient;
     }
 

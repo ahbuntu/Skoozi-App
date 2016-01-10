@@ -26,6 +26,7 @@ import com.megaphone.skoozi.ThreadActivity;
 import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
+import com.megaphone.skoozi.util.SkooziQnAUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -141,7 +142,7 @@ public class SkooziQnARequestService extends IntentService {
             } else if (ACTION_GET_QUESTIONS_LIST.equals(action)) {
                 final double lat = intent.getDoubleExtra(EXTRA_LATITUDE, 0);
                 final double lon = intent.getDoubleExtra(EXTRA_LONGITUDE, 0);
-                final double radius = intent.getDoubleExtra(EXTRA_RADIUS, MainActivity.DEFAULT_RADIUS_METRES / 1000); //API expects in km
+                final double radius = intent.getDoubleExtra(EXTRA_RADIUS, SkooziQnAUtil.DEFAULT_RADIUS_METRES / 1000); //API expects in km
                 handleActionGetQuestionsList(lat, lon, radius);
             } else if (ACTION_INSERT_QUESTION_ANSWER.equals(action)) {
                 final String key = intent.getStringExtra(EXTRA_QUESTION_KEY);
@@ -243,7 +244,7 @@ public class SkooziQnARequestService extends IntentService {
         }
 
         // if no questions, return null; service should not handle this
-        Intent localIntent = new Intent(MainActivity.BROADCAST_QUESTIONS_LIST_RESULT)
+        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_QUESTIONS_LIST_RESULT)
                 .putParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST, questionList);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }

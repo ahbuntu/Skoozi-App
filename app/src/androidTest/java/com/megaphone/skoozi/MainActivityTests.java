@@ -5,13 +5,13 @@ import android.test.ActivityInstrumentationTestCase2;
 /**
  * Created by ahmadul.hassan on 2015-06-22.
  */
-public class MainActivityTests extends ActivityInstrumentationTestCase2<MainActivity> {
+public class MainActivityTests extends ActivityInstrumentationTestCase2<BaseActivity> {
     public MainActivityTests() {
         super(MainActivity.class);
     }
 
     public void testActivityExists() {
-        MainActivity activity = getActivity();
+        BaseActivity activity = getActivity();
         assertNotNull(activity);
     }
 
