@@ -98,7 +98,7 @@ public class NearbyFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main_nearby, container, false);
+        View rootView = inflater.inflate(R.layout.nearby_fragment, container, false);
 
         rvList = (RecyclerView) rootView.findViewById(R.id.nearby_recycler);
         radiusSpinner = (Spinner) rootView.findViewById(R.id.radius_spinner);
@@ -139,7 +139,7 @@ public class NearbyFragment extends Fragment {
 
     private void setupRadiusSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.nearby_radius_options, R.layout.main_radius_spinner);
+                R.array.nearby_radius_options, R.layout.nearby_radius_spinner);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         radiusSpinner.setAdapter(adapter);
 

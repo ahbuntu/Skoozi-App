@@ -1,6 +1,8 @@
 package com.megaphone.skoozi;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +13,6 @@ import android.widget.TextView;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.PresentationUtil;
 
@@ -24,12 +23,7 @@ import java.util.List;
  */
 public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecyclerViewAdapter.NearbyViewHolder> {
 
-
-    public interface OnQuestionItemSelected{
-        void onQuestionSelected(Question mQuestion);
-    }
-
-    private Context mContext;
+    private Context context;
     private List<Question> nearbyQuestions;
     private GoogleMap nearbyMap;
 
@@ -44,19 +38,12 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
         TextView nearbyUserName;
         ImageView nearbyNameImage;
 
-        private OnQuestionItemSelected mQuestionItemCallback;
-        /**
-         * initializes all the views for a data item in a view holder
-         * @param itemView
-         */
-        public NearbyViewHolder(Context context, View itemView) {
+        public NearbyViewHolder(View itemView) {
             super(itemView);
             nearbyTimestamp = (TextView) itemView.findViewById(R.id.nearby_list_question_duration);
             nearbyUserName = (TextView) itemView.findViewById(R.id.nearby_list_profile_name);
             nearbyContent = (TextView) itemView.findViewById(R.id.nearby_list_question);
             nearbyNameImage = (ImageView) itemView.findViewById(R.id.nearby_list_name_image);
-//            this.context = context;
-//            mQuestionItemCallback = (OnQuestionItemSelected) context;
             itemView.setOnClickListener(this);
         }
 
@@ -64,17 +51,12 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
         public void onClick(View view) {
             int position = getLayoutPosition(); // gets item position
             Question clickedQuestion = nearbyQuestions.get(position);
-//            mQuestionItemCallback.onQuestionSelected(clickedQuestion);
+            Intent threadIntent = new Intent(context, ThreadActivity.class);
+            Bundle questionBundle = new Bundle();
+            questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, clickedQuestion);
+            threadIntent.putExtras(questionBundle);
+            context.startActivity(threadIntent);
         }
-
-        protected void displayOnMap(double locLat, double locLon) {
-            if (nearbyMap == null) return;
-
-            nearbyMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(locLat, locLon))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)));
-        }
-
     }
 
     /**
@@ -83,20 +65,16 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
      * @param questions NULL value is acceptable.
      */
     public NearbyRecyclerViewAdapter(Context context, List<Question> questions, GoogleMap map) {
-        mContext = context;
+        this.context = context;
         nearbyQuestions = questions;
         nearbyMap = map;
     }
 
-    //region AnswerViewHolder Lifecycle callbacks
-
     // Create new views (invoked by the layout manager)
     @Override
     public NearbyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v;
-        v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_nearby_list, parent, false);
-        return new NearbyViewHolder(mContext, v);
+        return new NearbyViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.nearby_item_row, parent, false));
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -107,7 +85,6 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
         holder.nearbyTimestamp.setText(PresentationUtil.unixTimestampAge(questionItem.timestamp));
         holder.nearbyUserName.setText(questionItem.author);
         holder.nearbyContent.setText(questionItem.content);
-        holder.displayOnMap(questionItem.locationLat, questionItem.locationLon);
 
         //todo: decision to display user image or letter should be made here
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
@@ -127,10 +104,8 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
 
     @Override
     public int getItemViewType(int position) {
-//        return threadAnswers == null ? CARD_EMPTY_TYPE : CARD_ANSWER_TYPE;
         return 0;
     }
-    //endregion
 
     public void updateNearbyQuestions(List<Question> questions) {
         nearbyQuestions = questions;
