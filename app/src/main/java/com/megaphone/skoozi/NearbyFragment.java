@@ -44,6 +44,7 @@ public class NearbyFragment extends Fragment {
     private Location searchOrigin;
     private NearbyQuestionsListener nearbyListener;
     private IntentFilter quesListIntentFilter;
+    private boolean requestInProgress;
 
     private AccountUtil.GoogleAuthTokenExceptionListener authTokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
         @Override
@@ -62,6 +63,7 @@ public class NearbyFragment extends Fragment {
     private BroadcastReceiver skooziApiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            requestInProgress = false;
             ArrayList<Question> questions = intent.getParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST);
             displayApiResponse(questions);
         }
@@ -111,13 +113,12 @@ public class NearbyFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        if (searchOrigin != null) tryGetQuestionsFromApi();
     }
 
     @Override
     public void onPause(){
         super.onResume();
-        removeListeners();
+        destroyLocalBroadcastPair();
     }
 
     private void initNearbyListener(Context context) {
@@ -157,9 +158,11 @@ public class NearbyFragment extends Fragment {
     }
 
     private void tryGetQuestionsFromApi() {
+        if (requestInProgress) return;
+        if (searchOrigin == null)  return; // can't do anything without a location
+
         setupLocalBroadcastPair();
         if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
-            if (searchOrigin == null)  return; // can't do anything without a location
             progressBar.setVisibility(View.VISIBLE);
             SkooziQnAUtil.quesListRequest(getActivity(), authTokenListener,
                     searchOrigin, getSearchRadiusKm());
@@ -167,6 +170,8 @@ public class NearbyFragment extends Fragment {
             if (nearbyListener == null) initNearbyListener(getActivity());
             if (nearbyListener != null)
                 nearbyListener.onSearchAreaUpdated(searchOrigin, getSearchRadiusKm());
+
+            requestInProgress = true;
         }
     }
 
@@ -177,7 +182,8 @@ public class NearbyFragment extends Fragment {
         }
     }
 
-    private void removeListeners() {
+    private void destroyLocalBroadcastPair() {
+        quesListIntentFilter = null;
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(skooziApiReceiver);
     }
 

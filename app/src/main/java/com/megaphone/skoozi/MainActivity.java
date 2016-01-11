@@ -21,7 +21,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
@@ -55,15 +54,13 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     private GoogleApiClientBroker googleApiBroker;
     private GoogleApiClient googleApiClient;
 
+    private MapFragment mapFragment;
     private CoordinatorLayout coordinatorLayout;
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
     private boolean resolvingGoogleApiError = false;// Bool to track whether the app is already resolving an error
     private Location latestLocation;
-
-    // non-null values indicate pending nearby map redraw
-    private Location searchLocation;
-    private Integer searchRadius;
+    private PendingMapUpdate pendingMapUpdate;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -121,6 +118,8 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         setupToolbar();
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
+        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.nearby_map);
+
         if (findViewById(R.id.main_fragment_container) != null) {
             if (savedInstanceState == null) {
                 nearbyFragment = NearbyFragment.newInstance();
@@ -136,9 +135,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     protected void onResume() {
         super.onResume();
 
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.nearby_map);
-        if (mapFragment != null)  mapFragment.getMapAsync(this);
-
         FloatingActionButton nearby_fab = (FloatingActionButton) findViewById(R.id.nearby_fabBtn);
         nearby_fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,15 +143,20 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
             }
         });
 
+        if (mapFragment != null)  mapFragment.getMapAsync(this);
+
         if (ConnectionUtil.hasGps(this, coordinatorLayout) && googleApiBroker == null) {
             googleApiBroker = new GoogleApiClientBroker(this);
             // assuming that both googleApiBroker & googleApiClient become null together
             if (!resolvingGoogleApiError) {
                 initGoogleApiClient();
-                if (googleApiClient != null) googleApiClient.connect();
+                googleApiClient.connect();
             }
         } else {
-            updateLatestLocation();
+            if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
+                googleApiClient.connect();
+            }
+//            updateLatestLocation();
         }
     }
 
@@ -170,15 +171,15 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     @Override
     public void onMapReady(GoogleMap map) {
         nearbyMap = map;
-        if (searchLocation == null && searchRadius == null) return;
+        if (pendingMapUpdate == null) return;
 
         // there is an outstanding update
         nearbyMap.clear(); // important to ensure that everything is cleared
-        updateCurrentLocation(searchLocation);
-        updateSearchRadiusCircle(searchLocation, searchRadius);
+        onSearchAreaUpdated(pendingMapUpdate.origin, pendingMapUpdate.radius);
+        onQuestionsAvailable(pendingMapUpdate.questions);
 
         // indicate that map update is finished
-        searchLocation = null; searchRadius = null;
+        pendingMapUpdate = null;
     }
 
     /**
@@ -187,21 +188,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
      * @param radius the radius that will be used for the pending update
      * @return
      */
-    private boolean canUpdateMap(Location origin, int radius) {
-        // todo: should display things on map only if the map is visible
-        if (nearbyMap == null) {
-            // set values so that map will be updated when available
-            searchLocation = origin; searchRadius = radius;
-            return false;
-        } else {
-            searchLocation = null; searchRadius = null;
-            return true;
-        }
-    }
-
-    private boolean canUpdateMap() {
-        return nearbyMap != null;
-    }
 
     @Override
     public void onSearchAreaUpdated(Location origin, int radius) {
@@ -214,7 +200,8 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
 
     @Override
     public void onQuestionsAvailable(List<Question> questions) {
-        if (canUpdateMap()) {
+        if (questions == null) return;
+        if (canUpdateMap(questions)) {
             LatLng questionLocation;
             for (Question question : questions) {
                 questionLocation = new LatLng(question.locationLat, question.locationLon);
@@ -258,16 +245,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         collapsingToolbar.setTitle(this.getString(R.string.app_name));
     }
 
-    private void tryNewQuestion() {
-        if (SkooziApplication.getUserAccount() == null) {
-            AccountUtil.pickUserAccount(MainActivity.this, ACTION_NEW_QUESTION);
-        } else {
-            Intent intent = new Intent(MainActivity.this, PostQuestionActivity.class);
-            startActivity(intent);
-        }
-    }
-
-
     private void updateCurrentLocation(Location origin) {
         LatLng searchLocation = new LatLng(origin.getLatitude(), origin.getLongitude());
         nearbyMap.addMarker(new MarkerOptions()
@@ -275,6 +252,26 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                 .title("Current location"));
         nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(searchLocation, DEFAULT_ZOOM));
+    }
+
+    private boolean canUpdateMap(Location origin, int radius) {
+        // todo: should display things on map only if the map is visible
+        if (nearbyMap == null) {
+            // set values so that map will be updated when available
+            pendingMapUpdate = new PendingMapUpdate(origin, radius);
+            return false;
+        }
+        pendingMapUpdate = null;
+        return true;
+    }
+
+    private boolean canUpdateMap(List<Question> questions) {
+        if (nearbyMap == null && pendingMapUpdate != null) {
+            pendingMapUpdate.setMapQuestionsMarkers(questions);
+            return false;
+        }
+        pendingMapUpdate = null;
+        return true;
     }
 
     private void updateSearchRadiusCircle(Location origin, int radius) {
@@ -288,6 +285,15 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                         Color.blue(radiusColorRgb)))
                 .radius(radius*1000); // need this in metres
         nearbyMap.addCircle(circleOptions);
+    }
+
+    private void tryNewQuestion() {
+        if (SkooziApplication.getUserAccount() == null) {
+            AccountUtil.pickUserAccount(MainActivity.this, ACTION_NEW_QUESTION);
+        } else {
+            Intent intent = new Intent(MainActivity.this, PostQuestionActivity.class);
+            startActivity(intent);
+        }
     }
 
     public NearbyFragment.NearbyQuestionsListener requestNearbyListener() {
