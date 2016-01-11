@@ -228,16 +228,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         if (latestLocation != null) nearbyFragment.updateSearchOrigin(latestLocation);
     }
 
-
-//    @Override
-//    public void onQuestionSelected(Question mQuestion) {
-//        Intent threadIntent = new Intent(this, ThreadActivity.class);
-//        Bundle questionBundle = new Bundle();
-//        questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, mQuestion);
-//        threadIntent.putExtras(questionBundle);
-//        startActivity(threadIntent);
-//    }
-
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

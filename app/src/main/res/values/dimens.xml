@@ -7,7 +7,7 @@
     <dimen name="nearby_radius_header_height">40dp</dimen>
     <dimen name="nearby_list_padding">20dp</dimen>
     <dimen name="nearby_map_height">250dp</dimen>
-    <dimen name="nearby_list_user_diameter">40dp</dimen>
+    <dimen name="nearby_list_user_diameter">36dp</dimen>
     <dimen name="nearby_list_user_vertical_margin">8dp</dimen>
     <dimen name="nearby_list_row_vertical_margin">4dp</dimen>
 

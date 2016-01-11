@@ -74,7 +74,7 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
     @Override
     public NearbyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new NearbyViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.nearby_item_row, parent, false));
+                .inflate(R.layout.nearby_item_row_new, parent, false));
     }
 
     // Replace the contents of a view (invoked by the layout manager)
