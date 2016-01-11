@@ -129,8 +129,6 @@ public class NearbyFragment extends Fragment {
         rvList.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         rvList.setLayoutManager(mLayoutManager);
-        RecyclerView.ItemDecoration mItemDecoration = new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL);
-        rvList.addItemDecoration(mItemDecoration);
 
         //recycler view will display the questions coords on the map, but the search radius needs to be displayed from Main Activity
         rvListAdapter = new NearbyRecyclerViewAdapter(getActivity(), null, null);
