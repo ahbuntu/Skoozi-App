@@ -168,8 +168,7 @@ public class NearbyFragment extends Fragment {
                     searchOrigin, getSearchRadiusKm());
 
             if (nearbyListener == null) initNearbyListener(getActivity());
-            if (nearbyListener != null)
-                nearbyListener.onSearchAreaUpdated(searchOrigin, getSearchRadiusKm());
+            nearbyListener.onSearchAreaUpdated(searchOrigin, getSearchRadiusKm());
 
             requestInProgress = true;
         }
@@ -199,8 +198,7 @@ public class NearbyFragment extends Fragment {
 
     private void displayApiResponse(List<Question> questions) {
         if (nearbyListener == null) initNearbyListener(getActivity());
-        if (nearbyListener != null)
-            nearbyListener.onQuestionsAvailable(questions);
+        nearbyListener.onQuestionsAvailable(questions);
 
         progressBar.setVisibility(View.GONE);
         if (questions == null) {
