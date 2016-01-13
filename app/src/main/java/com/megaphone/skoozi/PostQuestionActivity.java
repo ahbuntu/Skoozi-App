@@ -188,10 +188,10 @@ public class PostQuestionActivity extends AppCompatActivity
                     postQuestionButton.setEnabled(true);
                 }
 
-                MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
-                if (mMapFragment != null) {
-                    mMapFragment.getMapAsync(this);
-                }
+//                MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
+//                if (mMapFragment != null) {
+//                    mMapFragment.getMapAsync(this);
+//                }
 
                 setupLocalBroadcastPair();
             }

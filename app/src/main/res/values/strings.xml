@@ -16,7 +16,7 @@
     <string name="action_add_q">New Question</string>
     <string name="action_my_activity">My Activity</string>
 
-    <string name="new_question_map_heading">Your current location</string>
+    <string name="new_question_map_heading">Currently @</string>
     <string name="post_new_question">POST</string>
     <string name="new_question_location_change">CHANGE</string>
     <string name="new_question_location_hint">enter location if not correct</string>
