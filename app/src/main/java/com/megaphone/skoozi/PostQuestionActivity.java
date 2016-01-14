@@ -11,12 +11,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -25,42 +21,29 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.api.SkooziQnARequestService;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
+import com.megaphone.skoozi.util.PermissionUtil;
+import com.megaphone.skoozi.util.SkooziQnAUtil;
 
 
-public class PostQuestionActivity extends AppCompatActivity
-        implements OnMapReadyCallback,
-            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class PostQuestionActivity extends BaseActivity {
 
     private static final String TAG = "PostQuestionActivty";
     public static final String BROADCAST_POST_QUESTION_RESULT = "com.megaphone.skoozi.broadcast.POST_QUESTION_RESULT";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
     public static final String EXTRA_QUESTION_KEY  = "com.megaphone.skoozi.extra.QUESTION_KEY";
 
-    GoogleMap newQuestionMap;
-    Location mLastLocation;
-    LatLng postLocation;
-    GoogleApiClient mGoogleApiClient;
-
     private EditText postQuestionText;
-    private ProgressBar postQuestionProgress;
+    private ProgressBar progressBar;
     private CoordinatorLayout coordinatorLayout;
     private Button postQuestionButton;
-
-    Question postQuestion;
+    private Location selfLocation;
+    private boolean requestInProgress;
+    private Question postQuestion;
 
     private BroadcastReceiver questionInsertReceiver = new BroadcastReceiver() {
         @Override
@@ -91,114 +74,6 @@ public class PostQuestionActivity extends AppCompatActivity
         }
     };
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post_question);
-
-        setupToolbar();
-
-        buildGoogleApiClient();
-
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.new_question_coordinator_layout);
-        postQuestionProgress = (ProgressBar) findViewById(R.id.new_question_progress);
-        postQuestionText = (EditText) findViewById(R.id.new_question_content);
-        postQuestionButton = (Button) findViewById(R.id.post_new_question);
-        postQuestionButton.setEnabled(false);
-        postQuestionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String postContent = postQuestionText.getText().toString().trim();
-                if (isContentValid(postContent) && postLocation != null) {
-                    postQuestion = new Question(SkooziApplication.getUserAccount().name, postContent,
-                            null, System.currentTimeMillis() / 1000L,
-                            postLocation.latitude, postLocation.longitude);
-                    SkooziQnARequestService.startActionInsertNewQuestion(PostQuestionActivity.this, tokenListener,
-                            postQuestion);
-                    hideKeyboard();
-                } else {
-                    //todo: need to add in display error message for disabled GPS/location
-                    //ie. postLocation == null condition
-                }
-            }
-        });
-    }
-
-    /**
-     * Creating The Toolbar and setting it as the Toolbar for the activity
-     * home as up set to true
-     */
-    private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        final ActionBar ab = getSupportActionBar();
-//        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
-    private boolean isContentValid(String value) {
-        if (TextUtils.isEmpty(value)) {
-            Snackbar.make(coordinatorLayout, R.string.new_question_error_message, Snackbar.LENGTH_SHORT).show();
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == android.R.id.home) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.action_my_activity) {
-            Toast.makeText(this,"my activity",Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-    private void setupLocalBroadcastPair() {
-        IntentFilter mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(PostQuestionActivity.BROADCAST_POST_QUESTION_RESULT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(questionInsertReceiver, mIntentFilter);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        try {
-            if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
-                if (SkooziApplication.getUserAccount() == null) {
-                    AccountUtil.pickUserAccount(PostQuestionActivity.this, ACTION_NEW_QUESTION);
-                } else {
-                    postQuestionButton.setEnabled(true);
-                }
-
-//                MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
-//                if (mMapFragment != null) {
-//                    mMapFragment.getMapAsync(this);
-//                }
-
-                setupLocalBroadcastPair();
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
-        }
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -221,68 +96,62 @@ public class PostQuestionActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-//        if (!mResolvingError) {  // more about this later
-        mGoogleApiClient.connect();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_post_question);
+
+        setupToolbar();
+
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.new_question_coordinator_layout);
+        progressBar = (ProgressBar) findViewById(R.id.new_question_progress);
+        postQuestionText = (EditText) findViewById(R.id.new_question_content);
+        setupPostButton();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (ConnectionUtil.hasNetwork(coordinatorLayout)) connectToGoogleApi();
+
+        if (SkooziApplication.hasUserAccount()) postQuestionButton.setEnabled(true);
+
+//        try {
+//            if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
+//                if (SkooziApplication.getUserAccount() == null) {
+//                    AccountUtil.pickUserAccount(PostQuestionActivity.this, ACTION_NEW_QUESTION);
+//                } else {
+//                    postQuestionButton.setEnabled(true);
+//                }
+//
+////                MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
+////                if (mMapFragment != null) {
+////                    mMapFragment.getMapAsync(this);
+////                }
+//
+//                setupLocalBroadcastPair();
+//            }
+//        } catch (Exception e) {
+//            Log.d(TAG, e.getMessage());
 //        }
     }
 
     @Override
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
+    protected void onGoogleApiConnected() {
+        selfLocation = PermissionUtil.tryGetLatestLocation(PostQuestionActivity.this, getGoogleApiClient());
     }
 
-    private synchronized void buildGoogleApiClient(){
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-//                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        final ActionBar ab = getSupportActionBar();
+        if (ab != null) ab.setDisplayHomeAsUpEnabled(true);
     }
 
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation == null)
-            //todo: display persistent message
-            return;
-        updateCurrentLocation();
-    }
-    @Override
-    public void onConnectionSuspended (int cause) {
-        Log.d(TAG, "BOO - connection suspended due to " + cause);
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        // This callback is important for handling errors that
-        // may occur while attempting to connect with Google.
-        //
-        // More about this in the next section.
-        Log.d(TAG, "connection to GPS failed for " + result.toString());
-    }
-    private void updateCurrentLocation() {
-        if (newQuestionMap != null) {
-            postLocation = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
-            newQuestionMap.addMarker(new MarkerOptions()
-                    .position(postLocation)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .title("Current location"));
-            newQuestionMap.moveCamera(CameraUpdateFactory.newLatLngZoom(postLocation, 15));
-        }
-    }
-
-    @Override
-    public void onMapReady(GoogleMap map) {
-        newQuestionMap = map;
-        if (postLocation == null) {
-            //TODO: show persistent message that GPS needs to be enabled in order to post new question
-            return;
-        }
-        updateCurrentLocation();
+    private void setupLocalBroadcastPair() {
+        IntentFilter mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(PostQuestionActivity.BROADCAST_POST_QUESTION_RESULT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(questionInsertReceiver, mIntentFilter);
     }
 
     private void showThread(String questionKey) {
@@ -306,4 +175,54 @@ public class PostQuestionActivity extends AppCompatActivity
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
+
+    private void setupPostButton() {
+        postQuestionButton = (Button) findViewById(R.id.post_new_question);
+        postQuestionButton.setEnabled(false);
+        postQuestionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPostButtonClicked();
+            }
+        });
+    }
+
+    private void onPostButtonClicked() {
+        String postContent = postQuestionText.getText().toString().trim();
+        if (isContentValid(postContent)) {
+            if (selfLocation == null) {
+                //todo: need to add in display error message for disabled GPS/location
+                //ie. postLocation == null condition
+            } else {
+                // TODO: 2016-01-13 should use tryPostQuestionToApi() 
+                LatLng postLocation = new LatLng(selfLocation.getLatitude(), selfLocation.getLongitude());
+                postQuestion = new Question(SkooziApplication.getUserAccount().name, postContent,
+                        null, System.currentTimeMillis() / 1000L,
+                        postLocation.latitude, postLocation.longitude);
+                SkooziQnARequestService.startActionInsertNewQuestion(PostQuestionActivity.this, tokenListener,
+                        postQuestion);
+                hideKeyboard();
+            }
+        }
+    }
+
+    private boolean isContentValid(String value) {
+        if (TextUtils.isEmpty(value)) {
+            Snackbar.make(coordinatorLayout, R.string.new_question_error_message, Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+//    private void tryPostQuestionToApi() {
+//        if (requestInProgress) return;
+//        if (selfLocation == null)  return; // can't do anything without a location
+//        if (!isContentValid(postCon))
+//        setupLocalBroadcastPair();
+//        if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
+//            progressBar.setVisibility(View.VISIBLE);
+//            SkooziQnAUtil.quesListRequest(getActivity(), authTokenListener,
+//                    searchOrigin, getSearchRadiusKm());
+//            requestInProgress = true;
+//        }
+//    }
 }

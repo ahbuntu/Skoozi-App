@@ -51,14 +51,11 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
 
-    private GoogleApiClientBroker googleApiBroker;
-    private GoogleApiClient googleApiClient;
-
     private MapFragment mapFragment;
     private CoordinatorLayout coordinatorLayout;
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
-    private boolean resolvingGoogleApiError = false;// Bool to track whether the app is already resolving an error
+
     private Location latestLocation;
     private PendingMapUpdate pendingMapUpdate;
 
@@ -83,15 +80,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                 if (resultCode == RESULT_OK) {
                     // Receiving a result that follows a GoogleAuthException, try auth again
 //                    getUsername();
-                }
-                return;
-            case GoogleApiClientBroker.GOOGLE_API_REQUEST_RESOLVE_ERROR:
-                resolvingGoogleApiError = false;
-                if (resultCode == RESULT_OK) {
-                    // Make sure the app is not already connected or attempting to connect
-                    if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
-                        googleApiClient.connect();
-                    }
                 }
                 return;
         }
@@ -125,8 +113,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                 nearbyFragment = NearbyFragment.newInstance();
                 getFragmentManager().beginTransaction()
                         .add(R.id.main_fragment_container, nearbyFragment).commit();
-            } else {
-                return;
             }
         }
     }
@@ -145,25 +131,26 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
 
         if (mapFragment != null)  mapFragment.getMapAsync(this);
 
-        if (ConnectionUtil.hasGps(this, coordinatorLayout) && googleApiBroker == null) {
-            googleApiBroker = new GoogleApiClientBroker(this);
-            // assuming that both googleApiBroker & googleApiClient become null together
-            if (!resolvingGoogleApiError) {
-                initGoogleApiClient();
-                googleApiClient.connect();
-            }
-        } else {
-            if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
-                googleApiClient.connect();
-            }
-//            updateLatestLocation();
-        }
+        if (ConnectionUtil.hasNetwork(coordinatorLayout)) connectToGoogleApi();
+
+//        if (ConnectionUtil.hasGps(this, coordinatorLayout) && googleApiBroker == null) {
+//            googleApiBroker = new GoogleApiClientBroker(this);
+//            // assuming that both googleApiBroker & googleApiClient become null together
+//            if (!resolvingGoogleApiError) {
+//                initGoogleApiClient();
+//                googleApiClient.connect();
+//            }
+//        } else {
+//            if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
+//                googleApiClient.connect();
+//            }
+////            updateLatestLocation();
+//        }
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        if (googleApiClient != null) googleApiClient.disconnect();
+    protected void onGoogleApiConnected() {
+        updateLatestLocation();
     }
 
     // Interface implementations
@@ -210,21 +197,21 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         }
     }
 
-    private void initGoogleApiClient() {
-        if (googleApiClient != null) return;
-        if (ConnectionUtil.hasGps(this, coordinatorLayout)){
-            googleApiClient = googleApiBroker
-                    .getGoogleApiClient(new GoogleApiClientBroker.BrokerResultListener() {
-                        @Override
-                        public void onConnected() {
-                            updateLatestLocation();
-                        }
-                    });
-        }
-    }
+//    private void initGoogleApiClient() {
+//        if (googleApiClient != null) return;
+//        if (ConnectionUtil.hasGps(this, coordinatorLayout)){
+//            googleApiClient = googleApiBroker
+//                    .getGoogleApiClient(new GoogleApiClientBroker.BrokerResultListener() {
+//                        @Override
+//                        public void onConnected() {
+//                            updateLatestLocation();
+//                        }
+//                    });
+//        }
+//    }
 
     private void updateLatestLocation() {
-        latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, googleApiClient);
+        latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, getGoogleApiClient());
         if (latestLocation != null) nearbyFragment.updateSearchOrigin(latestLocation);
     }
 

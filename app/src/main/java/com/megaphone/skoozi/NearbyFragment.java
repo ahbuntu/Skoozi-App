@@ -145,8 +145,6 @@ public class NearbyFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 tryGetQuestionsFromApi();
-//                listener.radiusUpdated();
-//                getQuestionsFromApi(parseSearchRadiusKm(parentView.getSelectedItem().toString()));
             }
 
             @Override
