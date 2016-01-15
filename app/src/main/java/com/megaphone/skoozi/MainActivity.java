@@ -132,20 +132,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         if (mapFragment != null)  mapFragment.getMapAsync(this);
 
         if (ConnectionUtil.hasNetwork(coordinatorLayout)) connectToGoogleApi();
-
-//        if (ConnectionUtil.hasGps(this, coordinatorLayout) && googleApiBroker == null) {
-//            googleApiBroker = new GoogleApiClientBroker(this);
-//            // assuming that both googleApiBroker & googleApiClient become null together
-//            if (!resolvingGoogleApiError) {
-//                initGoogleApiClient();
-//                googleApiClient.connect();
-//            }
-//        } else {
-//            if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
-//                googleApiClient.connect();
-//            }
-////            updateLatestLocation();
-//        }
     }
 
     @Override
@@ -196,19 +182,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
             }
         }
     }
-
-//    private void initGoogleApiClient() {
-//        if (googleApiClient != null) return;
-//        if (ConnectionUtil.hasGps(this, coordinatorLayout)){
-//            googleApiClient = googleApiBroker
-//                    .getGoogleApiClient(new GoogleApiClientBroker.BrokerResultListener() {
-//                        @Override
-//                        public void onConnected() {
-//                            updateLatestLocation();
-//                        }
-//                    });
-//        }
-//    }
 
     private void updateLatestLocation() {
         latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, getGoogleApiClient());
