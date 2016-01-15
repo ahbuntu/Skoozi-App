@@ -92,8 +92,8 @@ public class NearbyRecyclerViewAdapter extends RecyclerView.Adapter<NearbyRecycl
         int nameImageColor = generator.getRandomColor();
         TextDrawable nameDrawable = TextDrawable.builder()
                 .buildRound(questionItem.author.substring(0,1).toUpperCase(), nameImageColor);
-        holder.nearbyNameImage.setImageDrawable(nameDrawable);
-        holder.nearbyNameImage.setVisibility(View.VISIBLE);
+//        holder.nearbyNameImage.setImageDrawable(nameDrawable);
+//        holder.nearbyNameImage.setVisibility(View.VISIBLE);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

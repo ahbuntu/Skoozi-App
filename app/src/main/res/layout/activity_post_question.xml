@@ -53,25 +53,24 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
 
                     <Button
                         android:id="@+id/post_new_question"
                         style="?attr/borderlessButtonStyle"
                         android:text="@string/post_new_question"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_alignParentRight="true"
-                        android:layout_marginTop="@dimen/new_question_vertical_margin"
-                        android:layout_marginBottom="@dimen/new_question_vertical_margin"
                         android:textColor="@color/accent"/>
 
                     <ProgressBar
                         android:id="@+id/new_question_progress"
                         style="?android:attr/progressBarStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
                         android:layout_toLeftOf="@id/post_new_question"
                         android:visibility="invisible"/>
                 </RelativeLayout>

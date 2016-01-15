@@ -87,6 +87,7 @@ public class AccountUtil {
                     AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
         }
     }
+    
     public static void displayAccountLoginErrorMessage(CoordinatorLayout layoutView) {
         Snackbar.make(layoutView, R.string.no_account_login_message, Snackbar.LENGTH_LONG)
                 .show();

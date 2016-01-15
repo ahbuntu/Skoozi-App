@@ -26,6 +26,7 @@ public class SkooziQnAUtil {
     public static final String BROADCAST_POST_QUESTION_RESULT = "com.megaphone.skoozi.broadcast.POST_QUESTION_RESULT";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
     public static final String EXTRA_QUESTION_KEY  = "com.megaphone.skoozi.extra.QUESTION_KEY";
+    public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
 
     public static void displayNoQuestionsMessage(CoordinatorLayout layoutView) {
         Snackbar.make(layoutView, R.string.no_questions_message, Snackbar.LENGTH_LONG)

@@ -48,7 +48,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     private static final int DEFAULT_ZOOM = 11;
     private static final int RADIUS_TRANSPARENCY = 64; //75%
 
-    public static final String EXTRAS_QUESTIONS_LIST  = "com.megaphone.skoozi.extras.QUESTIONS_LIST";
     public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
 
     private MapFragment mapFragment;

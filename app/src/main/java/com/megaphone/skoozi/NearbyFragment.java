@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -65,7 +66,7 @@ public class NearbyFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             requestInProgress = false;
             progressBar.setVisibility(View.GONE);
-            ArrayList<Question> questions = intent.getParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST);
+            ArrayList<Question> questions = intent.getParcelableArrayListExtra(SkooziQnAUtil.EXTRAS_QUESTIONS_LIST);
             displayApiResponse(questions);
         }
     };
@@ -80,13 +81,6 @@ public class NearbyFragment extends Fragment {
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        if (context instanceof NearbyQuestionsListener) {
-            initNearbyListener(context);
-        }
     }
 
     @Override
@@ -122,8 +116,13 @@ public class NearbyFragment extends Fragment {
         destroyLocalBroadcastPair();
     }
 
-    private void initNearbyListener(Context context) {
-        nearbyListener = (NearbyQuestionsListener) context;
+    @Nullable
+    private NearbyQuestionsListener getNearbyListener(Context context) {
+        if (context instanceof NearbyQuestionsListener) {
+            nearbyListener = (NearbyQuestionsListener) context;
+            return nearbyListener;
+        }
+        return null;
     }
 
     private void setupRecyclerView() {
@@ -164,8 +163,8 @@ public class NearbyFragment extends Fragment {
             SkooziQnAUtil.quesListRequest(getActivity(), authTokenListener,
                     searchOrigin, getSearchRadiusKm());
 
-            if (nearbyListener == null) initNearbyListener(getActivity());
-            nearbyListener.onSearchAreaUpdated(searchOrigin, getSearchRadiusKm());
+            if (getNearbyListener(getActivity()) != null)
+                    nearbyListener.onSearchAreaUpdated(searchOrigin, getSearchRadiusKm());
 
             requestInProgress = true;
         }
@@ -194,8 +193,8 @@ public class NearbyFragment extends Fragment {
     }
 
     private void displayApiResponse(List<Question> questions) {
-        if (nearbyListener == null) initNearbyListener(getActivity());
-        nearbyListener.onQuestionsAvailable(questions);
+        if (getNearbyListener(getActivity()) != null)
+            nearbyListener.onQuestionsAvailable(questions);
 
         if (questions == null) {
             SkooziQnAUtil.displayNoQuestionsMessage(coordinatorLayout);
