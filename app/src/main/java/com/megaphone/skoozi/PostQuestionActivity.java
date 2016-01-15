@@ -50,7 +50,6 @@ public class PostQuestionActivity extends BaseActivity {
             if (intent.getAction().equals(SkooziQnAUtil.BROADCAST_POST_QUESTION_RESULT)) {
                 String questionKey = intent.getStringExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY);
                 if (questionKey == null) {
-                    Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
                     Snackbar.make(coordinatorLayout, R.string.error_posting_new_question, Snackbar.LENGTH_LONG)
                             .show();
                 } else {
@@ -114,25 +113,6 @@ public class PostQuestionActivity extends BaseActivity {
         if (ConnectionUtil.hasNetwork(coordinatorLayout)) connectToGoogleApi();
 
         if (SkooziApplication.hasUserAccount()) postQuestionButton.setEnabled(true);
-
-//        try {
-//            if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
-//                if (SkooziApplication.getUserAccount() == null) {
-//                    AccountUtil.pickUserAccount(PostQuestionActivity.this, ACTION_NEW_QUESTION);
-//                } else {
-//                    postQuestionButton.setEnabled(true);
-//                }
-//
-////                MapFragment mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
-////                if (mMapFragment != null) {
-////                    mMapFragment.getMapAsync(this);
-////                }
-//
-//                setupLocalBroadcastPair();
-//            }
-//        } catch (Exception e) {
-//            Log.d(TAG, e.getMessage());
-//        }
     }
 
     @Override
