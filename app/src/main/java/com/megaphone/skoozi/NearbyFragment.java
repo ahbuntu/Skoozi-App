@@ -64,6 +64,7 @@ public class NearbyFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             requestInProgress = false;
+            progressBar.setVisibility(View.GONE);
             ArrayList<Question> questions = intent.getParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST);
             displayApiResponse(questions);
         }
@@ -83,7 +84,7 @@ public class NearbyFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        if (context instanceof MainActivity) {
+        if (context instanceof NearbyQuestionsListener) {
             initNearbyListener(context);
         }
     }
@@ -122,7 +123,7 @@ public class NearbyFragment extends Fragment {
     }
 
     private void initNearbyListener(Context context) {
-        nearbyListener = ((MainActivity) context).requestNearbyListener();
+        nearbyListener = (NearbyQuestionsListener) context;
     }
 
     private void setupRecyclerView() {
@@ -196,7 +197,6 @@ public class NearbyFragment extends Fragment {
         if (nearbyListener == null) initNearbyListener(getActivity());
         nearbyListener.onQuestionsAvailable(questions);
 
-        progressBar.setVisibility(View.GONE);
         if (questions == null) {
             SkooziQnAUtil.displayNoQuestionsMessage(coordinatorLayout);
         } else {

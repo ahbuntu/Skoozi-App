@@ -305,8 +305,8 @@ public class SkooziQnARequestService extends IntentService {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         }
-        Intent localIntent = new Intent(PostQuestionActivity.BROADCAST_POST_QUESTION_RESULT)
-                .putExtra(PostQuestionActivity.EXTRA_QUESTION_KEY, postKey);
+        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_POST_QUESTION_RESULT)
+                .putExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY, postKey);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 

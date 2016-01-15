@@ -245,8 +245,4 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
             startActivity(intent);
         }
     }
-
-    public NearbyFragment.NearbyQuestionsListener requestNearbyListener() {
-        return this;
-    }
 }

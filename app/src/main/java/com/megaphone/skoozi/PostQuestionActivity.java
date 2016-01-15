@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.maps.model.LatLng;
-import com.megaphone.skoozi.api.SkooziQnARequestService;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
@@ -33,9 +32,6 @@ import com.megaphone.skoozi.util.SkooziQnAUtil;
 public class PostQuestionActivity extends BaseActivity {
 
     private static final String TAG = "PostQuestionActivty";
-    public static final String BROADCAST_POST_QUESTION_RESULT = "com.megaphone.skoozi.broadcast.POST_QUESTION_RESULT";
-    public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
-    public static final String EXTRA_QUESTION_KEY  = "com.megaphone.skoozi.extra.QUESTION_KEY";
 
     private EditText postQuestionText;
     private ProgressBar progressBar;
@@ -44,15 +40,19 @@ public class PostQuestionActivity extends BaseActivity {
     private Location selfLocation;
     private boolean requestInProgress;
     private Question postQuestion;
+    private IntentFilter mIntentFilter;
 
-    private BroadcastReceiver questionInsertReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver skooziApiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(PostQuestionActivity.BROADCAST_POST_QUESTION_RESULT)) {
-                String questionKey = intent.getStringExtra(PostQuestionActivity.EXTRA_QUESTION_KEY);
+            requestInProgress = false;
+            progressBar.setVisibility(View.GONE);
+            if (intent.getAction().equals(SkooziQnAUtil.BROADCAST_POST_QUESTION_RESULT)) {
+                String questionKey = intent.getStringExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY);
                 if (questionKey == null) {
-                    //TODO: use a Snackbar here with option to retry :)
-                    Toast.makeText(context, "Looks like there was an error. Please try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(coordinatorLayout, R.string.error_posting_new_question, Snackbar.LENGTH_LONG)
+                            .show();
                 } else {
                     showThread(questionKey);
                 }
@@ -83,7 +83,7 @@ public class PostQuestionActivity extends BaseActivity {
                     // Receiving a result from the AccountPicker
                     SkooziApplication.setUserAccount(this, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
                     String action = data.getStringExtra(AccountUtil.EXTRA_USER_ACCOUNT_ACTION); //can return null
-                    if (action != null && action.equals(ACTION_NEW_QUESTION)) {
+                    if (action != null && action.equals(SkooziQnAUtil.ACTION_NEW_QUESTION)) {
                         postQuestionButton.setEnabled(true); // ok to proceed
                     }
                 } else if (resultCode == RESULT_CANCELED) {
@@ -99,7 +99,6 @@ public class PostQuestionActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_question);
-
         setupToolbar();
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.new_question_coordinator_layout);
@@ -137,6 +136,12 @@ public class PostQuestionActivity extends BaseActivity {
     }
 
     @Override
+    public void onPause(){
+        super.onPause();
+        destroyLocalBroadcastPair();
+    }
+
+    @Override
     protected void onGoogleApiConnected() {
         selfLocation = PermissionUtil.tryGetLatestLocation(PostQuestionActivity.this, getGoogleApiClient());
     }
@@ -149,13 +154,21 @@ public class PostQuestionActivity extends BaseActivity {
     }
 
     private void setupLocalBroadcastPair() {
-        IntentFilter mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(PostQuestionActivity.BROADCAST_POST_QUESTION_RESULT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(questionInsertReceiver, mIntentFilter);
+        if (mIntentFilter == null) {
+            mIntentFilter = new IntentFilter(SkooziQnAUtil.BROADCAST_POST_QUESTION_RESULT);
+            LocalBroadcastManager.getInstance(this).registerReceiver(skooziApiReceiver, mIntentFilter);
+        }
+    }
+
+    private void destroyLocalBroadcastPair() {
+        mIntentFilter = null;
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(skooziApiReceiver);
     }
 
     private void showThread(String questionKey) {
+        progressBar.setVisibility(View.GONE);
         if (questionKey != null) {
+            postQuestionText.setText("");
             postQuestion.key = questionKey;
             Intent threadIntent = new Intent(this, ThreadActivity.class);
             Bundle questionBundle = new Bundle();
@@ -165,7 +178,6 @@ public class PostQuestionActivity extends BaseActivity {
         } else {
             Toast.makeText(this, "Looks like there was an error :(", Toast.LENGTH_SHORT).show();
         }
-        postQuestionText.setText("");
     }
 
     private void hideKeyboard() {
@@ -188,21 +200,9 @@ public class PostQuestionActivity extends BaseActivity {
     }
 
     private void onPostButtonClicked() {
-        String postContent = postQuestionText.getText().toString().trim();
-        if (isContentValid(postContent)) {
-            if (selfLocation == null) {
-                //todo: need to add in display error message for disabled GPS/location
-                //ie. postLocation == null condition
-            } else {
-                // TODO: 2016-01-13 should use tryPostQuestionToApi() 
-                LatLng postLocation = new LatLng(selfLocation.getLatitude(), selfLocation.getLongitude());
-                postQuestion = new Question(SkooziApplication.getUserAccount().name, postContent,
-                        null, System.currentTimeMillis() / 1000L,
-                        postLocation.latitude, postLocation.longitude);
-                SkooziQnARequestService.startActionInsertNewQuestion(PostQuestionActivity.this, tokenListener,
-                        postQuestion);
-                hideKeyboard();
-            }
+        String content = postQuestionText.getText().toString().trim();
+        if (isContentValid(content)) {
+            tryPostQuestionToApi(content);
         }
     }
 
@@ -213,16 +213,21 @@ public class PostQuestionActivity extends BaseActivity {
         }
         return true;
     }
-//    private void tryPostQuestionToApi() {
-//        if (requestInProgress) return;
-//        if (selfLocation == null)  return; // can't do anything without a location
-//        if (!isContentValid(postCon))
-//        setupLocalBroadcastPair();
-//        if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
-//            progressBar.setVisibility(View.VISIBLE);
-//            SkooziQnAUtil.quesListRequest(getActivity(), authTokenListener,
-//                    searchOrigin, getSearchRadiusKm());
-//            requestInProgress = true;
-//        }
-//    }
+
+    private void tryPostQuestionToApi(String content) {
+        if (requestInProgress) return;
+        if (selfLocation == null)  return; // can't do anything without a location
+
+        setupLocalBroadcastPair();
+        if (ConnectionUtil.hasNetwork(coordinatorLayout)) {
+            progressBar.setVisibility(View.VISIBLE);
+            LatLng postLocation = new LatLng(selfLocation.getLatitude(), selfLocation.getLongitude());
+            postQuestion = new Question(SkooziApplication.getUserAccount().name, content,
+                    null, System.currentTimeMillis() / 1000L,
+                    postLocation.latitude, postLocation.longitude);
+            SkooziQnAUtil.postQuestionRequest(PostQuestionActivity.this, tokenListener, postQuestion);
+            hideKeyboard();
+            requestInProgress = true;
+        }
+    }
 }
