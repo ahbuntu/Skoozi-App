@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Skoozi</string>
-    <string name="app_api_url">https:skoozi-959.appspot.com/_ah/api</string>
 
     <string name="title_section1">NEARBY</string>
     <string name="nearby_section_label">Showing all questions within a radius of  </string>

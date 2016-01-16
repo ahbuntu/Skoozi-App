@@ -176,7 +176,7 @@ public class SkooziQnARequestService extends IntentService {
 
             Skooziqna.Builder builder = new Skooziqna.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), credential)
-                    .setRootUrl(getString(R.string.app_api_url));
+                    .setRootUrl(ServerConfig.getSkooziUrl());
             skooziqnaService = builder.build();
 
         }
