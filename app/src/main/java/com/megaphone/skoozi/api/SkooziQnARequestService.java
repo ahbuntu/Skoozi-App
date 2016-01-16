@@ -3,6 +3,7 @@ package com.megaphone.skoozi.api;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -18,6 +19,7 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.megaphone.skoozi.MainActivity;
 import com.megaphone.skoozi.PostQuestionActivity;
 import com.megaphone.skoozi.R;
@@ -162,11 +164,31 @@ public class SkooziQnARequestService extends IntentService {
      */
     private void initializeApiConnection() {
         if (skooziqnaService == null) { // do this once
+            GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(this,
+                    "server:client_id:26298710398-8jbuih8cj38ihi87bsloqkvur2mfut11.apps.googleusercontent.com");
+
+            if (credential.getSelectedAccountName() == null) {
+                // Not signed in, show login window or request an account.
+                credential.setSelectedAccountName(SkooziApplication.getUserAccount().name);
+            } else {
+                // Already signed in, begin app!
+            }
+
             Skooziqna.Builder builder = new Skooziqna.Builder(AndroidHttp.newCompatibleTransport(),
-                    new AndroidJsonFactory(), null)
+                    new AndroidJsonFactory(), credential)
                     .setRootUrl(getString(R.string.app_api_url));
             skooziqnaService = builder.build();
+
         }
+    }
+
+    // setSelectedAccountName definition
+    private void setSelectedAccountName(String accountName) {
+//        SharedPreferences.Editor editor = settings.edit();
+//        editor.putString(PREF_ACCOUNT_NAME, accountName);
+//        editor.commit();
+//        credential.setSelectedAccountName(accountName);
+//        this.accountName = accountName;
     }
 
     /**
@@ -288,6 +310,7 @@ public class SkooziQnARequestService extends IntentService {
         initializeApiConnection();
         String postKey = null;
         try {
+
             CoreModelsQuestionMessage questionMsg = new CoreModelsQuestionMessage();
 
             // FIXME: 2016-01-02 figure out right values
@@ -301,6 +324,8 @@ public class SkooziQnARequestService extends IntentService {
                     .insert(questionMsg)
                     .setOauthToken(SkooziApplication.accessToken)
                     .execute();
+
+            Log.d(TAG, insertResponse.toString());
             postKey = insertResponse.getPostKey();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
