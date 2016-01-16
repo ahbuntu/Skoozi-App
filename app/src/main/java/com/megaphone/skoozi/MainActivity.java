@@ -48,42 +48,12 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     private static final int DEFAULT_ZOOM = 11;
     private static final int RADIUS_TRANSPARENCY = 64; //75%
 
-    public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
-
     private MapFragment mapFragment;
     private CoordinatorLayout coordinatorLayout;
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
-
     private Location latestLocation;
     private PendingMapUpdate pendingMapUpdate;
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
-                if (resultCode == RESULT_OK) {
-                    // Receiving a result from the AccountPicker
-                    SkooziApplication.setUserAccount(this, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
-                    String action = data.getStringExtra(AccountUtil.EXTRA_USER_ACCOUNT_ACTION); //can return null
-                    if (action != null && action.equals(ACTION_NEW_QUESTION)) {
-                        tryNewQuestion();
-                    }
-                } else if (resultCode == RESULT_CANCELED) {
-                    // The account picker dialog closed without selecting an account.
-                    AccountUtil.displayAccountLoginErrorMessage(coordinatorLayout);
-                }
-                return;
-            case AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR:
-//            case REQUEST_CODE_RECOVER_FROM_AUTH_ERROR: //todo: figure out HOW/WHEN this is received
-                if (resultCode == RESULT_OK) {
-                    // Receiving a result that follows a GoogleAuthException, try auth again
-//                    getUsername();
-                }
-                return;
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -100,7 +70,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         setupToolbar();
 

@@ -46,20 +46,7 @@ public class NearbyFragment extends Fragment {
     private NearbyQuestionsListener nearbyListener;
     private IntentFilter quesListIntentFilter;
     private boolean requestInProgress;
-
-    private AccountUtil.GoogleAuthTokenExceptionListener authTokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
-        @Override
-        public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
-            // Because this call comes from the AsyncTask, we must ensure that the following
-            // code instead executes on the UI thread.
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    AccountUtil.resolveAuthExceptionError(getActivity(), exception);
-                }
-            });
-        }
-    };
+    private AccountUtil.GoogleAuthTokenExceptionListener authTokenListener;
 
     private BroadcastReceiver skooziApiReceiver = new BroadcastReceiver() {
         @Override
@@ -81,6 +68,14 @@ public class NearbyFragment extends Fragment {
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        if (context instanceof BaseActivity) {
+            BaseActivity activity = (BaseActivity) context;
+            authTokenListener = activity.tokenListener;
+        }
     }
 
     @Override
@@ -204,7 +199,6 @@ public class NearbyFragment extends Fragment {
     }
 
     // Exposed methods
-
     public void updateSearchOrigin(Location updatedLocation) {
         searchOrigin = updatedLocation;
         tryGetQuestionsFromApi();

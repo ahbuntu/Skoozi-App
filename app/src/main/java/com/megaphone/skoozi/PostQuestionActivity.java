@@ -59,21 +59,6 @@ public class PostQuestionActivity extends BaseActivity {
         }
     };
 
-    private AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
-        @Override
-        public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
-            // Because this call comes from the IntentService, we must ensure that the following
-            // code instead executes on the UI thread.
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    AccountUtil.resolveAuthExceptionError(PostQuestionActivity.this, exception);
-                }
-            });
-        }
-    };
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
