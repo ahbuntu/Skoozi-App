@@ -40,16 +40,16 @@ import java.util.List;
 public class SkooziQnARequestService extends IntentService {
 
     private static final String TAG = "SkooziQnARequestService";
-    private static final String ACTION_GET_THREAD_ANSWERS = "com.megaphone.skoozi.action.GET_THREAD_ANSWERS";
-    private static final String ACTION_GET_QUESTIONS_LIST = "com.megaphone.skoozi.action.GET_QUESTIONS_LIST";
-    private static final String ACTION_INSERT_QUESTION_ANSWER = "com.megaphone.skoozi.action.INSERT_QUESTION_ANSWER";
-    private static final String ACTION_INSERT_NEW_QUESTION = "com.megaphone.skoozi.action.INSERT_NEW_QUESTION";
-    private static final String EXTRA_QUESTION_KEY = "com.megaphone.skoozi.extra.QUESTION_KEY";
-    private static final String EXTRA_QUESTION_PARCEL = "com.megaphone.skoozi.extra.QUESTION_PARCEL";
-    private static final String EXTRA_ANSWER_PARCEL = "com.megaphone.skoozi.extra.ANSWER_PARCEL";
-    private static final String EXTRA_LATITUDE = "com.megaphone.skoozi.extra.LATITUDE";
-    private static final String EXTRA_LONGITUDE = "com.megaphone.skoozi.extra.LONGITUDE";
-    private static final String EXTRA_RADIUS = "com.megaphone.skoozi.extra.RADIUS";
+    private static final String ACTION_GET_THREAD_ANSWERS = "skoozi.action.GET_THREAD_ANSWERS";
+    private static final String ACTION_GET_QUESTIONS_LIST = "skoozi.action.GET_QUESTIONS_LIST";
+    private static final String ACTION_INSERT_QUESTION_ANSWER = "skoozi.action.INSERT_QUESTION_ANSWER";
+    private static final String ACTION_INSERT_NEW_QUESTION = "skoozi.action.INSERT_NEW_QUESTION";
+    private static final String EXTRA_QUESTION_KEY = "skoozi.extra.QUESTION_KEY";
+    private static final String EXTRA_QUESTION_PARCEL = "skoozi.extra.QUESTION_PARCEL";
+    private static final String EXTRA_ANSWER_PARCEL = "skoozi.extra.ANSWER_PARCEL";
+    private static final String EXTRA_LATITUDE = "skoozi.extra.LATITUDE";
+    private static final String EXTRA_LONGITUDE = "skoozi.extra.LONGITUDE";
+    private static final String EXTRA_RADIUS = "skoozi.extra.RADIUS";
 
     //http://stackoverflow.com/questions/10400428/can-i-use-androids-accountmanager-for-getting-oauth-access-token-for-appengine
     private final static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
@@ -245,7 +245,7 @@ public class SkooziQnARequestService extends IntentService {
 
         // if no questions, return null; service should not handle this
         Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_QUESTIONS_LIST_RESULT)
-                .putParcelableArrayListExtra(MainActivity.EXTRAS_QUESTIONS_LIST, questionList);
+                .putParcelableArrayListExtra(SkooziQnAUtil.EXTRAS_QUESTIONS_LIST, questionList);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 

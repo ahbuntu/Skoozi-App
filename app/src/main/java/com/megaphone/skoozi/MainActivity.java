@@ -1,6 +1,5 @@
 package com.megaphone.skoozi;
 
-import android.accounts.AccountManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -13,7 +12,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -25,7 +23,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
-import com.megaphone.skoozi.util.GoogleApiClientBroker;
 import com.megaphone.skoozi.util.PermissionUtil;
 
 import java.util.List;

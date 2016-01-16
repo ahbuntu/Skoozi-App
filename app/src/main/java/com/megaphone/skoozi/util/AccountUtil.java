@@ -29,7 +29,7 @@ public class AccountUtil {
     private static final String TAG = "AccountUtil";
     public static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     public static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1002;
-    public static final String EXTRA_USER_ACCOUNT_ACTION = "com.megaphone.skoozi.extra.USER_ACCOUNT_ACTION";
+    public static final String EXTRA_USER_ACCOUNT_ACTION = "skoozi.extra.USER_ACCOUNT_ACTION";
 
     public interface GoogleAuthTokenExceptionListener {
         void handleGoogleAuthException(UserRecoverableAuthException exception);

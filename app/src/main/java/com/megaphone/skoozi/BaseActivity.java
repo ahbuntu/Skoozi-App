@@ -37,7 +37,6 @@ abstract public class BaseActivity extends AppCompatActivity {
         }
     };
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the toolbar menu
