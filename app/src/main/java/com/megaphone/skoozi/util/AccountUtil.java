@@ -88,6 +88,6 @@ public class AccountUtil {
     public static void displayAccountSignedInMessage(CoordinatorLayout layoutView, String name) {
         Snackbar.make(layoutView,
                 layoutView.getContext().getString(R.string.account_login_success_message, name),
-                Snackbar.LENGTH_LONG).show();
+                Snackbar.LENGTH_SHORT).show();
     }
 }

@@ -52,7 +52,7 @@ public class NearbyFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             requestInProgress = false;
             progressBar.setVisibility(View.GONE);
-            ArrayList<Question> questions = intent.getParcelableArrayListExtra(SkooziQnAUtil.EXTRAS_QUESTIONS_LIST);
+            ArrayList<Question> questions = intent.getParcelableArrayListExtra(SkooziQnAUtil.EXTRA_QUESTIONS_LIST);
             displayApiResponse(questions);
         }
     };

@@ -214,8 +214,8 @@ public class SkooziQnARequestService extends IntentService {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         }
-        Intent localIntent = new Intent(ThreadActivity.BROADCAST_THREAD_ANSWERS_RESULT)
-                .putParcelableArrayListExtra(ThreadActivity.EXTRA_THREAD_ANSWERS, threadAnswers);
+        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_THREAD_ANSWERS_RESULT)
+                .putParcelableArrayListExtra(SkooziQnAUtil.EXTRA_THREAD_ANSWERS, threadAnswers);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
@@ -260,7 +260,7 @@ public class SkooziQnARequestService extends IntentService {
 
         // if no questions, return null; service should not handle this
         Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_QUESTIONS_LIST_RESULT)
-                .putParcelableArrayListExtra(SkooziQnAUtil.EXTRAS_QUESTIONS_LIST, questionList);
+                .putParcelableArrayListExtra(SkooziQnAUtil.EXTRA_QUESTIONS_LIST, questionList);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
@@ -289,8 +289,8 @@ public class SkooziQnARequestService extends IntentService {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         }
-        Intent localIntent = new Intent(ThreadActivity.BROADCAST_POST_ANSWER_RESULT)
-                .putExtra(ThreadActivity.EXTRA_ANSWER_KEY, postKey);
+        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_POST_ANSWER_RESULT)
+                .putExtra(SkooziQnAUtil.EXTRA_ANSWER_KEY, postKey);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 

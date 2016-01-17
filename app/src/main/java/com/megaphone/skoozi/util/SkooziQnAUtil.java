@@ -10,17 +10,17 @@ import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.api.SkooziQnARequestService;
 import com.megaphone.skoozi.model.Question;
 
-/**
- * Created by ahmadulhassan on 2015-07-01.
- */
 public class SkooziQnAUtil {
     private static final LatLng DEFAULT_LOCATION = new LatLng(43.6532,-79.3832);
     public static final int DEFAULT_RADIUS_METRES = 10000;
     public static final String BROADCAST_QUESTIONS_LIST_RESULT = "skoozi.broadcast.QUESTIONS_LIST_RESULT";
     public static final String BROADCAST_POST_QUESTION_RESULT = "skoozi.broadcast.POST_QUESTION_RESULT";
-    public static final String ACTION_NEW_QUESTION  = "skoozi.action.NEW_QUESTION";
+    public static final String BROADCAST_THREAD_ANSWERS_RESULT = "skoozi.broadcast.THREAD_ANSWERS_RESULT";
+    public static final String BROADCAST_POST_ANSWER_RESULT = "skoozi.broadcast.POST_ANSWER_RESULT";
     public static final String EXTRA_QUESTION_KEY  = "skoozi.extra.QUESTION_KEY";
-    public static final String EXTRAS_QUESTIONS_LIST  = "skoozi.extras.QUESTIONS_LIST";
+    public static final String EXTRA_ANSWER_KEY = "com.megaphone.skoozi.extra.ANSWER_KEY";
+    public static final String EXTRA_THREAD_ANSWERS = "com.megaphone.skoozi.extra.THREAD_ANSWERS";
+    public static final String EXTRA_QUESTIONS_LIST = "skoozi.extra.QUESTIONS_LIST";
 
     public static void displayNoQuestionsMessage(CoordinatorLayout layoutView) {
         Snackbar.make(layoutView, R.string.no_questions_message, Snackbar.LENGTH_LONG)

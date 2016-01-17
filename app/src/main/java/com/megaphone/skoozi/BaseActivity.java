@@ -15,9 +15,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
 
-/**
- * Created by ahmadul.hassan on 2016-01-09.
- */
 abstract public class BaseActivity extends AppCompatActivity {
     private GoogleApiClientBroker googleApiBroker;
     private GoogleApiClient googleApiClient;

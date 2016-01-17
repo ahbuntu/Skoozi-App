@@ -17,7 +17,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.megaphone.skoozi.model.Question;
@@ -27,7 +26,6 @@ import com.megaphone.skoozi.util.PermissionUtil;
 import com.megaphone.skoozi.util.SkooziQnAUtil;
 
 public class PostQuestionActivity extends BaseActivity {
-
     private static final String TAG = "PostQuestionActivty";
 
     private EditText postQuestionText;
@@ -49,6 +47,7 @@ public class PostQuestionActivity extends BaseActivity {
                     Snackbar.make(coordinatorLayout, R.string.error_posting_new_question, Snackbar.LENGTH_LONG)
                             .show();
                 } else {
+                    postQuestionText.setText("");
                     showThread(questionKey);
                 }
             }
@@ -134,19 +133,15 @@ public class PostQuestionActivity extends BaseActivity {
     }
 
     private void showThread(String questionKey) {
-        progressBar.setVisibility(View.GONE);
-        if (questionKey != null) {
-            postQuestionText.setText("");
-            postQuestion.key = questionKey;
-            Intent threadIntent = new Intent(this, ThreadActivity.class);
-            threadIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  
-            Bundle questionBundle = new Bundle();
-            questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, postQuestion);
-            threadIntent.putExtras(questionBundle);
-            startActivity(threadIntent);
-        } else {
-            Toast.makeText(this, "Looks like there was an error :(", Toast.LENGTH_SHORT).show();
-        }
+        if (questionKey == null) return;
+
+        postQuestion.key = questionKey;
+        Intent threadIntent = new Intent(this, ThreadActivity.class);
+        threadIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Bundle questionBundle = new Bundle();
+        questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, postQuestion);
+        threadIntent.putExtras(questionBundle);
+        startActivity(threadIntent);
     }
 
     private void hideKeyboard() {
