@@ -90,7 +90,8 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         nearby_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tryNewQuestion();
+                Intent intent = new Intent(MainActivity.this, PostQuestionActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -202,13 +203,5 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                 .radius(radius*1000); // need this in metres
         nearbyMap.addCircle(circleOptions);
     }
-
-    private void tryNewQuestion() {
-        if (SkooziApplication.getUserAccount() == null) {
-            AccountUtil.pickUserAccount(MainActivity.this, ACTION_NEW_QUESTION);
-        } else {
-            Intent intent = new Intent(MainActivity.this, PostQuestionActivity.class);
-            startActivity(intent);
-        }
-    }
+    
 }

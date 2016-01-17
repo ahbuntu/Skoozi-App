@@ -201,7 +201,6 @@ public class SkooziQnARequestService extends IntentService {
         try {
             CoreModelsAnswerMessageCollection threadRepsonse =  skooziqnaService.question().listAnswers()
                     .setId(question_key)
-                    .setOauthToken(SkooziApplication.accessToken)
                     .execute();
             List<CoreModelsAnswerMessage> threadAnswerMessages = threadRepsonse.getAnswers();
             if (threadAnswerMessages != null) {
@@ -291,7 +290,6 @@ public class SkooziQnARequestService extends IntentService {
 
             CoreModelsPostResponse insertResponse = skooziqnaService.answer()
                     .insert(answerMsg)
-                    .setOauthToken(SkooziApplication.accessToken)
                     .execute();
             postKey = insertResponse.getPostKey();
         } catch (IOException e) {
@@ -310,11 +308,7 @@ public class SkooziQnARequestService extends IntentService {
         initializeApiConnection();
         String postKey = null;
         try {
-
             CoreModelsQuestionMessage questionMsg = new CoreModelsQuestionMessage();
-
-            // FIXME: 2016-01-02 figure out right values
-//            questionMsg.setEmail(userQuestion.author);
             questionMsg.setContent(userQuestion.content);
             questionMsg.setLocationLat(userQuestion.locationLat);
             questionMsg.setLocationLon(userQuestion.locationLon);
@@ -322,13 +316,13 @@ public class SkooziQnARequestService extends IntentService {
 
             CoreModelsPostResponse insertResponse = skooziqnaService.question()
                     .insert(questionMsg)
-                    .setOauthToken(SkooziApplication.accessToken)
                     .execute();
 
             Log.d(TAG, insertResponse.toString());
             postKey = insertResponse.getPostKey();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
+            e.printStackTrace();
         }
         Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_POST_QUESTION_RESULT)
                 .putExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY, postKey);

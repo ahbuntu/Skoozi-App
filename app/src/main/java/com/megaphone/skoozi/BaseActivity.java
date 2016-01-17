@@ -2,6 +2,7 @@ package com.megaphone.skoozi;
 
 import android.accounts.AccountManager;
 import android.content.Intent;
+import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -11,15 +12,12 @@ import android.widget.Toast;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.megaphone.skoozi.util.AccountUtil;
-import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
 
 /**
  * Created by ahmadul.hassan on 2016-01-09.
  */
 abstract public class BaseActivity extends AppCompatActivity {
-    public static final String ACTION_NEW_QUESTION  = "com.megaphone.skoozi.action.NEW_QUESTION";
-
     private GoogleApiClientBroker googleApiBroker;
     private GoogleApiClient googleApiClient;
 
@@ -74,16 +72,11 @@ abstract public class BaseActivity extends AppCompatActivity {
         switch (requestCode) {
             case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
                 if (resultCode == RESULT_OK) {
-                    // Receiving a result from the AccountPicker
-                    SkooziApplication.setUserAccount(this, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
-                    String action = data.getStringExtra(AccountUtil.EXTRA_USER_ACCOUNT_ACTION); //can return null
-                    if (action != null && action.equals(ACTION_NEW_QUESTION)) {
-                        throw new RuntimeException("Need to decide what to do");
-                    }
+                    // Received valid result from the AccountPicker
+                    googleAccountSelected(data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
                 } else if (resultCode == RESULT_CANCELED) {
                     // The account picker dialog closed without selecting an account.
-//                    AccountUtil.displayAccountLoginErrorMessage(coordinatorLayout);
-                    throw new RuntimeException("Need to decide what to do");
+                    googleAccountNotSelected();
                 }
                 return;
             case AccountUtil.REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR:
@@ -91,15 +84,21 @@ abstract public class BaseActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     // Receiving a result that follows a GoogleAuthException, try auth again
 //                    getUsername();
+                    oAuthAuthenticationGranted();
+                } else {
+                    oAuthAuthenticationDenied();
                 }
                 return;
             case GoogleApiClientBroker.GOOGLE_API_REQUEST_RESOLVE_ERROR:
 //                resolvingGoogleApiError = false; // TODO: 2016-01-13 is this needed?
                 if (resultCode == RESULT_OK) {
+                    googleApiConnectionResolved();
                     // Make sure the app is not already connected or attempting to connect
                     if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
                         googleApiClient.connect();
                     }
+                } else {
+                    googleApiConnectionError();
                 }
                 return;
         }
@@ -135,6 +134,21 @@ abstract public class BaseActivity extends AppCompatActivity {
 //
 //        }
 //    }
+
+    @CallSuper
+    protected void googleAccountSelected(String accountName) {
+        SkooziApplication.setUserAccount(this, accountName);
+    }
+
+    protected void googleAccountNotSelected() {}
+
+    protected void oAuthAuthenticationGranted() {}
+
+    protected void oAuthAuthenticationDenied() {}
+
+    protected void googleApiConnectionResolved() {}
+
+    protected void googleApiConnectionError() {}
 
     // TODO: 2016-01-13 this two methods can be extracted out to an interface
     protected void connectToGoogleApi() {

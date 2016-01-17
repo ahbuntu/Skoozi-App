@@ -24,11 +24,13 @@ public class AccountUtil {
     public static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1002;
     public static final String EXTRA_USER_ACCOUNT_ACTION = "skoozi.extra.USER_ACCOUNT_ACTION";
 
+    private static final String[] accountTypes = new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
+
     public interface GoogleAuthTokenExceptionListener {
         void handleGoogleAuthException(UserRecoverableAuthException exception);
     }
+
     public static void pickUserAccount(Activity activity, String action) {
-        String[] accountTypes = new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
         Intent intent = AccountPicker.newChooseAccountIntent(null, null,
                 accountTypes, false, null, null, null, null); //alwaysPromptForAccount = false
         intent.putExtra(EXTRA_USER_ACCOUNT_ACTION, action);
@@ -46,12 +48,6 @@ public class AccountUtil {
             }
         }
         return null;
-    }
-
-
-    public static String getDisplayName() {
-        //todo: this should be changed so that the @ symbol is stripped out
-        return SkooziApplication.getUserAccount().name;
     }
 
     /**

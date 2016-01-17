@@ -28,7 +28,6 @@ import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.PermissionUtil;
 import com.megaphone.skoozi.util.SkooziQnAUtil;
 
-
 public class PostQuestionActivity extends BaseActivity {
 
     private static final String TAG = "PostQuestionActivty";
@@ -60,26 +59,6 @@ public class PostQuestionActivity extends BaseActivity {
     };
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
-                if (resultCode == RESULT_OK) {
-                    // Receiving a result from the AccountPicker
-                    SkooziApplication.setUserAccount(this, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
-                    String action = data.getStringExtra(AccountUtil.EXTRA_USER_ACCOUNT_ACTION); //can return null
-                    if (action != null && action.equals(SkooziQnAUtil.ACTION_NEW_QUESTION)) {
-                        postQuestionButton.setEnabled(true); // ok to proceed
-                    }
-                } else if (resultCode == RESULT_CANCELED) {
-                    // The account picker dialog closed without selecting an account.
-                    postQuestionButton.setEnabled(false);
-                    AccountUtil.displayAccountLoginErrorMessage(coordinatorLayout);
-                }
-                break;
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_question);
@@ -104,6 +83,33 @@ public class PostQuestionActivity extends BaseActivity {
     public void onPause(){
         super.onPause();
         destroyLocalBroadcastPair();
+    }
+
+    @Override
+    protected void googleAccountSelected(String accountName) {
+        super.googleAccountSelected(accountName);
+        postQuestionButton.setEnabled(true);
+    }
+
+    @Override
+    protected void googleAccountNotSelected() {
+        AccountUtil.displayAccountLoginErrorMessage(coordinatorLayout);
+        postQuestionButton.setEnabled(false);
+    }
+
+    @Override
+    protected void oAuthAuthenticationGranted() {
+        if (requestInProgress) {
+            // finish up the requested action
+            String content = postQuestionText.getText().toString().trim();
+            tryPostQuestionToApi(content);
+        }
+    }
+
+    @Override
+    protected void oAuthAuthenticationDenied() {
+        // figure out what to do here
+        throw new RuntimeException(TAG + ": not yet implemented");
     }
 
     @Override
