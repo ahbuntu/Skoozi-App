@@ -3,7 +3,6 @@ package com.megaphone.skoozi.api;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -20,9 +19,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.megaphone.skoozi.MainActivity;
-import com.megaphone.skoozi.PostQuestionActivity;
-import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.SkooziApplication;
 import com.megaphone.skoozi.ThreadActivity;
 import com.megaphone.skoozi.model.Answer;
@@ -60,7 +56,7 @@ public class SkooziQnARequestService extends IntentService {
 
     private static Context intentContext;
     private Skooziqna skooziqnaService;
-    private static AccountUtil.GoogleAuthTokenExceptionListener authExceptionlistener;
+    private static AccountUtil.GoogleAuthTokenExceptionListener authExceptionListener;
 
     /**
      * Starts this service to perform action Get Thread Answers with the given parameters. If
@@ -69,7 +65,7 @@ public class SkooziQnARequestService extends IntentService {
     public static void startActionGetThreadAnswers(Context context, AccountUtil.GoogleAuthTokenExceptionListener listener,
                                                    String question_key) {
         intentContext = context;
-        authExceptionlistener = listener;
+        authExceptionListener = listener;
         Intent intent = new Intent(context, SkooziQnARequestService.class);
         intent.setAction(ACTION_GET_THREAD_ANSWERS);
         intent.putExtra(EXTRA_QUESTION_KEY, question_key);
@@ -83,7 +79,7 @@ public class SkooziQnARequestService extends IntentService {
     public static void startActionGetQuestionsList(Context context,  AccountUtil.GoogleAuthTokenExceptionListener listener,
                                                    LatLng currentLocation, double radius_km) {
         intentContext = context;
-        authExceptionlistener = listener;
+        authExceptionListener = listener;
         Intent intent = new Intent(context, SkooziQnARequestService.class);
         intent.setAction(ACTION_GET_QUESTIONS_LIST);
         intent.putExtra(EXTRA_LATITUDE, currentLocation == null ? 0 : currentLocation.latitude);
@@ -99,7 +95,7 @@ public class SkooziQnARequestService extends IntentService {
     public static void startActionInsertAnswer(Context context,  AccountUtil.GoogleAuthTokenExceptionListener listener,
                                                String question_key, Answer userAnswer) {
         intentContext = context;
-        authExceptionlistener = listener;
+        authExceptionListener = listener;
         Intent intent = new Intent(context, SkooziQnARequestService.class);
         intent.setAction(ACTION_INSERT_QUESTION_ANSWER);
         intent.putExtra(EXTRA_QUESTION_KEY, question_key);
@@ -114,7 +110,7 @@ public class SkooziQnARequestService extends IntentService {
     public static void startActionInsertNewQuestion(Context context,  AccountUtil.GoogleAuthTokenExceptionListener listener,
                                                Question userQuestion) {
         intentContext = context;
-        authExceptionlistener = listener;
+        authExceptionListener = listener;
         Intent intent = new Intent(context, SkooziQnARequestService.class);
         intent.setAction(ACTION_INSERT_NEW_QUESTION);
         intent.putExtra(EXTRA_QUESTION_PARCEL, userQuestion);
@@ -165,13 +161,11 @@ public class SkooziQnARequestService extends IntentService {
     private void initializeApiConnection() {
         if (skooziqnaService == null) { // do this once
             GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(this,
-                    "server:client_id:26298710398-8jbuih8cj38ihi87bsloqkvur2mfut11.apps.googleusercontent.com");
+                    ServerConfig.getCredentialAudience());
 
             if (credential.getSelectedAccountName() == null) {
                 // Not signed in, show login window or request an account.
                 credential.setSelectedAccountName(SkooziApplication.getUserAccount().name);
-            } else {
-                // Already signed in, begin app!
             }
 
             Skooziqna.Builder builder = new Skooziqna.Builder(AndroidHttp.newCompatibleTransport(),
@@ -339,7 +333,7 @@ public class SkooziQnARequestService extends IntentService {
         } catch (UserRecoverableAuthException userRecoverableException) {
             // GooglePlayServices.apk is either old, disabled, or not present
             // so we need to show the user some UI in the activity to recover.
-            authExceptionlistener.handleGoogleAuthException(userRecoverableException);
+            authExceptionListener.handleGoogleAuthException(userRecoverableException);
         } catch (GoogleAuthException fatalException) {
             // Some other type of unrecoverable exception has occurred.
             // Report and log the error as appropriate for your app.
