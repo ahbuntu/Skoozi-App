@@ -80,8 +80,14 @@ public class AccountUtil {
         }
     }
 
-    public static void displayAccountLoginErrorMessage(CoordinatorLayout layoutView) {
+    public static void displayAccountSignInErrorMessage(CoordinatorLayout layoutView) {
         Snackbar.make(layoutView, R.string.no_account_login_message, Snackbar.LENGTH_LONG)
                 .show();
+    }
+
+    public static void displayAccountSignedInMessage(CoordinatorLayout layoutView, String name) {
+        Snackbar.make(layoutView,
+                layoutView.getContext().getString(R.string.account_login_success_message, name),
+                Snackbar.LENGTH_LONG).show();
     }
 }

@@ -36,7 +36,8 @@
     <string name="no_network_message">Network connectivity is currently unavailable</string>
     <string name="no_gps_message">GPS is disabled</string>
     <string name="snackbar_enable_gps">Enable</string>
-    <string name="no_account_login_message">You must log in to ask a question</string>
+    <string name="no_account_login_message">You must be signed in to ask a question</string>
+    <string name="account_login_success_message">Signed in as %1$s</string>
 
 
 </resources>

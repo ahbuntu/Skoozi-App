@@ -1,6 +1,5 @@
 package com.megaphone.skoozi;
 
-import android.accounts.AccountManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +19,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.maps.model.LatLng;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
@@ -34,7 +32,6 @@ public class PostQuestionActivity extends BaseActivity {
 
     private EditText postQuestionText;
     private ProgressBar progressBar;
-    private CoordinatorLayout coordinatorLayout;
     private Button postQuestionButton;
     private Location selfLocation;
     private boolean requestInProgress;
@@ -93,7 +90,7 @@ public class PostQuestionActivity extends BaseActivity {
 
     @Override
     protected void googleAccountNotSelected() {
-        AccountUtil.displayAccountLoginErrorMessage(coordinatorLayout);
+        AccountUtil.displayAccountSignInErrorMessage(coordinatorLayout);
         postQuestionButton.setEnabled(false);
     }
 

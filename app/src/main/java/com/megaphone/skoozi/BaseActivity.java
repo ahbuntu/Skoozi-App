@@ -4,6 +4,7 @@ import android.accounts.AccountManager;
 import android.content.Intent;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,8 @@ import com.megaphone.skoozi.util.GoogleApiClientBroker;
 abstract public class BaseActivity extends AppCompatActivity {
     private GoogleApiClientBroker googleApiBroker;
     private GoogleApiClient googleApiClient;
+
+    protected CoordinatorLayout coordinatorLayout;
 
     protected AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
         @Override
@@ -138,6 +141,7 @@ abstract public class BaseActivity extends AppCompatActivity {
     @CallSuper
     protected void googleAccountSelected(String accountName) {
         SkooziApplication.setUserAccount(this, accountName);
+        AccountUtil.displayAccountSignedInMessage(coordinatorLayout, accountName);
     }
 
     protected void googleAccountNotSelected() {}

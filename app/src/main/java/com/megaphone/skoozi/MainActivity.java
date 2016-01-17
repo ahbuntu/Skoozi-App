@@ -21,7 +21,6 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.model.Question;
-import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.PermissionUtil;
 
@@ -46,7 +45,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     private static final int RADIUS_TRANSPARENCY = 64; //75%
 
     private MapFragment mapFragment;
-    private CoordinatorLayout coordinatorLayout;
     private GoogleMap nearbyMap;
     private NearbyFragment nearbyFragment;
     private Location latestLocation;
@@ -203,5 +201,5 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                 .radius(radius*1000); // need this in metres
         nearbyMap.addCircle(circleOptions);
     }
-    
+
 }

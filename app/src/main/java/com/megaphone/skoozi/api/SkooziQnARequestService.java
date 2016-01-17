@@ -330,8 +330,8 @@ public class SkooziQnARequestService extends IntentService {
     }
 
     /**
-     * Gets an authentication token from Google and handles any
-     * GoogleAuthException that may occur.
+     * Gets an authentication token from Google and handles any GoogleAuthException that may occur.
+     *
      */
     private static String fetchToken() throws IOException {
         try {

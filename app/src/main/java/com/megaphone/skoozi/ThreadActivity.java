@@ -214,7 +214,7 @@ public class ThreadActivity extends AppCompatActivity implements OnMapReadyCallb
                 } else if (resultCode == RESULT_CANCELED) {
                     // The account picker dialog closed without selecting an account.
                     threadReplyFab.setEnabled(false);
-                    AccountUtil.displayAccountLoginErrorMessage(mLayoutView);
+                    AccountUtil.displayAccountSignInErrorMessage(mLayoutView);
                 }
                 break;
         }
