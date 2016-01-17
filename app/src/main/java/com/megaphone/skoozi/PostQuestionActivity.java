@@ -139,6 +139,7 @@ public class PostQuestionActivity extends BaseActivity {
             postQuestionText.setText("");
             postQuestion.key = questionKey;
             Intent threadIntent = new Intent(this, ThreadActivity.class);
+            threadIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  
             Bundle questionBundle = new Bundle();
             questionBundle.putParcelable(ThreadActivity.EXTRA_QUESTION, postQuestion);
             threadIntent.putExtras(questionBundle);
