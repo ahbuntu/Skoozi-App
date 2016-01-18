@@ -5,10 +5,12 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by ahmadul.hassan on 2015-07-26.
@@ -27,6 +29,7 @@ public class SkooziApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         singleton = this;
     }
 
