@@ -246,7 +246,7 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
      * This method is called after the API request to get answers for the question has been made
      */
     private void updateThreadResponse() {
-        mAdapter = new ThreadRecyclerViewAdapter(this, threadAnswers);
+        mAdapter = new ThreadRecyclerViewAdapter(threadAnswers);
 
         List<ThreadSectionedAdapter.Section> sections = new ArrayList<>();
         //Sections

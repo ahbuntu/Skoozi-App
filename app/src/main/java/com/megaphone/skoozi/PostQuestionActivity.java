@@ -113,6 +113,7 @@ public class PostQuestionActivity extends BaseActivity {
 
     @Override
     protected void onGoogleApiConnected() {
+        super.onGoogleApiConnected();
         selfLocation = PermissionUtil.tryGetLatestLocation(PostQuestionActivity.this, getGoogleApiClient());
     }
 
