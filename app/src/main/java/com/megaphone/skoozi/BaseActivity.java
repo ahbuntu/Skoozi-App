@@ -6,6 +6,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -16,6 +17,7 @@ import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
 
 abstract public class BaseActivity extends AppCompatActivity {
+    private static final String TAG = "BaseActivity";
     private GoogleApiClientBroker googleApiBroker;
     private GoogleApiClient googleApiClient;
 
@@ -113,43 +115,46 @@ abstract public class BaseActivity extends AppCompatActivity {
 
     private void initGoogleApiClient() {
         if (googleApiBroker == null) googleApiBroker = new GoogleApiClientBroker(this);
-        googleApiClient = googleApiBroker
-                .getGoogleApiClient(new GoogleApiClientBroker.BrokerResultListener() {
+        googleApiClient = googleApiBroker.getGoogleApiClient(
+                new GoogleApiClientBroker.BrokerResultListener() {
                     @Override
                     public void onConnected() {
                         onGoogleApiConnected();
                     }
                 });
     }
-//                initGoogleApiClient();
-//                googleApiClient.connect();
-//        } else {
-//            if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
-//                googleApiClient.connect();
-//            }
-//            updateLatestLocation();
-//        }
-
-//        if (ConnectionUtil.hasGps(this, coordinatorLayout)){
-//
-//        }
-//    }
 
     @CallSuper
     protected void googleAccountSelected(String accountName) {
+        Log.d(TAG, "Google Account selected via account picker");
         SkooziApplication.setUserAccount(this, accountName);
         AccountUtil.displayAccountSignedInMessage(coordinatorLayout, accountName);
     }
 
-    protected void googleAccountNotSelected() {}
+    @CallSuper
+    protected void googleAccountNotSelected() {
+        Log.d(TAG, "Google Account not selected from account picker");
+    }
 
-    protected void oAuthAuthenticationGranted() {}
+    @CallSuper
+    protected void oAuthAuthenticationGranted() {
+        Log.d(TAG, "OAuth authenticated granted");
+    }
 
-    protected void oAuthAuthenticationDenied() {}
+    @CallSuper
+    protected void oAuthAuthenticationDenied() {
+        Log.d(TAG, "OAuth authenticated denied");
+    }
 
-    protected void googleApiConnectionResolved() {}
+    @CallSuper
+    protected void googleApiConnectionResolved() {
+        Log.d(TAG, "Google API connection resolved by user");
+    }
 
-    protected void googleApiConnectionError() {}
+    @CallSuper
+    protected void googleApiConnectionError() {
+        Log.d(TAG, "Google API connection error");
+    }
 
     // TODO: 2016-01-13 this two methods can be extracted out to an interface
     protected void connectToGoogleApi() {
@@ -159,5 +164,8 @@ abstract public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected void onGoogleApiConnected() {}
+    @CallSuper
+    protected void onGoogleApiConnected() {
+        Log.d(TAG, "Googple API Connection established");
+    }
 }

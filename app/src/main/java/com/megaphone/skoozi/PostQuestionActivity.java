@@ -89,12 +89,14 @@ public class PostQuestionActivity extends BaseActivity {
 
     @Override
     protected void googleAccountNotSelected() {
+        super.googleAccountNotSelected();
         AccountUtil.displayAccountSignInErrorMessage(coordinatorLayout);
         postQuestionButton.setEnabled(false);
     }
 
     @Override
     protected void oAuthAuthenticationGranted() {
+        super.oAuthAuthenticationGranted();
         if (requestInProgress) {
             // finish up the requested action
             String content = postQuestionText.getText().toString().trim();
@@ -104,6 +106,7 @@ public class PostQuestionActivity extends BaseActivity {
 
     @Override
     protected void oAuthAuthenticationDenied() {
+        super.oAuthAuthenticationDenied();
         // figure out what to do here
         throw new RuntimeException(TAG + ": not yet implemented");
     }

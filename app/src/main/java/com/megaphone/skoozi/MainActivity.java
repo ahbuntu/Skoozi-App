@@ -100,6 +100,7 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
 
     @Override
     protected void onGoogleApiConnected() {
+        super.onGoogleApiConnected();
         updateLatestLocation();
     }
 
@@ -148,9 +149,8 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     }
 
     private void updateLatestLocation() {
-        // FIXME: 2016-01-16 this method is getting called even before the Nearby Fragment is attached
-//        latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, getGoogleApiClient());
-//        if (latestLocation != null) nearbyFragment.updateSearchOrigin(latestLocation);
+        latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, getGoogleApiClient());
+        if (latestLocation != null) nearbyFragment.updateSearchOrigin(latestLocation);
     }
 
     private void setupToolbar() {
