@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.megaphone.skoozi.model.Question;
+import com.megaphone.skoozi.thread.ThreadActivity;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.PermissionUtil;

@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.nearby;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.google.android.gms.maps.GoogleMap;
+import com.megaphone.skoozi.R;
+import com.megaphone.skoozi.thread.ThreadActivity;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.PresentationUtil;
 

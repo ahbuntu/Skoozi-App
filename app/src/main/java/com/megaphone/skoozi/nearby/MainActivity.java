@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.nearby;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,6 +20,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.megaphone.skoozi.BaseActivity;
+import com.megaphone.skoozi.PendingMapUpdate;
+import com.megaphone.skoozi.PostQuestionActivity;
+import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.PermissionUtil;

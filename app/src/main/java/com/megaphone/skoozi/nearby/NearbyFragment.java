@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.nearby;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,6 +21,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
+import com.megaphone.skoozi.BaseActivity;
+import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;

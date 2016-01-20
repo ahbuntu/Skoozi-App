@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.megaphone.skoozi.nearby.MainActivity;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
 

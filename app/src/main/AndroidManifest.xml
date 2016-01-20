@@ -31,7 +31,7 @@
         android:theme="@style/MyTheme" >
         <!--android:theme="@style/AppTheme"-->
 
-        <activity android:name=".MainActivity" >
+        <activity android:name=".nearby.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -42,7 +42,7 @@
         </activity>
 
         <!--http://stackoverflow.com/questions/30801379/coordinatorlayout-with-collapsingtoolbarlayout-breaks-with-keyboard-in-dialog-fr-->
-        <activity android:name=".ThreadActivity"
+        <activity android:name=".thread.ThreadActivity"
             android:windowSoftInputMode="adjustPan">
         </activity>
 

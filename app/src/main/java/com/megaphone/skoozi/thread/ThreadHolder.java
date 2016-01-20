@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.thread;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.megaphone.skoozi.BaseHolder;
+import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.util.PresentationUtil;
 

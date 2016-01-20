@@ -1,9 +1,11 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.thread;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.megaphone.skoozi.BaseHolder;
 import com.megaphone.skoozi.model.Answer;
+import com.megaphone.skoozi.thread.ThreadHolder;
 
 import java.util.ArrayList;
 import java.util.List;

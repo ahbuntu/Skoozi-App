@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.thread;
 
 import android.animation.Animator;
 import android.content.BroadcastReceiver;
@@ -31,6 +31,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.megaphone.skoozi.BaseActivity;
+import com.megaphone.skoozi.DividerItemDecoration;
+import com.megaphone.skoozi.R;
+import com.megaphone.skoozi.SkooziApplication;
 import com.megaphone.skoozi.api.SkooziQnARequestService;
 import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.model.Question;

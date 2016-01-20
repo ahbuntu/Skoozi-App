@@ -20,7 +20,6 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.megaphone.skoozi.SkooziApplication;
-import com.megaphone.skoozi.ThreadActivity;
 import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;

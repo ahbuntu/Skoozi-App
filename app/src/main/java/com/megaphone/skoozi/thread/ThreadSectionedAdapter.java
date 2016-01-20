@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.thread;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -6,18 +6,21 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+
+import com.megaphone.skoozi.R;
+import com.megaphone.skoozi.model.Question;
+import com.megaphone.skoozi.util.PresentationUtil;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * Created by ahmadulhassan on 2015-06-28. Big shout out to:
+ * Created by ahmadulhassan on 2015-06-28.
+ * Big shout out to:
  * https://gist.github.com/gabrielemariotti/4c189fb1124df4556058
  */
-public class NearbySectionedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ThreadSectionedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int SECTION_TYPE = 0;
     private final Context mContext;
@@ -25,18 +28,19 @@ public class NearbySectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     private LayoutInflater mLayoutInflater;
     private int mSectionResourceId;
-    private int mTextResourceId;
+    private int mQuesTitleResId;
+    private int mQuesTimestampResId;
     private RecyclerView.Adapter mBaseAdapter;
     private boolean mValid = true;
     private SparseArray<Section> mSections = new SparseArray<Section>();
 
-    //TODO: this needs to be reworked to make it more dynamic
-    public NearbySectionedAdapter(Context context, int sectionResourceId, int textResourceId,
-                                  RecyclerView.Adapter baseAdapter) {
+    public ThreadSectionedAdapter(Context context, int sectionResourceId, int questionTitleResId,
+                                  int questionTimestampResId, RecyclerView.Adapter baseAdapter) {
 
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSectionResourceId = sectionResourceId;
-        mTextResourceId = textResourceId;
+        mQuesTitleResId = questionTitleResId;
+        mQuesTimestampResId = questionTimestampResId;
         mBaseAdapter = baseAdapter;
         mContext = context;
 
@@ -67,13 +71,17 @@ public class NearbySectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         });
     }
 
+
     public static class SectionViewHolder extends RecyclerView.ViewHolder {
 
         public TextView title;
+        public TextView timestamp;
 
-        public SectionViewHolder(View view,int mTextResourceid) {
+        public SectionViewHolder(View view, int questionTitleResId,
+                                 int questionTimestampResId) {
             super(view);
-            title = (TextView) view.findViewById(mTextResourceid);
+            title = (TextView) view.findViewById(questionTitleResId);
+            timestamp = (TextView) view.findViewById(questionTimestampResId);
         }
     }
 
@@ -81,16 +89,18 @@ public class NearbySectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int typeView) {
         if (typeView == SECTION_TYPE) {
             final View view = LayoutInflater.from(mContext).inflate(mSectionResourceId, parent, false);
-            return new SectionViewHolder(view,mTextResourceId);
+            return new SectionViewHolder(view, mQuesTitleResId, mQuesTimestampResId);
         }else{
-            return mBaseAdapter.onCreateViewHolder(parent, typeView -1);
+            return mBaseAdapter.onCreateViewHolder(parent, typeView);
         }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder sectionViewHolder, int position) {
         if (isSectionHeaderPosition(position)) {
-            ((SectionViewHolder)sectionViewHolder).title.setText(mSections.get(position).getTitle());
+            ((SectionViewHolder)sectionViewHolder).title.setText(mSections.get(position).title);
+            ((SectionViewHolder)sectionViewHolder).timestamp.setText(mContext.getString(R.string.thread_question_timestamp,
+                    PresentationUtil.unixTimestampAsDateTime(mSections.get(position).timestamp)));
         }else{
             mBaseAdapter.onBindViewHolder(sectionViewHolder,sectionedPositionToPosition(position));
         }
@@ -101,7 +111,7 @@ public class NearbySectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public int getItemViewType(int position) {
         return isSectionHeaderPosition(position)
                 ? SECTION_TYPE
-                : mBaseAdapter.getItemViewType(sectionedPositionToPosition(position)) +1 ;
+                : mBaseAdapter.getItemViewType(sectionedPositionToPosition(position));
     }
 
 
@@ -109,14 +119,12 @@ public class NearbySectionedAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         int firstPosition;
         int sectionedPosition;
         CharSequence title;
+        Long timestamp;
 
-        public Section(int firstPosition, CharSequence questionContent) {
+        public Section(int firstPosition, Question question) {
             this.firstPosition = firstPosition;
-            this.title = questionContent;
-        }
-
-        public CharSequence getTitle() {
-            return title;
+            this.title = question.content;
+            this.timestamp = question.timestamp;
         }
     }
 
