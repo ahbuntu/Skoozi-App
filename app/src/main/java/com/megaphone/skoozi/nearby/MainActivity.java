@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.megaphone.skoozi.BaseActivity;
+import com.megaphone.skoozi.base.BaseActivity;
 import com.megaphone.skoozi.PendingMapUpdate;
 import com.megaphone.skoozi.PostQuestionActivity;
 import com.megaphone.skoozi.R;

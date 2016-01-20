@@ -21,7 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
-import com.megaphone.skoozi.BaseActivity;
+import com.megaphone.skoozi.base.BaseActivity;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.AccountUtil;

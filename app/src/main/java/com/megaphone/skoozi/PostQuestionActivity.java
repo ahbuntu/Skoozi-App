@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.megaphone.skoozi.base.BaseActivity;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.thread.ThreadActivity;
 import com.megaphone.skoozi.util.AccountUtil;

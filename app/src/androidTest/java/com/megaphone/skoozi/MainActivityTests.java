@@ -2,6 +2,7 @@ package com.megaphone.skoozi;
 
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.megaphone.skoozi.base.BaseActivity;
 import com.megaphone.skoozi.nearby.MainActivity;
 
 /**

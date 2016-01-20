@@ -31,7 +31,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.megaphone.skoozi.BaseActivity;
+import com.megaphone.skoozi.base.BaseActivity;
+import com.megaphone.skoozi.base.BaseSection;
 import com.megaphone.skoozi.DividerItemDecoration;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.SkooziApplication;
@@ -58,7 +59,7 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
     private Question threadQuestion;
     private List<Answer> threadAnswers; //null value is good and well
     private RecyclerView threadAnswerRecycler;
-    private ThreadRecyclerViewAdapter mAdapter;
+    private ThreadRvAdapter rvAdapter;
     private Answer latestThreadAnswer;
     private LinearLayout threadReply;
     private EditText answerContent;
@@ -234,11 +235,11 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
      * method invoked once a response has been SUCCESSFULLY provided and inserted
      */
     private void handleResponseSuccessful() {
-        if (mAdapter == null || latestThreadAnswer == null) return;
+        if (rvAdapter == null || latestThreadAnswer == null) return;
         //todo: need to see if there's a better way to verify that this answer_key correspnds to the
         //one that i sent out
         //one approach could be to generate a local guid and match that one to figure out if this is the right one
-        mAdapter.add(0, latestThreadAnswer);
+        rvAdapter.add(0, latestThreadAnswer);
         answerContent = (EditText) findViewById(R.id.thread_reply_content);
         answerContent.setText("");
         hideKeyboard();
@@ -250,17 +251,14 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
      * This method is called after the API request to get answers for the question has been made
      */
     private void updateThreadResponse() {
-        mAdapter = new ThreadRecyclerViewAdapter(threadAnswers);
+        rvAdapter = new ThreadRvAdapter(threadAnswers);
 
-        List<ThreadSectionedAdapter.Section> sections = new ArrayList<>();
         //Sections
-        sections.add(new ThreadSectionedAdapter.Section(0, threadQuestion));
+        List<ThreadSection> sections = new ArrayList<>();
+        sections.add(new ThreadSection(0, threadQuestion.author));
 
-        ThreadSectionedAdapter mSectionedAdapter = new
-                ThreadSectionedAdapter(this,R.layout.section_thread,
-                R.id.section_question_content, R.id.section_question_timestamp, //represents the section header content
-                mAdapter);
-        ThreadSectionedAdapter.Section[] dummy = new ThreadSectionedAdapter.Section[sections.size()];
+        ThreadSectionAdapter mSectionedAdapter = new ThreadSectionAdapter(rvAdapter);
+        BaseSection[] dummy = new BaseSection[sections.size()];
         mSectionedAdapter.setSections(sections.toArray(dummy));
 
         threadAnswerRecycler.setAdapter(mSectionedAdapter);

@@ -1,5 +1,6 @@
 package com.megaphone.skoozi.thread;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,14 +9,14 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.megaphone.skoozi.BaseHolder;
+import com.megaphone.skoozi.base.BaseHolder;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.util.PresentationUtil;
 
 public class ThreadHolder<T extends Answer> extends BaseHolder<T, ThreadHolder.AnswerViewHolder> {
 
-    public static class AnswerViewHolder extends BaseHolder.ViewHolder {
+    public static class AnswerViewHolder extends BaseHolder.BaseViewHolder {
         TextView threadTimestamp;
         TextView threadContent;
         TextView threadUserName;
@@ -31,7 +32,7 @@ public class ThreadHolder<T extends Answer> extends BaseHolder<T, ThreadHolder.A
     }
 
     @Override
-    public AnswerViewHolder create(ViewGroup parent, int viewType) {
+    public BaseViewHolder create(ViewGroup parent, int viewType) {
         return new AnswerViewHolder(LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_thread_list, parent));
     }

@@ -1,4 +1,4 @@
-package com.megaphone.skoozi;
+package com.megaphone.skoozi.base;
 
 import android.accounts.AccountManager;
 import android.content.Intent;
@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.megaphone.skoozi.R;
+import com.megaphone.skoozi.SkooziApplication;
 import com.megaphone.skoozi.nearby.MainActivity;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
