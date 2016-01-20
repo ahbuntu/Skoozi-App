@@ -5,7 +5,7 @@ import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import com.megaphone.skoozi.base.BaseAdapter;
-import com.megaphone.skoozi.base.BaseHolder;
+import com.megaphone.skoozi.base.BaseVhConductor;
 import com.megaphone.skoozi.base.BaseSection;
 
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import java.util.Comparator;
  * Big shout out to:
  * https://gist.github.com/gabrielemariotti/4c189fb1124df4556058
  */
-public class ThreadSectionAdapter extends BaseAdapter<ThreadSection, ThreadSectionHolder.SectionViewHolder> {
+public class ThreadSectionAdapter extends BaseAdapter<ThreadSection, ThreadSectionVhConductor.SectionViewHolder> {
 
     private static final int SECTION_TYPE = 0;
 
@@ -55,22 +55,21 @@ public class ThreadSectionAdapter extends BaseAdapter<ThreadSection, ThreadSecti
 
 
     @Override
-    public BaseHolder.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseVhConductor.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == SECTION_TYPE) {
-            return holder.create(parent, viewType);
+            return vhConductor.create(parent, viewType);
         }else{
             return threadRvAdapter.onCreateViewHolder(parent, viewType);
         }
     }
 
     @Override
-    public void onBindViewHolder(BaseHolder.BaseViewHolder sectionViewHolder, int position) {
+    public void onBindViewHolder(BaseVhConductor.BaseViewHolder sectionViewHolder, int position) {
         if (isSectionHeaderPosition(position)) {
-            holder.bind((ThreadSectionHolder.SectionViewHolder) sectionViewHolder, getItem(position));
+            vhConductor.bind((ThreadSectionVhConductor.SectionViewHolder) sectionViewHolder, getItem(position));
         }else{
             threadRvAdapter.onBindViewHolder(sectionViewHolder, sectionedPositionToPosition(position));
         }
-
     }
 
     @Override

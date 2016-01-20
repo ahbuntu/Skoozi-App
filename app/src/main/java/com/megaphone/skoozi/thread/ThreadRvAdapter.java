@@ -7,20 +7,18 @@ import com.megaphone.skoozi.model.Answer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ThreadRvAdapter extends BaseAdapter<Answer, ThreadHolder.AnswerViewHolder> {
+public class ThreadRvAdapter extends BaseAdapter<Answer, ThreadVhConductor.AnswerViewHolder> {
 
     private static final int ROW_ANSWER_TYPE = 2000;
 
     private List<Answer> threadAnswers;
-    private ThreadHolder<Answer> holder;
-
     /**
      *
      * @param answers NULL value is acceptable. will display card accordingly
      */
     public ThreadRvAdapter(List<Answer> answers) {
         threadAnswers = (answers == null) ? (new ArrayList<Answer>() ) : answers;
-        holder = new ThreadHolder<>();
+        vhConductor = new ThreadVhConductor<>();
     }
 
     @Override

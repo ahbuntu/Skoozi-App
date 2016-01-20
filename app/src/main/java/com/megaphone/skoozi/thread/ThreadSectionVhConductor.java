@@ -6,11 +6,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.megaphone.skoozi.R;
-import com.megaphone.skoozi.base.BaseHolder;
+import com.megaphone.skoozi.base.BaseVhConductor;
 
-public class ThreadSectionHolder<T extends ThreadSection> extends BaseHolder<T, ThreadSectionHolder.SectionViewHolder> {
+public class ThreadSectionVhConductor<T extends ThreadSection>
+        extends BaseVhConductor<T, ThreadSectionVhConductor.SectionViewHolder> {
 
-    public static class SectionViewHolder extends BaseHolder.BaseViewHolder {
+    public static class SectionViewHolder extends BaseVhConductor.BaseViewHolder {
         TextView title;
         TextView timestamp;
 
@@ -30,7 +31,7 @@ public class ThreadSectionHolder<T extends ThreadSection> extends BaseHolder<T, 
     @Override
     public void bind(final SectionViewHolder holder, T item) {
         holder.title.setText(item.title);
-//            holder.timestamp.setText(mContext.getString(R.string.thread_question_timestamp,
+//            vhConductor.timestamp.setText(mContext.getString(R.string.thread_question_timestamp,
 //                    PresentationUtil.unixTimestampAsDateTime(mSections.get(position).timestamp)));
     }
 }
