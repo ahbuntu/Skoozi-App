@@ -52,7 +52,6 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
     private static final String TAG = "ThreadActivity";
     public static final String EXTRA_QUESTION = "com.megaphone.skoozi.extra.question_parcel";
 
-
     public static final String ACTION_THREAD_REPLY = "com.megaphone.skoozi.action.THREAD_REPLY";
 
     private CollapsingToolbarLayout collapsingToolbar;
@@ -258,8 +257,7 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
         sections.add(new ThreadSection(0, threadQuestion.author));
 
         ThreadSectionedAdapter sectionedAdapter = new ThreadSectionedAdapter(rvAdapter);
-        BaseSection[] dummy = new BaseSection[sections.size()];
-        sectionedAdapter.setSections(sections.toArray(dummy));
+        sectionedAdapter.setSections(sections.toArray(new BaseSection[sections.size()]));
 
         threadAnswerRecycler.setAdapter(sectionedAdapter);
     }

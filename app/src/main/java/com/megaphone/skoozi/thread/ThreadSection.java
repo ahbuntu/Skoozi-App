@@ -6,7 +6,7 @@ public class ThreadSection extends BaseSection {
     int firstPosition;
     String title;
 
-    public ThreadSection(int firstPosition, String title) {
+public ThreadSection(int firstPosition, String title) {
         super(firstPosition);
         this.firstPosition = firstPosition;
         this.title = title;

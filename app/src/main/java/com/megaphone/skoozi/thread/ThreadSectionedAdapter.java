@@ -21,38 +21,37 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
     private static final int SECTION_TYPE = 0;
 
     private ThreadRvAdapter threadRvAdapter;
-    private boolean mValid = true;
-    private SparseArray<ThreadSection> mSections = new SparseArray<>();
+    private boolean rvAdapterHasItems = true;
+    private SparseArray<ThreadSection> sections = new SparseArray<>();
 
     public ThreadSectionedAdapter(ThreadRvAdapter baseAdapter) {
         threadRvAdapter = baseAdapter;
         threadRvAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                mValid = threadRvAdapter.getItemCount() > 0;
+                rvAdapterHasItems = threadRvAdapter.getItemCount() > 0;
                 notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeChanged(int positionStart, int itemCount) {
-                mValid = threadRvAdapter.getItemCount() > 0;
+                rvAdapterHasItems = threadRvAdapter.getItemCount() > 0;
                 notifyItemRangeChanged(positionStart, itemCount);
             }
 
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
-                mValid = threadRvAdapter.getItemCount() > 0;
+                rvAdapterHasItems = threadRvAdapter.getItemCount() > 0;
                 notifyItemRangeInserted(positionStart, itemCount);
             }
 
             @Override
             public void onItemRangeRemoved(int positionStart, int itemCount) {
-                mValid = threadRvAdapter.getItemCount() > 0;
+                rvAdapterHasItems = threadRvAdapter.getItemCount() > 0;
                 notifyItemRangeRemoved(positionStart, itemCount);
             }
         });
     }
-
 
     @Override
     public BaseVhMaker.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -74,7 +73,7 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
 
     @Override
     protected ThreadSection getItem(int position) {
-        return mSections.get(position);
+        return sections.get(position);
     }
 
     @Override
@@ -85,10 +84,10 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
     }
 
     public void setSections(BaseSection[] baseSections) {
-        ThreadSection[] sections = (ThreadSection[]) baseSections;
-        mSections.clear();
+        ThreadSection[] threadSections = (ThreadSection[]) baseSections;
+        sections.clear();
 
-        Arrays.sort(sections, new Comparator<BaseSection>() {
+        Arrays.sort(threadSections, new Comparator<BaseSection>() {
             @Override
             public int compare(BaseSection o, BaseSection o1) {
                 return (o.firstPosition == o1.firstPosition)
@@ -98,9 +97,9 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
         });
 
         int offset = 0; // offset positions for the headers we're adding
-        for (ThreadSection section : sections) {
+        for (ThreadSection section : threadSections) {
             section.sectionedPosition = section.firstPosition + offset;
-            mSections.append(section.sectionedPosition, section);
+            sections.append(section.sectionedPosition, section);
             ++offset;
         }
 
@@ -109,8 +108,8 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
 
     public int positionToSectionedPosition(int position) {
         int offset = 0;
-        for (int i = 0; i < mSections.size(); i++) {
-            if (mSections.valueAt(i).firstPosition > position) {
+        for (int i = 0; i < sections.size(); i++) {
+            if (sections.valueAt(i).firstPosition > position) {
                 break;
             }
             ++offset;
@@ -124,8 +123,8 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
         }
 
         int offset = 0;
-        for (int i = 0; i < mSections.size(); i++) {
-            if (mSections.valueAt(i).sectionedPosition > sectionedPosition) {
+        for (int i = 0; i < sections.size(); i++) {
+            if (sections.valueAt(i).sectionedPosition > sectionedPosition) {
                 break;
             }
             --offset;
@@ -134,20 +133,19 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
     }
 
     public boolean isSectionHeaderPosition(int position) {
-        return mSections.get(position) != null;
+        return sections.get(position) != null;
     }
-
 
     @Override
     public long getItemId(int position) {
         return isSectionHeaderPosition(position)
-                ? Integer.MAX_VALUE - mSections.indexOfKey(position)
+                ? Integer.MAX_VALUE - sections.indexOfKey(position)
                 : threadRvAdapter.getItemId(sectionedPositionToPosition(position));
     }
 
     @Override
     public int getItemCount() {
-        return (mValid ? threadRvAdapter.getItemCount() + mSections.size() : 0);
+        return (rvAdapterHasItems ? threadRvAdapter.getItemCount() + sections.size() : 0);
     }
 
 
