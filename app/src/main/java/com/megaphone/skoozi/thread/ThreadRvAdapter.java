@@ -1,13 +1,13 @@
 package com.megaphone.skoozi.thread;
 
 
-import com.megaphone.skoozi.base.BaseAdapter;
+import com.megaphone.skoozi.base.BaseRvAdapter;
 import com.megaphone.skoozi.model.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ThreadRvAdapter extends BaseAdapter<Answer, ThreadVhMaker.AnswerViewHolder> {
+public class ThreadRvAdapter extends BaseRvAdapter<Answer, ThreadVhMaker.AnswerViewHolder> {
 
     private static final int ROW_ANSWER_TYPE = 2000;
 

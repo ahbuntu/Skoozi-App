@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
-import com.megaphone.skoozi.base.BaseAdapter;
+import com.megaphone.skoozi.base.BaseRvAdapter;
 import com.megaphone.skoozi.base.BaseVhMaker;
 import com.megaphone.skoozi.base.BaseSection;
 
@@ -16,7 +16,7 @@ import java.util.Comparator;
  * Big shout out to:
  * https://gist.github.com/gabrielemariotti/4c189fb1124df4556058
  */
-public class ThreadSectionAdapter extends BaseAdapter<ThreadSection, ThreadSectionVhMaker.SectionViewHolder> {
+public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadSectionVhMaker.SectionViewHolder> {
 
     private static final int SECTION_TYPE = 0;
 
@@ -24,7 +24,7 @@ public class ThreadSectionAdapter extends BaseAdapter<ThreadSection, ThreadSecti
     private boolean mValid = true;
     private SparseArray<ThreadSection> mSections = new SparseArray<>();
 
-    public ThreadSectionAdapter(ThreadRvAdapter baseAdapter) {
+    public ThreadSectionedAdapter(ThreadRvAdapter baseAdapter) {
         threadRvAdapter = baseAdapter;
         threadRvAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override

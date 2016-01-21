@@ -3,7 +3,7 @@ package com.megaphone.skoozi.base;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-abstract public class BaseAdapter<T, VH extends BaseVhMaker.BaseViewHolder>
+abstract public class BaseRvAdapter<T, VH extends BaseVhMaker.BaseViewHolder>
         extends RecyclerView.Adapter<BaseVhMaker.BaseViewHolder>{
 
     protected BaseVhMaker<T, VH> vhConductor;

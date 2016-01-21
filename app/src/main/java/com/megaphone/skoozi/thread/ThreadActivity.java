@@ -257,7 +257,7 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
         List<ThreadSection> sections = new ArrayList<>();
         sections.add(new ThreadSection(0, threadQuestion.author));
 
-        ThreadSectionAdapter sectionedAdapter = new ThreadSectionAdapter(rvAdapter);
+        ThreadSectionedAdapter sectionedAdapter = new ThreadSectionedAdapter(rvAdapter);
         BaseSection[] dummy = new BaseSection[sections.size()];
         sectionedAdapter.setSections(sections.toArray(dummy));
 
