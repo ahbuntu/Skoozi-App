@@ -6,12 +6,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.megaphone.skoozi.R;
-import com.megaphone.skoozi.base.BaseVhConductor;
+import com.megaphone.skoozi.base.BaseVhMaker;
 
-public class ThreadSectionVhConductor<T extends ThreadSection>
-        extends BaseVhConductor<T, ThreadSectionVhConductor.SectionViewHolder> {
+public class ThreadSectionVhMaker<T extends ThreadSection>
+        extends BaseVhMaker<T, ThreadSectionVhMaker.SectionViewHolder> {
 
-    public static class SectionViewHolder extends BaseVhConductor.BaseViewHolder {
+    public static class SectionViewHolder extends BaseVhMaker.BaseViewHolder {
         TextView title;
         TextView timestamp;
 

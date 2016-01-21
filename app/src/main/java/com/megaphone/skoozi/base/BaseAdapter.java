@@ -3,18 +3,18 @@ package com.megaphone.skoozi.base;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-abstract public class BaseAdapter<T, VH extends BaseVhConductor.BaseViewHolder>
-        extends RecyclerView.Adapter<BaseVhConductor.BaseViewHolder>{
+abstract public class BaseAdapter<T, VH extends BaseVhMaker.BaseViewHolder>
+        extends RecyclerView.Adapter<BaseVhMaker.BaseViewHolder>{
 
-    protected BaseVhConductor<T, VH> vhConductor;
+    protected BaseVhMaker<T, VH> vhConductor;
 
     @Override
-    public BaseVhConductor.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseVhMaker.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return vhConductor.create(parent, viewType);
     }
 
     @Override
-    public void onBindViewHolder(BaseVhConductor.BaseViewHolder viewHolder, int position) {
+    public void onBindViewHolder(BaseVhMaker.BaseViewHolder viewHolder, int position) {
         vhConductor.bind((VH) viewHolder, getItem(position));
     }
 

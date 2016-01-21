@@ -7,7 +7,7 @@ import com.megaphone.skoozi.model.Answer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ThreadRvAdapter extends BaseAdapter<Answer, ThreadVhConductor.AnswerViewHolder> {
+public class ThreadRvAdapter extends BaseAdapter<Answer, ThreadVhMaker.AnswerViewHolder> {
 
     private static final int ROW_ANSWER_TYPE = 2000;
 
@@ -18,7 +18,7 @@ public class ThreadRvAdapter extends BaseAdapter<Answer, ThreadVhConductor.Answe
      */
     public ThreadRvAdapter(List<Answer> answers) {
         threadAnswers = (answers == null) ? (new ArrayList<Answer>() ) : answers;
-        vhConductor = new ThreadVhConductor<>();
+        vhConductor = new ThreadVhMaker<>();
     }
 
     @Override

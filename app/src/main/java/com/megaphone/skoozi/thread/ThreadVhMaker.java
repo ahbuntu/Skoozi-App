@@ -8,14 +8,14 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.megaphone.skoozi.base.BaseVhConductor;
+import com.megaphone.skoozi.base.BaseVhMaker;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.util.PresentationUtil;
 
-public class ThreadVhConductor<T extends Answer> extends BaseVhConductor<T, ThreadVhConductor.AnswerViewHolder> {
+public class ThreadVhMaker<T extends Answer> extends BaseVhMaker<T, ThreadVhMaker.AnswerViewHolder> {
 
-    public static class AnswerViewHolder extends BaseVhConductor.BaseViewHolder {
+    public static class AnswerViewHolder extends BaseVhMaker.BaseViewHolder {
         TextView threadTimestamp;
         TextView threadContent;
         TextView threadUserName;
