@@ -26,7 +26,7 @@ abstract public class BaseActivity extends AppCompatActivity {
 
     protected CoordinatorLayout coordinatorLayout;
 
-    protected AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
+    public AccountUtil.GoogleAuthTokenExceptionListener tokenListener = new AccountUtil.GoogleAuthTokenExceptionListener() {
         @Override
         public void handleGoogleAuthException(final UserRecoverableAuthException exception) {
             // Because this call comes from the IntentService, we must ensure that the following

@@ -250,13 +250,14 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
      * This method is called after the API request to get answers for the question has been made
      */
     private void updateThreadResponse() {
-        rvAdapter = new ThreadRvAdapter(threadAnswers);
+        rvAdapter = new ThreadRvAdapter();
+        rvAdapter.setAnswers(threadAnswers);
 
         //Sections
         List<ThreadSection> sections = new ArrayList<>();
         sections.add(new ThreadSection(0, threadQuestion.author));
 
-        ThreadSectionedAdapter sectionedAdapter = new ThreadSectionedAdapter(rvAdapter);
+        GenericSectionedAdapter<ThreadSection, ThreadRvAdapter> sectionedAdapter = new GenericSectionedAdapter<>(rvAdapter);
         sectionedAdapter.setSections(sections.toArray(new BaseSection[sections.size()]));
 
         threadAnswerRecycler.setAdapter(sectionedAdapter);

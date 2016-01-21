@@ -31,7 +31,7 @@ public class ThreadSectionVhMaker<T extends ThreadSection>
     @Override
     public void bind(final SectionViewHolder holder, T item) {
         holder.title.setText(item.title);
-//            vhConductor.timestamp.setText(mContext.getString(R.string.thread_question_timestamp,
+//            vhMaker.timestamp.setText(mContext.getString(R.string.thread_question_timestamp,
 //                    PresentationUtil.unixTimestampAsDateTime(mSections.get(position).timestamp)));
     }
 }

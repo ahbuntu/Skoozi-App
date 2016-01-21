@@ -12,42 +12,41 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * Created by ahmadulhassan on 2015-06-28.
  * Big shout out to:
  * https://gist.github.com/gabrielemariotti/4c189fb1124df4556058
  */
-public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadSectionVhMaker.SectionViewHolder> {
+public class GenericSectionedAdapter<T extends BaseSection, K extends BaseRvAdapter> extends BaseRvAdapter<T, ThreadSectionVhMaker.SectionViewHolder> {
 
     private static final int SECTION_TYPE = 0;
 
-    private ThreadRvAdapter threadRvAdapter;
+    private K rvAdapter;
     private boolean rvAdapterHasItems = true;
-    private SparseArray<ThreadSection> sections = new SparseArray<>();
+    private SparseArray<T> sections = new SparseArray<>();
 
-    public ThreadSectionedAdapter(ThreadRvAdapter baseAdapter) {
-        threadRvAdapter = baseAdapter;
-        threadRvAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+    public GenericSectionedAdapter(K baseAdapter) {
+        rvAdapter = baseAdapter;
+        rvAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                rvAdapterHasItems = threadRvAdapter.getItemCount() > 0;
+                rvAdapterHasItems = rvAdapter.getItemCount() > 0;
                 notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeChanged(int positionStart, int itemCount) {
-                rvAdapterHasItems = threadRvAdapter.getItemCount() > 0;
+                rvAdapterHasItems = rvAdapter.getItemCount() > 0;
                 notifyItemRangeChanged(positionStart, itemCount);
             }
 
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
-                rvAdapterHasItems = threadRvAdapter.getItemCount() > 0;
+                rvAdapterHasItems = rvAdapter.getItemCount() > 0;
                 notifyItemRangeInserted(positionStart, itemCount);
             }
 
             @Override
             public void onItemRangeRemoved(int positionStart, int itemCount) {
-                rvAdapterHasItems = threadRvAdapter.getItemCount() > 0;
+                rvAdapterHasItems = rvAdapter.getItemCount() > 0;
                 notifyItemRangeRemoved(positionStart, itemCount);
             }
         });
@@ -56,23 +55,23 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
     @Override
     public BaseVhMaker.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == SECTION_TYPE) {
-            return vhConductor.create(parent, viewType);
+            return vhMaker.create(parent, viewType);
         }else{
-            return threadRvAdapter.onCreateViewHolder(parent, viewType);
+            return rvAdapter.onCreateViewHolder(parent, viewType);
         }
     }
 
     @Override
     public void onBindViewHolder(BaseVhMaker.BaseViewHolder sectionViewHolder, int position) {
         if (isSectionHeaderPosition(position)) {
-            vhConductor.bind((ThreadSectionVhMaker.SectionViewHolder) sectionViewHolder, getItem(position));
+            vhMaker.bind((ThreadSectionVhMaker.SectionViewHolder) sectionViewHolder, getItem(position));
         }else{
-            threadRvAdapter.onBindViewHolder(sectionViewHolder, sectionedPositionToPosition(position));
+            rvAdapter.onBindViewHolder(sectionViewHolder, sectionedPositionToPosition(position));
         }
     }
 
     @Override
-    protected ThreadSection getItem(int position) {
+    protected T getItem(int position) {
         return sections.get(position);
     }
 
@@ -80,11 +79,11 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
     public int getItemViewType(int position) {
         return isSectionHeaderPosition(position)
                 ? SECTION_TYPE
-                : threadRvAdapter.getItemViewType(sectionedPositionToPosition(position));
+                : rvAdapter.getItemViewType(sectionedPositionToPosition(position));
     }
 
     public void setSections(BaseSection[] baseSections) {
-        ThreadSection[] threadSections = (ThreadSection[]) baseSections;
+        T[] threadSections = (T[]) baseSections;
         sections.clear();
 
         Arrays.sort(threadSections, new Comparator<BaseSection>() {
@@ -97,7 +96,7 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
         });
 
         int offset = 0; // offset positions for the headers we're adding
-        for (ThreadSection section : threadSections) {
+        for (T section : threadSections) {
             section.sectionedPosition = section.firstPosition + offset;
             sections.append(section.sectionedPosition, section);
             ++offset;
@@ -140,12 +139,12 @@ public class ThreadSectionedAdapter extends BaseRvAdapter<ThreadSection, ThreadS
     public long getItemId(int position) {
         return isSectionHeaderPosition(position)
                 ? Integer.MAX_VALUE - sections.indexOfKey(position)
-                : threadRvAdapter.getItemId(sectionedPositionToPosition(position));
+                : rvAdapter.getItemId(sectionedPositionToPosition(position));
     }
 
     @Override
     public int getItemCount() {
-        return (rvAdapterHasItems ? threadRvAdapter.getItemCount() + sections.size() : 0);
+        return (rvAdapterHasItems ? rvAdapter.getItemCount() + sections.size() : 0);
     }
 
 

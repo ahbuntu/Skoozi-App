@@ -11,17 +11,20 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.megaphone.skoozi.base.BaseVhMaker;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.model.Answer;
+import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.PresentationUtil;
 
-public class ThreadVhMaker<T extends Answer> extends BaseVhMaker<T, ThreadVhMaker.AnswerViewHolder> {
+public class ThreadVhMaker<T extends ThreadVhMaker.TypeContract> extends BaseVhMaker<T, ThreadVhMaker.ContractViewHolder> {
 
-    public static class AnswerViewHolder extends BaseVhMaker.BaseViewHolder {
+    public interface TypeContract {}
+
+    public static class ContractViewHolder extends BaseVhMaker.BaseViewHolder {
         TextView threadTimestamp;
         TextView threadContent;
         TextView threadUserName;
         ImageView threadNameImage;
 
-        public AnswerViewHolder(View itemView) {
+        public ContractViewHolder(View itemView) {
             super(itemView);
             threadTimestamp = (TextView) itemView.findViewById(R.id.thread_answer_timestamp);
             threadUserName = (TextView) itemView.findViewById(R.id.thread_answer_profile_name);
@@ -32,12 +35,24 @@ public class ThreadVhMaker<T extends Answer> extends BaseVhMaker<T, ThreadVhMake
 
     @Override
     public BaseViewHolder create(ViewGroup parent, int viewType) {
-        return new AnswerViewHolder(LayoutInflater.from(parent.getContext())
+        return new ContractViewHolder(LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_thread_list, parent));
     }
 
     @Override
-    public void bind(final AnswerViewHolder holder, T item) {
+    public void bind(final ContractViewHolder holder, T item) {
+        if (item instanceof Question) {
+            bindQuestion(holder, (Question) item);
+        } else if (item instanceof Answer) {
+            bindAnswer(holder, (Answer) item);
+        }
+    }
+
+    private void bindQuestion(final ContractViewHolder holder, Question item) {
+        throw new RuntimeException("bind Question not implemented yet");
+    }
+
+    private void bindAnswer(final ContractViewHolder holder, Answer item) {
         holder.threadTimestamp.setText(PresentationUtil.unixTimestampAge(item.timestamp));
         holder.threadUserName.setText(item.author);
         holder.threadContent.setText(item.content);
