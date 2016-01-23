@@ -15,15 +15,17 @@ import java.util.Comparator;
  * Big shout out to:
  * https://gist.github.com/gabrielemariotti/4c189fb1124df4556058
  */
-public class GenericSectionedAdapter<T extends BaseSection, K extends BaseRvAdapter> extends BaseRvAdapter<T, ThreadSectionVhMaker.SectionViewHolder> {
+public class ThreadSectionedAdapter<K extends ThreadRvAdapter>
+        extends BaseRvAdapter<ThreadSection, ThreadSectionVhMaker.ViewHolder> {
 
     private static final int SECTION_TYPE = 0;
 
     private K rvAdapter;
     private boolean rvAdapterHasItems = true;
-    private SparseArray<T> sections = new SparseArray<>();
+    private SparseArray<ThreadSection> sections = new SparseArray<>();
 
-    public GenericSectionedAdapter(K baseAdapter) {
+    public ThreadSectionedAdapter(K baseAdapter) {
+        vhMaker = new ThreadSectionVhMaker();
         rvAdapter = baseAdapter;
         rvAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -64,14 +66,14 @@ public class GenericSectionedAdapter<T extends BaseSection, K extends BaseRvAdap
     @Override
     public void onBindViewHolder(BaseVhMaker.BaseViewHolder sectionViewHolder, int position) {
         if (isSectionHeaderPosition(position)) {
-            vhMaker.bind((ThreadSectionVhMaker.SectionViewHolder) sectionViewHolder, getItem(position));
+            vhMaker.bind((ThreadSectionVhMaker.ViewHolder) sectionViewHolder, getItem(position));
         }else{
             rvAdapter.onBindViewHolder(sectionViewHolder, sectionedPositionToPosition(position));
         }
     }
 
     @Override
-    protected T getItem(int position) {
+    protected ThreadSection getItem(int position) {
         return sections.get(position);
     }
 
@@ -83,7 +85,7 @@ public class GenericSectionedAdapter<T extends BaseSection, K extends BaseRvAdap
     }
 
     public void setSections(BaseSection[] baseSections) {
-        T[] threadSections = (T[]) baseSections;
+        ThreadSection[] threadSections = (ThreadSection[]) baseSections;
         sections.clear();
 
         Arrays.sort(threadSections, new Comparator<BaseSection>() {
@@ -96,7 +98,7 @@ public class GenericSectionedAdapter<T extends BaseSection, K extends BaseRvAdap
         });
 
         int offset = 0; // offset positions for the headers we're adding
-        for (T section : threadSections) {
+        for (ThreadSection section : threadSections) {
             section.sectionedPosition = section.firstPosition + offset;
             sections.append(section.sectionedPosition, section);
             ++offset;
