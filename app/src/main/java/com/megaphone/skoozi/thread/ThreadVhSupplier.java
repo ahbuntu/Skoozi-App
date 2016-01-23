@@ -8,17 +8,17 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.megaphone.skoozi.base.BaseVhMaker;
+import com.megaphone.skoozi.base.BaseVhSupplier;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.PresentationUtil;
 
-public class ThreadVhMaker<T extends ThreadVhMaker.TypeContract> extends BaseVhMaker<T, ThreadVhMaker.ViewHolder> {
+public class ThreadVhSupplier<T extends ThreadVhSupplier.TypeContract> extends BaseVhSupplier<T, ThreadVhMaker.ViewHolder> {
 
     public interface TypeContract {}
 
-    public static class ViewHolder extends BaseVhMaker.BaseViewHolder {
+    public static class ViewHolder extends BaseVhSupplier.BaseViewHolder {
         TextView threadTimestamp;
         TextView threadContent;
         TextView threadUserName;

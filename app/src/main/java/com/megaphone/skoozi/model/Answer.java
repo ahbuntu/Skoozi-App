@@ -3,12 +3,12 @@ package com.megaphone.skoozi.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.megaphone.skoozi.thread.ThreadVhMaker;
+import com.megaphone.skoozi.thread.ThreadVhSupplier;
 
 /**
  * Created by ahmadul.hassan on 2015-05-02.
  */
-public class Answer implements Parcelable, ThreadVhMaker.TypeContract {
+public class Answer implements Parcelable, ThreadVhSupplier.TypeContract {
     public String postKey;
     public String author;
     public String content;
