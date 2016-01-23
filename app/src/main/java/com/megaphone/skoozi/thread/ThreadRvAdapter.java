@@ -1,57 +1,65 @@
 package com.megaphone.skoozi.thread;
 
 
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.megaphone.skoozi.base.BaseRvAdapter;
-import com.megaphone.skoozi.base.BaseVhSupplier;
+import com.megaphone.skoozi.base.BaseVhBinder;
 import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.model.Question;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ThreadRvAdapter extends BaseRvAdapter<ThreadVhSupplier.TypeContract, ThreadVhSupplier.ViewHolder> {
-
-    private static final int ROW_ANSWER_TYPE = 2000;
-
+public class ThreadRvAdapter extends BaseRvAdapter<ThreadItemVhBinder.TypeContract, ThreadItemVhBinder.ViewHolder> {
+    private static final String TAG = ThreadRvAdapter.class.getSimpleName();
     private List<Answer> threadAnswers;
-    private List<Question> threadQuestions;
+    private Question threadQuestion;
 
     public ThreadRvAdapter() {
-        vhSupplier = new ThreadVhSupplier<>();
+        vhBinder = new ThreadItemVhBinder<>();
     }
 
     @Override
-    public BaseVhSupplier.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return vhSupplier.create(parent, viewType);
+    public BaseVhBinder.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return vhBinder.create(parent, viewType);
     }
 
     @Override
-    public void onBindViewHolder(BaseVhSupplier.BaseViewHolder sectionViewHolder, int position) {
-        vhSupplier.bind((ThreadVhSupplier.ViewHolder) sectionViewHolder, getItem(position));
+    public void onBindViewHolder(BaseVhBinder.BaseViewHolder sectionViewHolder, int position) {
+        vhBinder.bind((ThreadItemVhBinder.ViewHolder) sectionViewHolder, getItem(position));
     }
 
     @Override
-    protected ThreadVhSupplier.TypeContract getItem(int position) {
-        return threadAnswers.get(position);
+    protected ThreadItemVhBinder.TypeContract getItem(int position) {
+        if (position == 0) {
+            return threadQuestion;
+        } else {
+            return threadAnswers.get(position - 1);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return threadAnswers == null ? 1 : threadAnswers.size();
+        return 1 + (threadAnswers == null ? 1 : threadAnswers.size());
     }
 
     @Override
     public int getItemViewType(int position) {
-        return ROW_ANSWER_TYPE;
+        ThreadItemVhBinder.TypeContract item =  getItem(position);
+        if (item instanceof Question) {
+            return ThreadItemVhBinder.THREAD_QUESTION_TYPE;
+        } else {
+            return ThreadItemVhBinder.THREAD_ANSWER_TYPE;
+        }
     }
 
-    public void add(int position, ThreadVhSupplier.TypeContract item) {
+    public void add(int position, ThreadItemVhBinder.TypeContract item) {
         if (item instanceof Answer) {
             threadAnswers.add(position, (Answer) item);
-        } else if (item instanceof Question) {
-            threadQuestions.add(position, (Question) item);
+        } else {
+            Log.e(TAG, "add: unexpected TypeContract received. only expecting Answers.");
         }
         notifyItemInserted(position);
     }
@@ -60,8 +68,8 @@ public class ThreadRvAdapter extends BaseRvAdapter<ThreadVhSupplier.TypeContract
         threadAnswers = (answers == null) ? (new ArrayList<Answer>() ) : answers;
     }
 
-    public void setQuestions(List<Question> questions) {
-        threadQuestions = (questions == null) ? (new ArrayList<Question>() ) : questions;
+    public void setQuestion(Question question) {
+        threadQuestion = question;
     }
     public void remove(Answer item) {
         int position = threadAnswers.indexOf(item);

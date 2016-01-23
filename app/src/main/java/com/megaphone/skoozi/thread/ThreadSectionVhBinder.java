@@ -6,13 +6,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.megaphone.skoozi.R;
-import com.megaphone.skoozi.base.BaseVhSupplier;
+import com.megaphone.skoozi.base.BaseVhBinder;
 import com.megaphone.skoozi.util.PresentationUtil;
 
-public class ThreadSectionVhSupplier extends
-        BaseVhSupplier<ThreadSection, ThreadSectionVhSupplier.ViewHolder> {
+public class ThreadSectionVhBinder extends
+        BaseVhBinder<ThreadSection, ThreadSectionVhBinder.ViewHolder> {
 
-    public static class ViewHolder extends BaseVhSupplier.BaseViewHolder {
+    public static class ViewHolder extends BaseVhBinder.BaseViewHolder {
         TextView timestamp;
 
         public ViewHolder(View itemView) {
@@ -24,7 +24,7 @@ public class ThreadSectionVhSupplier extends
     @Override
     public BaseViewHolder create(ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.section_thread, parent, false));
+                .inflate(R.layout.thread_section, parent, false));
     }
 
     @Override

@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-abstract public class BaseVhSupplier<T, VH extends BaseVhSupplier.BaseViewHolder> {
+abstract public class BaseVhBinder<T, VH extends BaseVhBinder.BaseViewHolder> {
 
     public static class BaseViewHolder extends RecyclerView.ViewHolder {
         public BaseViewHolder(View itemView) {

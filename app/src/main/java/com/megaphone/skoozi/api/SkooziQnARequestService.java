@@ -255,6 +255,7 @@ public class SkooziQnARequestService extends IntentService {
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
+            // FIXME: 2016-01-23 need to send broadcast with timeout error message
         }
 
         // if no questions, return null; service should not handle this

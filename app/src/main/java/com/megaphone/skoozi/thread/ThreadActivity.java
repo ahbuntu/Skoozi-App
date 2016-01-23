@@ -32,7 +32,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.base.BaseActivity;
-import com.megaphone.skoozi.base.BaseSection;
 import com.megaphone.skoozi.DividerItemDecoration;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.SkooziApplication;
@@ -252,6 +251,7 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
     private void updateThreadResponse() {
         rvAdapter = new ThreadRvAdapter();
         rvAdapter.setAnswers(threadAnswers);
+        rvAdapter.setQuestion(threadQuestion);
 
         //Sections
         List<ThreadSection> sections = new ArrayList<>();

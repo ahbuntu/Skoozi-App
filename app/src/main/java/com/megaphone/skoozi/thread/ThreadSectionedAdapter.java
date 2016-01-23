@@ -5,7 +5,7 @@ import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import com.megaphone.skoozi.base.BaseRvAdapter;
-import com.megaphone.skoozi.base.BaseVhSupplier;
+import com.megaphone.skoozi.base.BaseVhBinder;
 import com.megaphone.skoozi.base.BaseSection;
 
 import java.util.Collections;
@@ -17,7 +17,7 @@ import java.util.List;
  * https://gist.github.com/gabrielemariotti/4c189fb1124df4556058
  */
 public class ThreadSectionedAdapter<K extends ThreadRvAdapter>
-        extends BaseRvAdapter<ThreadSection, ThreadSectionVhSupplier.ViewHolder> {
+        extends BaseRvAdapter<ThreadSection, ThreadSectionVhBinder.ViewHolder> {
 
     private static final int SECTION_TYPE = 0;
 
@@ -26,7 +26,7 @@ public class ThreadSectionedAdapter<K extends ThreadRvAdapter>
     private SparseArray<ThreadSection> sections = new SparseArray<>();
 
     public ThreadSectionedAdapter(K baseAdapter) {
-        vhSupplier = new ThreadSectionVhSupplier();
+        vhBinder = new ThreadSectionVhBinder();
         rvAdapter = baseAdapter;
         rvAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -56,18 +56,18 @@ public class ThreadSectionedAdapter<K extends ThreadRvAdapter>
     }
 
     @Override
-    public BaseVhSupplier.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseVhBinder.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == SECTION_TYPE) {
-            return vhSupplier.create(parent, viewType);
+            return vhBinder.create(parent, viewType);
         }else{
             return rvAdapter.onCreateViewHolder(parent, viewType);
         }
     }
 
     @Override
-    public void onBindViewHolder(BaseVhSupplier.BaseViewHolder sectionViewHolder, int position) {
+    public void onBindViewHolder(BaseVhBinder.BaseViewHolder sectionViewHolder, int position) {
         if (isSectionHeaderPosition(position)) {
-            vhSupplier.bind((ThreadSectionVhSupplier.ViewHolder) sectionViewHolder, getItem(position));
+            vhBinder.bind((ThreadSectionVhBinder.ViewHolder) sectionViewHolder, getItem(position));
         }else{
             rvAdapter.onBindViewHolder(sectionViewHolder, sectionedPositionToPosition(position));
         }
