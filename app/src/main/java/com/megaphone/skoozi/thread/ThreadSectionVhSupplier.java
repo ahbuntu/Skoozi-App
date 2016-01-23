@@ -7,17 +7,16 @@ import android.widget.TextView;
 
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.base.BaseVhSupplier;
+import com.megaphone.skoozi.util.PresentationUtil;
 
 public class ThreadSectionVhSupplier extends
         BaseVhSupplier<ThreadSection, ThreadSectionVhSupplier.ViewHolder> {
 
     public static class ViewHolder extends BaseVhSupplier.BaseViewHolder {
-        TextView title;
         TextView timestamp;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            title = (TextView) itemView.findViewById(R.id.section_question_content);
             timestamp = (TextView) itemView.findViewById(R.id.section_question_timestamp);
         }
     }
@@ -30,8 +29,9 @@ public class ThreadSectionVhSupplier extends
 
     @Override
     public void bind(final ViewHolder holder, ThreadSection item) {
-        holder.title.setText(item.title);
-//            vhSupplier.timestamp.setText(mContext.getString(R.string.thread_question_timestamp,
-//                    PresentationUtil.unixTimestampAsDateTime(mSections.get(position).timestamp)));
+        if (item.question == null) return;
+
+        holder.timestamp.setText(holder.itemView.getContext().getString(R.string.thread_question_timestamp,
+                PresentationUtil.unixTimestampAsDateTime(item.question.timestamp)));
     }
 }

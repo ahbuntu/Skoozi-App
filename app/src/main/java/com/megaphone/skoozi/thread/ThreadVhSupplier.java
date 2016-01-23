@@ -14,7 +14,7 @@ import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.PresentationUtil;
 
-public class ThreadVhSupplier<T extends ThreadVhSupplier.TypeContract> extends BaseVhSupplier<T, ThreadVhMaker.ViewHolder> {
+public class ThreadVhSupplier<T extends ThreadVhSupplier.TypeContract> extends BaseVhSupplier<T, ThreadVhSupplier.ViewHolder> {
 
     public interface TypeContract {}
 

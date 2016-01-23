@@ -4,13 +4,8 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_marginStart="@dimen/activity_horizontal_margin"
-    android:layout_marginEnd="@dimen/activity_horizontal_margin"
-    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-    android:layout_marginRight="@dimen/activity_horizontal_margin" >
+    style="@style/SectionHeader"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/section_question_timestamp"
@@ -19,20 +14,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:layout_marginTop="@dimen/nearby_list_row_vertical_margin"
-        tools:text="Jul 12, 2015 at 2:45pm "
-        />
+        tools:text="Jul 12, 2015 at 2:45pm "/>
 
-    <TextView
-        android:id="@+id/section_question_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textStyle="bold"
-        android:background="@android:color/transparent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="@dimen/thread_list_user_diameter"
-        tools:text="this is the question content and how it will be displayed"
-        />
+    <!--<TextView-->
+        <!--android:id="@+id/section_question_content"-->
+        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+        <!--android:textStyle="bold"-->
+        <!--android:background="@android:color/transparent"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:layout_marginBottom="@dimen/thread_list_user_diameter"-->
+        <!--tools:text="this is the question content and how it will be displayed"-->
+        <!--/>-->
 
 </LinearLayout>
