@@ -9,7 +9,9 @@ import com.megaphone.skoozi.base.BaseVhMaker;
 import com.megaphone.skoozi.base.BaseSection;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Big shout out to:
@@ -84,11 +86,10 @@ public class ThreadSectionedAdapter<K extends ThreadRvAdapter>
                 : rvAdapter.getItemViewType(sectionedPositionToPosition(position));
     }
 
-    public void setSections(BaseSection[] baseSections) {
-        ThreadSection[] threadSections = (ThreadSection[]) baseSections;
+    public void setSections(List<ThreadSection> threadSections) {
         sections.clear();
 
-        Arrays.sort(threadSections, new Comparator<BaseSection>() {
+        Collections.sort(threadSections, new Comparator<BaseSection>() {
             @Override
             public int compare(BaseSection o, BaseSection o1) {
                 return (o.firstPosition == o1.firstPosition)

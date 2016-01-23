@@ -25,7 +25,7 @@ public class ThreadSectionVhMaker
     @Override
     public BaseViewHolder create(ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.section_thread, parent));
+                .inflate(R.layout.section_thread, parent, false));
     }
 
     @Override

@@ -1,14 +1,17 @@
 package com.megaphone.skoozi.thread;
 
 
+import android.view.ViewGroup;
+
 import com.megaphone.skoozi.base.BaseRvAdapter;
+import com.megaphone.skoozi.base.BaseVhMaker;
 import com.megaphone.skoozi.model.Answer;
 import com.megaphone.skoozi.model.Question;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ThreadRvAdapter extends BaseRvAdapter<ThreadVhMaker.TypeContract, ThreadVhMaker.ContractViewHolder> {
+public class ThreadRvAdapter extends BaseRvAdapter<ThreadVhMaker.TypeContract, ThreadVhMaker.ViewHolder> {
 
     private static final int ROW_ANSWER_TYPE = 2000;
 
@@ -17,6 +20,16 @@ public class ThreadRvAdapter extends BaseRvAdapter<ThreadVhMaker.TypeContract, T
 
     public ThreadRvAdapter() {
         vhMaker = new ThreadVhMaker<>();
+    }
+
+    @Override
+    public BaseVhMaker.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return vhMaker.create(parent, viewType);
+    }
+
+    @Override
+    public void onBindViewHolder(BaseVhMaker.BaseViewHolder sectionViewHolder, int position) {
+        vhMaker.bind((ThreadVhMaker.ViewHolder) sectionViewHolder, getItem(position));
     }
 
     @Override
