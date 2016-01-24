@@ -24,15 +24,15 @@
                 android:src="@drawable/profile"
                 app:border_width="0dp"
                 app:border_color="?attr/colorAccent"
-                android:layout_width="@dimen/nearby_list_user_diameter"
-                android:layout_height="@dimen/nearby_list_user_diameter"
+                android:layout_width="@dimen/user_diameter"
+                android:layout_height="@dimen/user_diameter"
                 android:visibility="gone"
                 tools:visibility="visible"/>
 
             <ImageView
                 android:id="@+id/nearby_list_name_image"
-                android:layout_width="@dimen/nearby_list_user_diameter"
-                android:layout_height="@dimen/nearby_list_user_diameter"
+                android:layout_width="@dimen/user_diameter"
+                android:layout_height="@dimen/user_diameter"
                 android:visibility="gone"/>
         </FrameLayout>
 

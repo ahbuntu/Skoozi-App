@@ -79,6 +79,18 @@ public class ThreadSectionedAdapter<K extends ThreadRvAdapter>
     }
 
     @Override
+    public long getItemId(int position) {
+        return isSectionHeaderPosition(position)
+                ? Integer.MAX_VALUE - sections.indexOfKey(position)
+                : rvAdapter.getItemId(sectionedPositionToPosition(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return (rvAdapterHasItems ? rvAdapter.getItemCount() + sections.size() : 0);
+    }
+
+    @Override
     public int getItemViewType(int position) {
         return isSectionHeaderPosition(position)
                 ? SECTION_TYPE
@@ -136,18 +148,4 @@ public class ThreadSectionedAdapter<K extends ThreadRvAdapter>
     public boolean isSectionHeaderPosition(int position) {
         return sections.get(position) != null;
     }
-
-    @Override
-    public long getItemId(int position) {
-        return isSectionHeaderPosition(position)
-                ? Integer.MAX_VALUE - sections.indexOfKey(position)
-                : rvAdapter.getItemId(sectionedPositionToPosition(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return (rvAdapterHasItems ? rvAdapter.getItemCount() + sections.size() : 0);
-    }
-
-
 }

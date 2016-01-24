@@ -21,42 +21,6 @@ public class ThreadItemVhBinder<T extends ThreadItemVhBinder.TypeContract> exten
 
     public interface TypeContract {}
 
-//    public static class ViewHolder extends BaseVhBinder.BaseViewHolder {
-//        // Question View Type
-//        TextView questionContent;
-//
-//        // Answer View Type
-//        TextView threadTimestamp;
-//        TextView threadContent;
-//        TextView threadUserName;
-//        ImageView threadNameImage;
-//
-//        public ViewHolder(View itemView, int viewType) {
-//            super(itemView);
-//            switch (viewType) {
-//                case THREAD_QUESTION_TYPE:
-//                    initQuestionFields();
-//                    break;
-//
-//                default:
-//                case THREAD_ANSWER_TYPE:
-//                    initAnswerFields();
-//                    break;
-//            }
-//        }
-//
-//        private void initQuestionFields() {
-//            questionContent = (TextView) itemView.findViewById(R.id.thread_question_content);
-//        }
-//
-//        private void initAnswerFields() {
-//            threadTimestamp = (TextView) itemView.findViewById(R.id.thread_answer_timestamp);
-//            threadUserName = (TextView) itemView.findViewById(R.id.thread_answer_profile_name);
-//            threadContent = (TextView) itemView.findViewById(R.id.thread_answer_content);
-//            threadNameImage = (ImageView) itemView.findViewById(R.id.thread_list_name_image);
-//        }
-//    }
-
     abstract public static class ViewHolder extends BaseVhBinder.BaseViewHolder {
         public ViewHolder(View itemView) {
             super(itemView);

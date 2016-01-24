@@ -15,13 +15,16 @@
     <string name="action_add_q">New Question</string>
     <string name="action_my_activity">My Activity</string>
 
+    <!-- New question -->
     <string name="new_question_map_heading">Currently @</string>
     <string name="post_new_question">POST</string>
     <string name="new_question_location_change">CHANGE</string>
     <string name="new_question_location_hint">enter location if not correct</string>
     <string name="new_question_error_message">Question details are missing</string>
 
+    <!-- Thread -->
     <string name="post_new_answer">POST</string>
+    <string name="thread_section_responses">Responses</string>
     <string name="thread_empty_heading">No answers to this question yet.</string>
     <string name="reply_error_message">No response provided</string>
 

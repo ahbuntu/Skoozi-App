@@ -105,8 +105,6 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
         // use a linear layout manager
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         threadAnswerRecycler.setLayoutManager(mLayoutManager);
-        RecyclerView.ItemDecoration mItemDecoration = new DividerItemDecoration(this, LinearLayoutManager.VERTICAL);
-        threadAnswerRecycler.addItemDecoration(mItemDecoration);
 
         threadReply = (LinearLayout) findViewById(R.id.thread_reply_container);
         threadReplyFab = (FloatingActionButton) findViewById(R.id.reply_fab);
@@ -255,7 +253,8 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
 
         //Sections
         List<ThreadSection> sections = new ArrayList<>();
-        sections.add(new ThreadSection(0, "", threadQuestion));
+        sections.add(new ThreadSection(0, null, threadQuestion));
+        sections.add(new ThreadSection(1, this.getString(R.string.thread_section_responses), threadQuestion));
 
         ThreadSectionedAdapter<ThreadRvAdapter> sectionedAdapter = new ThreadSectionedAdapter<>(rvAdapter);
         sectionedAdapter.setSections(sections);

@@ -1,5 +1,9 @@
 package com.megaphone.skoozi.thread;
 
+import android.content.Context;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +17,11 @@ public class ThreadSectionVhBinder extends
         BaseVhBinder<ThreadSection, ThreadSectionVhBinder.ViewHolder> {
 
     public static class ViewHolder extends BaseVhBinder.BaseViewHolder {
-        TextView timestamp;
+        TextView sectionTitle;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            timestamp = (TextView) itemView.findViewById(R.id.section_question_timestamp);
+            sectionTitle = (TextView) itemView.findViewById(R.id.section_left);
         }
     }
 
@@ -29,9 +33,21 @@ public class ThreadSectionVhBinder extends
 
     @Override
     public void bind(final ViewHolder holder, ThreadSection item) {
-        if (item.question == null) return;
-
-        holder.timestamp.setText(holder.itemView.getContext().getString(R.string.thread_question_timestamp,
-                PresentationUtil.unixTimestampAsDateTime(item.question.timestamp)));
+        final Context context = holder.itemView.getContext();
+        if (TextUtils.isEmpty(item.title)) {
+            if (item.question == null) return;
+            holder.sectionTitle.setTextColor(ContextCompat.getColor(context, R.color.primary_dark));
+            holder.sectionTitle.setText(holder.itemView.getContext().getString(R.string.thread_question_timestamp,
+                    PresentationUtil.unixTimestampAsDateTime(item.question.timestamp)));
+        } else {
+            holder.sectionTitle.setTextColor(ContextCompat.getColor(context, R.color.accent));
+            String title = item.title;
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                holder.sectionTitle.setFontFeatureSettings("smcp");
+                holder.sectionTitle.setText(title.toUpperCase());
+            }
+            else
+                holder.sectionTitle.setText(title.toUpperCase());
+        }
     }
 }

@@ -5,9 +5,6 @@ import android.os.Parcelable;
 
 import com.megaphone.skoozi.thread.ThreadItemVhBinder;
 
-/**
- * Created by ahmadul.hassan on 2015-05-02.
- */
 public class Question implements Parcelable, ThreadItemVhBinder.TypeContract {
     public String author;
     public String content;
