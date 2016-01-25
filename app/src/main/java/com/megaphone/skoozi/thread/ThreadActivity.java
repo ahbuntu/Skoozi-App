@@ -32,7 +32,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.base.BaseActivity;
-import com.megaphone.skoozi.DividerItemDecoration;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.SkooziApplication;
 import com.megaphone.skoozi.api.SkooziQnARequestService;
@@ -43,6 +42,8 @@ import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.SkooziQnAUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -247,9 +248,10 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
      * This method is called after the API request to get answers for the question has been made
      */
     private void updateThreadResponse() {
+        sortAnswersByTime();
         rvAdapter = new ThreadRvAdapter();
-        rvAdapter.setAnswers(threadAnswers);
         rvAdapter.setQuestion(threadQuestion);
+        rvAdapter.setAnswers(threadAnswers);
 
         //Sections
         List<ThreadSection> sections = new ArrayList<>();
@@ -260,6 +262,15 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
         sectionedAdapter.setSections(sections);
 
         threadAnswerRecycler.setAdapter(sectionedAdapter);
+    }
+
+    private void sortAnswersByTime() {
+        Collections.sort(threadAnswers, new Comparator<Answer>() {
+            @Override
+            public int compare(Answer lhs, Answer rhs) {
+                return ((Long) rhs.timestamp).compareTo(lhs.timestamp);
+            }
+        });
     }
 
     private boolean isValidContent(String value) {
