@@ -47,6 +47,8 @@
         android:id="@+id/thread_answer_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="@dimen/fab_size"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <include layout="@layout/reply_thread"
