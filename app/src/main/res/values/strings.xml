@@ -21,6 +21,7 @@
     <string name="new_question_location_change">CHANGE</string>
     <string name="new_question_location_hint">enter location if not correct</string>
     <string name="new_question_error_message">Question details are missing</string>
+    <string name="new_question_notification_area">Notification Area</string>
 
     <!-- Thread -->
     <string name="post_new_answer">POST</string>

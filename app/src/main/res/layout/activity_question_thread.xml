@@ -27,7 +27,7 @@
             <fragment android:name="com.google.android.gms.maps.MapFragment"
                 android:id="@+id/thread_map"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/nearby_map_height"
+                android:layout_height="@dimen/map_height"
                 app:layout_collapseMode="parallax"/>
 
             <android.support.v7.widget.Toolbar

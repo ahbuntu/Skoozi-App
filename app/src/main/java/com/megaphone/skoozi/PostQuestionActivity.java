@@ -28,7 +28,7 @@ import com.megaphone.skoozi.util.PermissionUtil;
 import com.megaphone.skoozi.util.SkooziQnAUtil;
 
 public class PostQuestionActivity extends BaseActivity {
-    private static final String TAG = "PostQuestionActivty";
+    private static final String TAG = PostQuestionActivity.class.getSimpleName();
 
     private EditText postQuestionText;
     private ProgressBar progressBar;
