@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
+import android.os.Build;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
@@ -17,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.megaphone.skoozi.base.BaseActivity;
@@ -29,6 +31,7 @@ import com.megaphone.skoozi.util.SkooziQnAUtil;
 
 public class PostQuestionActivity extends BaseActivity {
     private static final String TAG = PostQuestionActivity.class.getSimpleName();
+    private static final String SMALL_CAPS = "smcp";
 
     private EditText postQuestionText;
     private ProgressBar progressBar;
@@ -37,6 +40,7 @@ public class PostQuestionActivity extends BaseActivity {
     private boolean requestInProgress;
     private Question postQuestion;
     private IntentFilter mIntentFilter;
+    private TextView postQuestionMapSection;
 
     private BroadcastReceiver skooziApiReceiver = new BroadcastReceiver() {
         @Override
@@ -65,7 +69,13 @@ public class PostQuestionActivity extends BaseActivity {
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.new_question_coordinator_layout);
         progressBar = (ProgressBar) findViewById(R.id.new_question_progress);
         postQuestionText = (EditText) findViewById(R.id.new_question_content);
-        setupPostButton();
+        postQuestionMapSection = (TextView) findViewById(R.id.new_question_map_section);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            postQuestionMapSection.setFontFeatureSettings(SMALL_CAPS);
+        } else {
+            postQuestionMapSection.setAllCaps(true);
+        }
+            setupPostButton();
     }
 
     @Override

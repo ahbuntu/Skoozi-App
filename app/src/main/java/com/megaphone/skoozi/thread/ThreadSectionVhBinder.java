@@ -16,6 +16,8 @@ import com.megaphone.skoozi.util.PresentationUtil;
 public class ThreadSectionVhBinder extends
         BaseVhBinder<ThreadSection, ThreadSectionVhBinder.ViewHolder> {
 
+    private static final String SMALL_CAPS = "smcp";
+
     public static class ViewHolder extends BaseVhBinder.BaseViewHolder {
         TextView sectionTitle;
 
@@ -43,8 +45,8 @@ public class ThreadSectionVhBinder extends
             holder.sectionTitle.setTextColor(ContextCompat.getColor(context, R.color.accent));
             String title = item.title;
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-                holder.sectionTitle.setFontFeatureSettings("smcp");
-                holder.sectionTitle.setText(title.toUpperCase());
+                holder.sectionTitle.setFontFeatureSettings(SMALL_CAPS);
+                holder.sectionTitle.setText(title);
             }
             else
                 holder.sectionTitle.setText(title.toUpperCase());
