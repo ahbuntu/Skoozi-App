@@ -4,10 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -20,7 +22,14 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.megaphone.skoozi.base.BaseActivity;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.thread.ThreadActivity;
@@ -29,10 +38,11 @@ import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.PermissionUtil;
 import com.megaphone.skoozi.util.SkooziQnAUtil;
 
-public class PostQuestionActivity extends BaseActivity {
+public class PostQuestionActivity extends BaseActivity implements OnMapReadyCallback {
     private static final String TAG = PostQuestionActivity.class.getSimpleName();
     private static final String SMALL_CAPS = "smcp";
 
+    private MapFragment mapFragment;
     private EditText postQuestionText;
     private ProgressBar progressBar;
     private Button postQuestionButton;
@@ -41,6 +51,7 @@ public class PostQuestionActivity extends BaseActivity {
     private Question postQuestion;
     private IntentFilter mIntentFilter;
     private TextView postQuestionMapSection;
+    private GoogleMap questionMap;
 
     private BroadcastReceiver skooziApiReceiver = new BroadcastReceiver() {
         @Override
@@ -66,6 +77,7 @@ public class PostQuestionActivity extends BaseActivity {
         setContentView(R.layout.activity_post_question);
         setupToolbar();
 
+        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.new_question_map);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.new_question_coordinator_layout);
         progressBar = (ProgressBar) findViewById(R.id.new_question_progress);
         postQuestionText = (EditText) findViewById(R.id.new_question_content);
@@ -85,12 +97,20 @@ public class PostQuestionActivity extends BaseActivity {
         if (ConnectionUtil.hasNetwork(coordinatorLayout)) connectToGoogleApi();
 
         if (SkooziApplication.hasUserAccount()) postQuestionButton.setEnabled(true);
+
+        if (mapFragment != null)  mapFragment.getMapAsync(this);
     }
 
     @Override
     public void onPause(){
         super.onPause();
         destroyLocalBroadcastPair();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        questionMap = map;
+        updateQuestionMap(10);
     }
 
     @Override
@@ -209,5 +229,34 @@ public class PostQuestionActivity extends BaseActivity {
             hideKeyboard();
             requestInProgress = true;
         }
+    }
+
+    private void updateQuestionMap(int radius) {
+        questionMap.clear(); // important to ensure that everything is cleared
+        updateCurrentLocation(selfLocation);
+        updateSearchRadiusCircle(selfLocation, radius);
+    }
+    private static final int DEFAULT_ZOOM = 11;
+    private static final int RADIUS_TRANSPARENCY = 64; //75%
+    private void updateCurrentLocation(Location origin) {
+        LatLng searchLocation = new LatLng(origin.getLatitude(), origin.getLongitude());
+        questionMap.addMarker(new MarkerOptions()
+                .position(searchLocation)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .title("Current location"));
+        questionMap.moveCamera(CameraUpdateFactory.newLatLngZoom(searchLocation, DEFAULT_ZOOM));
+    }
+
+    private void updateSearchRadiusCircle(Location origin, int radius) {
+        // Instantiates a new CircleOptions object and defines the center and radius
+        int radiusColorRgb = ContextCompat.getColor(this, R.color.accent_material_light);
+        CircleOptions circleOptions = new CircleOptions()
+                .center(new LatLng(origin.getLatitude(), origin.getLongitude()))
+                .fillColor(Color.argb(RADIUS_TRANSPARENCY,
+                        Color.red(radiusColorRgb),
+                        Color.green(radiusColorRgb),
+                        Color.blue(radiusColorRgb)))
+                .radius(radius*1000); // need this in metres
+        questionMap.addCircle(circleOptions);
     }
 }

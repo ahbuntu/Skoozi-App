@@ -10,6 +10,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,7 +45,7 @@ import java.util.List;
  */
 public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQuestionsListener,
         OnMapReadyCallback {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int DEFAULT_ZOOM = 11;
     private static final int RADIUS_TRANSPARENCY = 64; //75%
 
@@ -80,6 +81,8 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                 nearbyFragment = NearbyFragment.newInstance();
                 getFragmentManager().beginTransaction()
                         .add(R.id.main_fragment_container, nearbyFragment).commit();
+            } else {
+                Log.d(TAG, "onCreate: savedInstanceState is not null");
             }
         }
     }
@@ -154,7 +157,14 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
 
     private void updateLatestLocation() {
         latestLocation = PermissionUtil.tryGetLatestLocation(MainActivity.this, getGoogleApiClient());
-        if (latestLocation != null) nearbyFragment.updateSearchOrigin(latestLocation);
+        if (latestLocation != null) {
+            try {
+                nearbyFragment.updateSearchOrigin(latestLocation);
+            } catch (Exception e) {
+                Log.e(TAG, "updateLatestLocation: VERY STRANGE. nearbyFragment is null. Stacktrace to follow");
+                e.printStackTrace();
+            }
+        }
     }
 
     private void setupToolbar() {

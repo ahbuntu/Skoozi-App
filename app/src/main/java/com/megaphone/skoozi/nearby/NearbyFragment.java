@@ -103,7 +103,7 @@ public class NearbyFragment extends Fragment {
 
     @Override
     public void onResume(){
-        super.onResume();
+         super.onResume();
     }
 
     @Override
