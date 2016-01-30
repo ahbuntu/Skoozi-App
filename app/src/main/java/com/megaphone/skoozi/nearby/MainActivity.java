@@ -83,6 +83,11 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
                         .add(R.id.main_fragment_container, nearbyFragment).commit();
             } else {
                 Log.d(TAG, "onCreate: savedInstanceState is not null");
+                if (nearbyFragment == null) {
+                    nearbyFragment = NearbyFragment.newInstance();
+                    getFragmentManager().beginTransaction()
+                            .add(R.id.main_fragment_container, nearbyFragment).commit();
+                }
             }
         }
     }
