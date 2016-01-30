@@ -68,26 +68,39 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction() == null ? "no action" : intent.getAction();
+            boolean success = intent.getBooleanExtra(SkooziQnAUtil.EXTRA_RESULT_SUCCESS, false);
 
             switch (action) {
                 case SkooziQnAUtil.BROADCAST_POST_ANSWER_RESULT:
-                    String answer_key = intent.getStringExtra(SkooziQnAUtil.EXTRA_ANSWER_KEY);
-                    if (answer_key == null) {
+                    if (success) {
+                        String answer_key = intent.getStringExtra(SkooziQnAUtil.EXTRA_ANSWER_KEY);
+                        if (answer_key == null) {
+                            Snackbar.make(coordinatorLayout, R.string.error_generic, Snackbar.LENGTH_LONG)
+                                    .show();
+                        } else {
+                            handleResponseSuccessful();
+                        }
+                    } else {
                         Snackbar.make(coordinatorLayout, R.string.error_generic, Snackbar.LENGTH_LONG)
                                 .show();
-                    } else {
-                        handleResponseSuccessful();
                     }
                     break;
 
                 case SkooziQnAUtil.BROADCAST_THREAD_ANSWERS_RESULT:
-                    threadAnswers = intent.getParcelableArrayListExtra(SkooziQnAUtil.EXTRA_THREAD_ANSWERS);
-                    updateThreadResponse();
+                    if (success) {
+                        threadAnswers = intent.getParcelableArrayListExtra(SkooziQnAUtil.EXTRA_THREAD_ANSWERS);
+                        updateThreadResponse();
+                    } else {
+                        Snackbar.make(coordinatorLayout, R.string.error_generic, Snackbar.LENGTH_LONG)
+                                .show();
+                    }
                     break;
 
                 default:
                     Log.e(TAG, "onReceive: Unexpected action specified in the intent");
                     Log.d(TAG, "onReceive: Action provided " + action);
+                    Snackbar.make(coordinatorLayout, R.string.error_generic, Snackbar.LENGTH_LONG)
+                            .show();
                     break;
             }
         }

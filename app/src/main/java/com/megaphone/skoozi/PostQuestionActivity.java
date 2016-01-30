@@ -61,13 +61,19 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
             requestInProgress = false;
             progressBar.setVisibility(View.GONE);
 
-            String questionKey = intent.getStringExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY);
-            if (questionKey == null) {
+            boolean success = intent.getBooleanExtra(SkooziQnAUtil.EXTRA_RESULT_SUCCESS, false);
+            if (success) {
+                String questionKey = intent.getStringExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY);
+                if (questionKey == null) {
+                    Snackbar.make(coordinatorLayout, R.string.error_generic, Snackbar.LENGTH_LONG)
+                            .show();
+                } else {
+                    postQuestionText.setText("");
+                    showThread(questionKey);
+                }
+            } else {
                 Snackbar.make(coordinatorLayout, R.string.error_generic, Snackbar.LENGTH_LONG)
                         .show();
-            } else {
-                postQuestionText.setText("");
-                showThread(questionKey);
             }
         }
     };
