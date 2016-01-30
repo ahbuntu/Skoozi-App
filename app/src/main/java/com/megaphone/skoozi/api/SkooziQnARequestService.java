@@ -189,6 +189,8 @@ public class SkooziQnARequestService extends IntentService {
      */
     private void handleActionGetThreadAnswers(String question_key) {
         Log.d(TAG, String.format("Trying to get all answers for question key %s", question_key));
+        boolean success;
+        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_THREAD_ANSWERS_RESULT);
         initializeApiConnection();
         ArrayList<Answer> threadAnswers = null;
         try {
@@ -210,11 +212,15 @@ public class SkooziQnARequestService extends IntentService {
                             answerMessage.getLocationLon()));
                 }
             }
+            success = true;
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            success = false;
+            Log.e(TAG, "handleActionGetThreadAnswers: API error");
+            e.printStackTrace();
         }
-        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_THREAD_ANSWERS_RESULT)
-                .putParcelableArrayListExtra(SkooziQnAUtil.EXTRA_THREAD_ANSWERS, threadAnswers);
+
+        localIntent.putExtra(SkooziQnAUtil.EXTRA_RESULT_SUCCESS, success);
+        localIntent.putParcelableArrayListExtra(SkooziQnAUtil.EXTRA_THREAD_ANSWERS, threadAnswers);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
@@ -224,7 +230,8 @@ public class SkooziQnARequestService extends IntentService {
     private void handleActionGetQuestionsList(double lat, double lon, double radius) {
         Log.d(TAG, String.format("Trying to get questions for area with radius %f, centred at %f, %f.",
                 radius, lat, lon));
-
+        boolean success;
+        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_QUESTIONS_LIST_RESULT);
         initializeApiConnection();
         ArrayList<Question> questionList = null;
         try {
@@ -253,14 +260,15 @@ public class SkooziQnARequestService extends IntentService {
                             questionMessage.getLocationLon()));
                 }
             }
+            success = true;
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            // FIXME: 2016-01-23 need to send broadcast with timeout error message
+            success = false;
+            Log.e(TAG, "handleActionGetQuestionsList: API error");
+            e.printStackTrace();
         }
 
-        // if no questions, return null; service should not handle this
-        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_QUESTIONS_LIST_RESULT)
-                .putParcelableArrayListExtra(SkooziQnAUtil.EXTRA_QUESTIONS_LIST, questionList);
+        localIntent.putExtra(SkooziQnAUtil.EXTRA_RESULT_SUCCESS, success);
+        localIntent.putParcelableArrayListExtra(SkooziQnAUtil.EXTRA_QUESTIONS_LIST, questionList);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
@@ -269,7 +277,8 @@ public class SkooziQnARequestService extends IntentService {
      */
     private void handleActionInsertAnswer(String questionKey, Answer userAnswer) {
         Log.d(TAG, "Trying to post a new answer.");
-
+        boolean success;
+        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_POST_ANSWER_RESULT);
         initializeApiConnection();
         String postKey = null;
         try {
@@ -286,11 +295,15 @@ public class SkooziQnARequestService extends IntentService {
                     .insert(answerMsg)
                     .execute();
             postKey = insertResponse.getPostKey();
+            success = true;
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            success = false;
+            Log.e(TAG, "handleActionInsertAnswer: API error");
+            e.printStackTrace();
         }
-        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_POST_ANSWER_RESULT)
-                .putExtra(SkooziQnAUtil.EXTRA_ANSWER_KEY, postKey);
+
+        localIntent.putExtra(SkooziQnAUtil.EXTRA_RESULT_SUCCESS, success);
+        localIntent.putExtra(SkooziQnAUtil.EXTRA_ANSWER_KEY, postKey);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
@@ -299,6 +312,8 @@ public class SkooziQnARequestService extends IntentService {
      */
     private void handleActionInsertQuestion(Question userQuestion) {
         Log.d(TAG, "Trying to post a new question.");
+        boolean success;
+        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_POST_QUESTION_RESULT);
         initializeApiConnection();
         String postKey = null;
         try {
@@ -314,12 +329,15 @@ public class SkooziQnARequestService extends IntentService {
 
             Log.d(TAG, insertResponse.toString());
             postKey = insertResponse.getPostKey();
+            success = true;
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            success = false;
+            Log.e(TAG, "handleActionInsertQuestion: API error");
             e.printStackTrace();
         }
-        Intent localIntent = new Intent(SkooziQnAUtil.BROADCAST_POST_QUESTION_RESULT)
-                .putExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY, postKey);
+
+        localIntent.putExtra(SkooziQnAUtil.EXTRA_RESULT_SUCCESS, success);
+        localIntent.putExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY, postKey);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 

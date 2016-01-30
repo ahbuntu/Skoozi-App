@@ -76,19 +76,16 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.nearby_map);
 
-        if (findViewById(R.id.main_fragment_container) != null) {
-            if (savedInstanceState == null) {
-                nearbyFragment = NearbyFragment.newInstance();
-                getFragmentManager().beginTransaction()
-                        .add(R.id.main_fragment_container, nearbyFragment).commit();
-            } else {
-                Log.d(TAG, "onCreate: savedInstanceState is not null");
-                if (nearbyFragment == null) {
-                    nearbyFragment = NearbyFragment.newInstance();
-                    getFragmentManager().beginTransaction()
-                            .add(R.id.main_fragment_container, nearbyFragment).commit();
-                }
-            }
+        if (savedInstanceState != null) {
+            nearbyFragment = (NearbyFragment)
+                    getSupportFragmentManager().findFragmentByTag(NearbyFragment.getFragmentTag());
+            Log.d(TAG, "onCreate: found fragment from a non null savedInstanceState");
+        } else if (nearbyFragment == null) {
+            nearbyFragment = NearbyFragment.newInstance();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_fragment_container, nearbyFragment, NearbyFragment.getFragmentTag())
+                    .commit();
+            Log.d(TAG, "onCreate: instanting new Nearby fragment");
         }
     }
 

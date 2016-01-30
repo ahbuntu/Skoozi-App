@@ -17,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -52,8 +53,6 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
     private static final String TAG = "ThreadActivity";
     public static final String EXTRA_QUESTION = "com.megaphone.skoozi.extra.question_parcel";
 
-    public static final String ACTION_THREAD_REPLY = "com.megaphone.skoozi.action.THREAD_REPLY";
-
     private CollapsingToolbarLayout collapsingToolbar;
     private Question threadQuestion;
     private List<Answer> threadAnswers; //null value is good and well
@@ -68,20 +67,27 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
     private BroadcastReceiver skooziApiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
+            String action = intent.getAction() == null ? "no action" : intent.getAction();
+
+            switch (action) {
                 case SkooziQnAUtil.BROADCAST_POST_ANSWER_RESULT:
                     String answer_key = intent.getStringExtra(SkooziQnAUtil.EXTRA_ANSWER_KEY);
                     if (answer_key == null) {
-                        Snackbar.make(coordinatorLayout, R.string.error_posting_new_question, Snackbar.LENGTH_LONG)
+                        Snackbar.make(coordinatorLayout, R.string.error_generic, Snackbar.LENGTH_LONG)
                                 .show();
                     } else {
                         handleResponseSuccessful();
                     }
                     break;
-                default:
+
                 case SkooziQnAUtil.BROADCAST_THREAD_ANSWERS_RESULT:
                     threadAnswers = intent.getParcelableArrayListExtra(SkooziQnAUtil.EXTRA_THREAD_ANSWERS);
                     updateThreadResponse();
+                    break;
+
+                default:
+                    Log.e(TAG, "onReceive: Unexpected action specified in the intent");
+                    Log.d(TAG, "onReceive: Action provided " + action);
                     break;
             }
         }

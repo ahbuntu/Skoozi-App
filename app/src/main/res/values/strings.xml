@@ -35,8 +35,8 @@
     <string name="thread_question_timestamp">%s</string>
 
     <!-- Error messages-->
+    <string name="error_generic">Looks like there was an error. Please try again later.</string>
     <string name="no_questions_message">No questions nearby. Search with a larger radius.</string>
-    <string name="error_posting_new_question">Looks like there was an error. Please try again.</string>
     <string name="no_network_message">Network connectivity is currently unavailable</string>
     <string name="no_gps_message">GPS is disabled</string>
     <string name="snackbar_enable_gps">Enable</string>

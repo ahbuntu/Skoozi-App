@@ -56,17 +56,18 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
     private BroadcastReceiver skooziApiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (!SkooziQnAUtil.BROADCAST_POST_QUESTION_RESULT.equals(intent.getAction())) return;
+
             requestInProgress = false;
             progressBar.setVisibility(View.GONE);
-            if (intent.getAction().equals(SkooziQnAUtil.BROADCAST_POST_QUESTION_RESULT)) {
-                String questionKey = intent.getStringExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY);
-                if (questionKey == null) {
-                    Snackbar.make(coordinatorLayout, R.string.error_posting_new_question, Snackbar.LENGTH_LONG)
-                            .show();
-                } else {
-                    postQuestionText.setText("");
-                    showThread(questionKey);
-                }
+
+            String questionKey = intent.getStringExtra(SkooziQnAUtil.EXTRA_QUESTION_KEY);
+            if (questionKey == null) {
+                Snackbar.make(coordinatorLayout, R.string.error_generic, Snackbar.LENGTH_LONG)
+                        .show();
+            } else {
+                postQuestionText.setText("");
+                showThread(questionKey);
             }
         }
     };
