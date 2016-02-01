@@ -186,7 +186,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     }
 
     private boolean canUpdateMap(Location origin, int radius) {
-        // todo: should display things on map only if the map is visible
         if (nearbyMap == null) {
             // set values so that map will be updated when available
             pendingMapUpdate = new PendingMapUpdate(origin, radius);
