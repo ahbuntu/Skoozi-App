@@ -27,6 +27,7 @@ import com.megaphone.skoozi.PostQuestionActivity;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.model.Question;
 import com.megaphone.skoozi.util.ConnectionUtil;
+import com.megaphone.skoozi.util.MapDecorator;
 import com.megaphone.skoozi.util.PermissionUtil;
 
 import java.util.List;
@@ -140,8 +141,8 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
     public void onSearchAreaUpdated(Location origin, int radius) {
         if (canUpdateMap(origin, radius)) {
             nearbyMap.clear(); // important to ensure that everything is cleared
-            updateCurrentLocation(origin);
-            updateSearchRadiusCircle(origin, radius);
+            MapDecorator.drawLocationMarker(nearbyMap, origin); //updateCurrentLocation(origin);
+            MapDecorator.drawNotificationArea(this, nearbyMap, origin, radius); // updateSearchRadiusCircle(origin, radius);
         }
     }
 
@@ -176,15 +177,6 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         collapsingToolbar.setTitle(this.getString(R.string.app_name));
     }
 
-    private void updateCurrentLocation(Location origin) {
-        LatLng searchLocation = new LatLng(origin.getLatitude(), origin.getLongitude());
-        nearbyMap.addMarker(new MarkerOptions()
-                .position(searchLocation)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                .title("Current location"));
-        nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(searchLocation, DEFAULT_ZOOM));
-    }
-
     private boolean canUpdateMap(Location origin, int radius) {
         if (nearbyMap == null) {
             // set values so that map will be updated when available
@@ -203,18 +195,27 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         pendingMapUpdate = null;
         return true;
     }
+//
+//    private void updateCurrentLocation(Location origin) {
+//        LatLng searchLocation = new LatLng(origin.getLatitude(), origin.getLongitude());
+//        nearbyMap.addMarker(new MarkerOptions()
+//                .position(searchLocation)
+//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+//                .title("Current location"));
+//        nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(searchLocation, DEFAULT_ZOOM));
+//    }
 
-    private void updateSearchRadiusCircle(Location origin, int radius) {
-        // Instantiates a new CircleOptions object and defines the center and radius
-        int radiusColorRgb = ContextCompat.getColor(this, R.color.accent_material_light);
-        CircleOptions circleOptions = new CircleOptions()
-                .center(new LatLng(origin.getLatitude(), origin.getLongitude()))
-                .fillColor(Color.argb(RADIUS_TRANSPARENCY,
-                        Color.red(radiusColorRgb),
-                        Color.green(radiusColorRgb),
-                        Color.blue(radiusColorRgb)))
-                .radius(radius*1000); // need this in metres
-        nearbyMap.addCircle(circleOptions);
-    }
+//    private void updateSearchRadiusCircle(Location origin, int radius) {
+//        // Instantiates a new CircleOptions object and defines the center and radius
+//        int radiusColorRgb = ContextCompat.getColor(this, R.color.accent_material_light);
+//        CircleOptions circleOptions = new CircleOptions()
+//                .center(new LatLng(origin.getLatitude(), origin.getLongitude()))
+//                .fillColor(Color.argb(RADIUS_TRANSPARENCY,
+//                        Color.red(radiusColorRgb),
+//                        Color.green(radiusColorRgb),
+//                        Color.blue(radiusColorRgb)))
+//                .radius(radius*1000); // need this in metres
+//        nearbyMap.addCircle(circleOptions);
+//    }
 
 }
