@@ -112,7 +112,7 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap map) {
         questionMap = map;
-        updateQuestionMap(10);
+        if (selfLocation != null) updateQuestionMap(10); // TODO: 2016-02-02 need to figure out correct radius value to use here
     }
 
     @Override
@@ -149,6 +149,7 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
     protected void onGoogleApiConnected() {
         super.onGoogleApiConnected();
         selfLocation = PermissionUtil.tryGetLatestLocation(PostQuestionActivity.this, getGoogleApiClient());
+        updateQuestionMap(10); // TODO: 2016-02-02 need to figure out correct radius value to use here
     }
 
     private void setupToolbar() {

@@ -169,6 +169,6 @@ abstract public class BaseActivity extends AppCompatActivity {
 
     @CallSuper
     protected void onGoogleApiConnected() {
-        Log.d(TAG, "Googple API Connection established");
+        Log.d(TAG, "onGoogleApiConnected: API connection established");
     }
 }
