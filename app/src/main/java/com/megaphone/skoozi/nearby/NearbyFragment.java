@@ -125,6 +125,7 @@ public class NearbyFragment extends Fragment {
     public void onPause(){
         super.onResume();
         destroyLocalBroadcastPair();
+        progressBar.setVisibility(View.GONE);
     }
 
     @Nullable

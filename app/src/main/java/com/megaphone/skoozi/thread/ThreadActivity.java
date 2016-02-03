@@ -89,6 +89,7 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
                 case SkooziQnAUtil.BROADCAST_THREAD_ANSWERS_RESULT:
                     if (success) {
                         threadAnswers = intent.getParcelableArrayListExtra(SkooziQnAUtil.EXTRA_THREAD_ANSWERS);
+                        if (threadAnswers == null) threadAnswers = new ArrayList<>();
                         updateThreadResponse();
                     } else {
                         Snackbar.make(coordinatorLayout, R.string.error_generic, Snackbar.LENGTH_LONG)
