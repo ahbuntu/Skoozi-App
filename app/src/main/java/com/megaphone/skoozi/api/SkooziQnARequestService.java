@@ -117,7 +117,6 @@ public class SkooziQnARequestService extends IntentService {
     }
 
 
-    // TODO: Check for network connectivity before starting the Service.
     public SkooziQnARequestService() {
         super("SkooziQnARequestService");
     }
@@ -236,15 +235,9 @@ public class SkooziQnARequestService extends IntentService {
         ArrayList<Question> questionList = null;
         try {
             CoreModelsQuestionMessageCollection questionsListResponse;
-            if (lat == 0 || lon == 0) {
-                //need to get ALL since no location information was provided
-                questionsListResponse =  skooziqnaService.questions().list()
-                        .execute();
-            } else {
-                questionsListResponse =  skooziqnaService.questions().list()
-                        .setLat(lat).setLon(lon).setRadiusKm(radius)
-                        .execute();
-            }
+            questionsListResponse =  skooziqnaService.questions().list()
+                    .setLat(lat).setLon(lon).setRadiusKm(radius)
+                    .execute();
 
             List<CoreModelsQuestionMessage> questionMessages =  questionsListResponse.getQuestions();
             if (questionMessages != null) {

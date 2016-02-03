@@ -195,27 +195,4 @@ public class MainActivity extends BaseActivity implements NearbyFragment.NearbyQ
         pendingMapUpdate = null;
         return true;
     }
-//
-//    private void updateCurrentLocation(Location origin) {
-//        LatLng searchLocation = new LatLng(origin.getLatitude(), origin.getLongitude());
-//        nearbyMap.addMarker(new MarkerOptions()
-//                .position(searchLocation)
-//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-//                .title("Current location"));
-//        nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(searchLocation, DEFAULT_ZOOM));
-//    }
-
-//    private void updateSearchRadiusCircle(Location origin, int radius) {
-//        // Instantiates a new CircleOptions object and defines the center and radius
-//        int radiusColorRgb = ContextCompat.getColor(this, R.color.accent_material_light);
-//        CircleOptions circleOptions = new CircleOptions()
-//                .center(new LatLng(origin.getLatitude(), origin.getLongitude()))
-//                .fillColor(Color.argb(RADIUS_TRANSPARENCY,
-//                        Color.red(radiusColorRgb),
-//                        Color.green(radiusColorRgb),
-//                        Color.blue(radiusColorRgb)))
-//                .radius(radius*1000); // need this in metres
-//        nearbyMap.addCircle(circleOptions);
-//    }
-
 }

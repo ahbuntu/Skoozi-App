@@ -18,6 +18,8 @@ public class MapDecorator {
     private static final int RADIUS_TRANSPARENCY = 64; //75%
 
     public static void drawLocationMarker(GoogleMap map, Location origin) {
+        if (map == null || origin == null) return;
+
         LatLng searchLocation = new LatLng(origin.getLatitude(), origin.getLongitude());
         map.addMarker(new MarkerOptions()
                 .position(searchLocation)
@@ -28,7 +30,8 @@ public class MapDecorator {
 
     public static void drawNotificationArea(Context context, GoogleMap map,
                                             Location origin, int radius) {
-        // Instantiates a new CircleOptions object and defines the center and radius
+        if (map == null || origin == null ) return;
+
         int radiusColorRgb = ContextCompat.getColor(context, R.color.accent_material_light);
         CircleOptions circleOptions = new CircleOptions()
                 .center(new LatLng(origin.getLatitude(), origin.getLongitude()))

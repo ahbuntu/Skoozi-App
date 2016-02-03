@@ -238,6 +238,4 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
         MapDecorator.drawLocationMarker(questionMap, selfLocation);
         MapDecorator.drawNotificationArea(this, questionMap, selfLocation, radius);
     }
-
-
 }
