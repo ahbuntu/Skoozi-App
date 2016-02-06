@@ -1,65 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:layout_margin="8dp">
 
-    <android.support.v7.widget.CardView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="@dimen/content_spacing">
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/nearby_list_profile_name"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:gravity="center_vertical"
+            android:textStyle="bold"
+            tools:text="ahmadul.hassan" />
+
+        <TextView
+            android:id="@+id/nearby_list_question_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/nearby_list_profile_name"
+            android:layout_toRightOf="@id/nearby_list_profile_name"
+            android:gravity="center_vertical|right"
+            tools:text="2d" />
+
+        <TextView
+            android:id="@+id/nearby_list_question"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/content_spacing">
+            android:layout_below="@id/nearby_list_profile_name"
+            android:layout_marginTop="@dimen/content_spacing"
+            android:ellipsize="end"
+            android:maxLines="5"
+            android:minLines="2"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            tools:text="This is where the text of the question will be. This is a very long and elaborate example of what a question may look like." />
 
-            <TextView
-                android:id="@+id/nearby_list_profile_name"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:gravity="center_vertical"
-                android:textStyle="bold"
-                tools:text="ahmadul.hassan" />
+        <View
+            android:id="@+id/divider"
+            style="@style/Divider"
+            android:layout_below="@id/nearby_list_question" />
 
-            <TextView
-                android:id="@+id/nearby_list_question_duration"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignTop="@id/nearby_list_profile_name"
-                android:layout_toRightOf="@id/nearby_list_profile_name"
-                android:gravity="center_vertical|right"
-                tools:text="2d" />
-
-            <TextView
-                android:id="@+id/nearby_list_question"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/nearby_list_profile_name"
-                android:layout_marginTop="@dimen/content_spacing"
-                android:ellipsize="end"
-                android:maxLines="5"
-                android:minLines="2"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                tools:text="This is where the text of the question will be. This is a very long and elaborate example of what a question may look like." />
-
-            <View style="@style/Divider"
-                android:id="@+id/divider"
-                android:layout_below="@id/nearby_list_question"/>
-
-            <TextView
-                android:id="@+id/nearby_list_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/divider"
-                android:gravity="center_vertical"
-                android:text="This is where the other random crap will go"
-                android:textStyle="bold" />
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
-
-</FrameLayout>
-
+        <TextView
+            android:id="@+id/nearby_list_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/divider"
+            android:gravity="center_vertical"
+            android:text="This is where the other random crap will go"
+            android:textStyle="bold" />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
