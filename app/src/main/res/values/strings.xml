@@ -29,6 +29,9 @@
     <string name="thread_empty_heading">No answers to this question yet.</string>
     <string name="reply_error_message">No response provided</string>
 
+    <!-- User Account -->
+    <string name="user_avatar_content_desc">User content description</string>
+
     <!--Instructions-->
     <string name="new_question_hint">Ask a question</string>
     <string name="new_answer_content_hint">Enter a response</string>
