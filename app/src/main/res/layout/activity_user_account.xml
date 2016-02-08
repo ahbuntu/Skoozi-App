@@ -30,56 +30,99 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v7.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/content_spacing"
-            android:background="@color/offwhite">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
-                <RelativeLayout
+                <ImageView
+                    android:id="@+id/user_avatar"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:contentDescription="@string/user_avatar_content_desc" />
+
+                <TextView
+                    android:id="@+id/user_nickname"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:id="@+id/user_avatar"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:contentDescription="@string/user_avatar_content_desc" />
-
-                    <TextView
-                        android:id="@+id/user_nickname"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_toRightOf="@id/user_avatar"
-                        tools:text="Ahmad Hassan" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/user_nickname"
-                        android:layout_toRightOf="@id/user_avatar"
-                        tools:text="ahmadul.hassan@gmail.com" />
-
-
-                </RelativeLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_toRightOf="@id/user_avatar"
+                    tools:text="Ahmad Hassan" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:text="Home Notification Area" />
+                    android:layout_below="@id/user_nickname"
+                    android:layout_toRightOf="@id/user_avatar"
+                    tools:text="ahmadul.hassan@gmail.com" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginLeft="@dimen/default_margin">
+
+                <ImageView
+                    android:id="@+id/home_area_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:src="@mipmap/ic_place_black_24dp" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:text="Work Notification Area"/>
+                    android:layout_alignTop="@id/home_area_icon"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@id/home_area_icon"
+                    android:text="@string/user_default_notify_area" />
 
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/home_area_icon"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@id/home_area_icon"
+                    android:text="@string/user_home_area" />
+            </RelativeLayout>
+
+            <View
+                style="@style/Divider"
+                android:layout_marginLeft="72dp"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/default_margin">
+
+                <ImageView
+                    android:id="@+id/work_area_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/ic_place_black_24dp"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/work_area_icon"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@id/work_area_icon"
+                    android:text="@string/user_default_notify_area" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/work_area_icon"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@id/work_area_icon"
+                    android:text="@string/user_work_area" />
+            </RelativeLayout>
+        </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>
