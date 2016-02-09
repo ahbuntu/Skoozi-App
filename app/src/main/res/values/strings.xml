@@ -33,7 +33,9 @@
     <string name="user_avatar_content_desc">User content description</string>
     <string name="user_home_area">Home Area</string>
     <string name="user_work_area">Work Area</string>
-    <string name="user_default_notify_area">Notifications not set up. Tap to get started.</string>
+    <string name="user_default_notify_area">Notifications not set up. Get started!</string>
+    <string name="notify_map_collapse_content_description">Hide notification area on the map</string>
+    <string name="notify_map_expand_content_description">Show notification area on the map</string>
 
     <!--Instructions-->
     <string name="new_question_hint">Ask a question</string>

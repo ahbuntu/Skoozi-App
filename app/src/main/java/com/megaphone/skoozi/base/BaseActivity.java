@@ -15,6 +15,7 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.SkooziApplication;
+import com.megaphone.skoozi.UserAccountActivity;
 import com.megaphone.skoozi.nearby.MainActivity;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
@@ -55,6 +56,7 @@ abstract public class BaseActivity extends AppCompatActivity {
             startActivity(intent);
         } else if (id == R.id.action_my_activity) {
             Toast.makeText(this, "my activity", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, UserAccountActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
