@@ -158,14 +158,12 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
     @Override
     protected void googleAccountSelected(String accountName) {
         super.googleAccountSelected(accountName);
-        threadReplyFab.setEnabled(true);
     }
 
     @Override
     protected void googleAccountNotSelected() {
         super.googleAccountNotSelected();
         AccountUtil.displayAccountSignInErrorMessage(coordinatorLayout);
-        threadReplyFab.setEnabled(false);
     }
 
     private void setupToolbar() {

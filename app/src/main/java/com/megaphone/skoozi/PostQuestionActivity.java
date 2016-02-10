@@ -98,8 +98,6 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
 
         if (ConnectionUtil.hasNetwork(coordinatorLayout)) connectToGoogleApi();
 
-        if (SkooziApplication.hasUserAccount()) postQuestionButton.setEnabled(true);
-
         if (mapFragment != null)  mapFragment.getMapAsync(this);
     }
 
@@ -118,14 +116,12 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
     @Override
     protected void googleAccountSelected(String accountName) {
         super.googleAccountSelected(accountName);
-        postQuestionButton.setEnabled(true);
     }
 
     @Override
     protected void googleAccountNotSelected() {
         super.googleAccountNotSelected();
         AccountUtil.displayAccountSignInErrorMessage(coordinatorLayout);
-        postQuestionButton.setEnabled(false);
     }
 
     @Override
@@ -193,7 +189,6 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
 
     private void setupPostButton() {
         postQuestionButton = (Button) findViewById(R.id.post_new_question);
-        postQuestionButton.setEnabled(false);
         postQuestionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -203,9 +198,13 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
     }
 
     private void onPostButtonClicked() {
-        String content = postQuestionText.getText().toString().trim();
-        if (isContentValid(content)) {
-            tryPostQuestionToApi(content);
+        if (SkooziApplication.hasUserAccount()) {
+            String content = postQuestionText.getText().toString().trim();
+            if (isContentValid(content)) {
+                tryPostQuestionToApi(content);
+            }
+        } else {
+            AccountUtil.displayAccountSignInErrorMessage(coordinatorLayout);
         }
     }
 

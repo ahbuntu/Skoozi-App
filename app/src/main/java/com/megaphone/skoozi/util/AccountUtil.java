@@ -29,10 +29,10 @@ public class AccountUtil {
         void handleGoogleAuthException(UserRecoverableAuthException exception);
     }
 
-    public static void saveUserAccount(Context context, String accountName) {
+    public static void saveUserAccount(String accountName) {
         SharedPrefsUtil.getEditor()
                 .putString(SharedPrefsUtil.ACCOUNT_NAME_KEY, accountName).apply();
-        SkooziApplication.setUserAccount(context, accountName);
+        SkooziApplication.setUserAccount(accountName);
     }
     public static void pickUserAccount(Activity activity, String action) {
         Intent intent = AccountPicker.newChooseAccountIntent(null, null,

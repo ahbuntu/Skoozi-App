@@ -17,9 +17,9 @@ import io.fabric.sdk.android.Fabric;
 
 public class SkooziApplication extends Application {
     private static SkooziApplication singleton;
-    private static Account userAccount;
-
     public static String accessToken;
+
+    private static Account userAccount; // initialized onCreate() of application
 
     // Returns the application instance
     public static SkooziApplication getInstance() {
@@ -31,16 +31,17 @@ public class SkooziApplication extends Application {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
         singleton = this;
+        getUserAccount();
     }
 
-    public static void setUserAccount(Context context, String userEmail) {
-        userAccount = AccountUtil.getAccountForName(context, userEmail);
+    public static void setUserAccount(String userEmail) {
+        userAccount = AccountUtil.getAccountForName(singleton.getApplicationContext(), userEmail);
     }
 
     public static Account getUserAccount() {
         if (userAccount == null) {
-            setUserAccount(singleton.getApplicationContext(),
-                    SharedPrefsUtil.getInstance().getString(SharedPrefsUtil.ACCOUNT_NAME_KEY, null));
+            setUserAccount(SharedPrefsUtil.getInstance()
+                    .getString(SharedPrefsUtil.ACCOUNT_NAME_KEY, null));
         }
         return userAccount;
     }

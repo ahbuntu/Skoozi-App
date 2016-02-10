@@ -70,7 +70,6 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     @Override
     protected void googleAccountSelected(String accountName) {
         super.googleAccountSelected(accountName);
-//        postQuestionButton.setEnabled(true);
     }
 
     @Override

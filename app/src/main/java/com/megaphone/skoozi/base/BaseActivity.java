@@ -131,7 +131,9 @@ abstract public class BaseActivity extends AppCompatActivity {
     @CallSuper
     protected void googleAccountSelected(String accountName) {
         Log.d(TAG, "Google Account selected via account picker");
-        AccountUtil.saveUserAccount(this, accountName);
+        if (!SkooziApplication.hasUserAccount()) {
+            AccountUtil.saveUserAccount(accountName);
+        }
         AccountUtil.displayAccountSignedInMessage(coordinatorLayout, accountName);
     }
 
