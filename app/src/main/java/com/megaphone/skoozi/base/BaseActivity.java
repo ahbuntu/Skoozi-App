@@ -41,48 +41,14 @@ abstract public class BaseActivity extends AppCompatActivity {
         }
     };
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the toolbar menu
-        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.action_my_activity) {
-            Toast.makeText(this, "my activity", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, UserAccountActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (SkooziApplication.getUserAccount() == null) AccountUtil.pickUserAccount(this, null);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (googleApiClient != null) googleApiClient.disconnect();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
                 if (resultCode == RESULT_OK) {
-                    // Received valid result from the AccountPicker
                     googleAccountSelected(data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
                 } else if (resultCode == RESULT_CANCELED) {
-                    // The account picker dialog closed without selecting an account.
                     googleAccountNotSelected();
                 }
                 return;
@@ -112,6 +78,39 @@ abstract public class BaseActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the toolbar menu
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.action_my_activity) {
+            Toast.makeText(this, "my activity", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, UserAccountActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: invoked");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (googleApiClient != null) googleApiClient.disconnect();
+    }
+
     @Nullable
     public GoogleApiClient getGoogleApiClient() {
         if (googleApiClient == null) initGoogleApiClient();
@@ -132,12 +131,13 @@ abstract public class BaseActivity extends AppCompatActivity {
     @CallSuper
     protected void googleAccountSelected(String accountName) {
         Log.d(TAG, "Google Account selected via account picker");
-        SkooziApplication.setUserAccount(this, accountName);
+        AccountUtil.saveUserAccount(this, accountName);
         AccountUtil.displayAccountSignedInMessage(coordinatorLayout, accountName);
     }
 
     @CallSuper
     protected void googleAccountNotSelected() {
+        // The account picker dialog closed without selecting an account.
         Log.d(TAG, "Google Account not selected from account picker");
     }
 

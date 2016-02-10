@@ -1,6 +1,7 @@
 package com.megaphone.skoozi;
 
 import android.accounts.Account;
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.Nullable;
@@ -10,11 +11,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.GoogleApiClientBroker;
+import com.megaphone.skoozi.util.SharedPrefsUtil;
+
 import io.fabric.sdk.android.Fabric;
 
-/**
- * Created by ahmadul.hassan on 2015-07-26.
- */
 public class SkooziApplication extends Application {
     private static SkooziApplication singleton;
     private static Account userAccount;
@@ -38,6 +38,10 @@ public class SkooziApplication extends Application {
     }
 
     public static Account getUserAccount() {
+        if (userAccount == null) {
+            setUserAccount(singleton.getApplicationContext(),
+                    SharedPrefsUtil.getInstance().getString(SharedPrefsUtil.ACCOUNT_NAME_KEY, null));
+        }
         return userAccount;
     }
 

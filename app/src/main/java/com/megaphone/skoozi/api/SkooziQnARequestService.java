@@ -123,7 +123,7 @@ public class SkooziQnARequestService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent == null || SkooziApplication.getUserAccount() == null) {
+        if (intent == null || !SkooziApplication.hasUserAccount()) {
             Log.d(TAG, "intent or user account was null");
             return;
         }

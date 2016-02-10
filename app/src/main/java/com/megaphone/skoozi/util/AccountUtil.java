@@ -19,10 +19,9 @@ import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.SkooziApplication;
 
 public class AccountUtil {
-    private static final String TAG = "AccountUtil";
+    private static final String TAG = AccountUtil.class.getSimpleName();
     public static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     public static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1002;
-    public static final String EXTRA_USER_ACCOUNT_ACTION = "skoozi.extra.USER_ACCOUNT_ACTION";
 
     private static final String[] accountTypes = new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
 
@@ -30,10 +29,14 @@ public class AccountUtil {
         void handleGoogleAuthException(UserRecoverableAuthException exception);
     }
 
+    public static void saveUserAccount(Context context, String accountName) {
+        SharedPrefsUtil.getEditor()
+                .putString(SharedPrefsUtil.ACCOUNT_NAME_KEY, accountName).apply();
+        SkooziApplication.setUserAccount(context, accountName);
+    }
     public static void pickUserAccount(Activity activity, String action) {
         Intent intent = AccountPicker.newChooseAccountIntent(null, null,
                 accountTypes, false, null, null, null, null); //alwaysPromptForAccount = false
-        intent.putExtra(EXTRA_USER_ACCOUNT_ACTION, action);
         activity.startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
     }
 
