@@ -13,9 +13,6 @@ import android.view.View;
 import com.megaphone.skoozi.R;
 import com.megaphone.skoozi.SkooziApplication;
 
-/**
- * Created by ahmadulhassan on 2015-07-01.
- */
 public class ConnectionUtil {
 
     public static boolean hasNetwork(CoordinatorLayout layout) {

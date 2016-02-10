@@ -163,7 +163,7 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
     @Override
     protected void googleAccountNotSelected() {
         super.googleAccountNotSelected();
-        AccountUtil.displayAccountSignInErrorMessage(coordinatorLayout);
+        AccountUtil.displayAccountSignInErrorMessage(this, coordinatorLayout);
     }
 
     private void setupToolbar() {

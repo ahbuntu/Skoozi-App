@@ -75,7 +75,7 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     @Override
     protected void googleAccountNotSelected() {
         super.googleAccountNotSelected();
-        AccountUtil.displayAccountSignInErrorMessage(coordinatorLayout);
+        AccountUtil.displayAccountSignInErrorMessage(this, coordinatorLayout);
     }
 
     @Override

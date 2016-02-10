@@ -121,7 +121,7 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
     @Override
     protected void googleAccountNotSelected() {
         super.googleAccountNotSelected();
-        AccountUtil.displayAccountSignInErrorMessage(coordinatorLayout);
+        AccountUtil.displayAccountSignInErrorMessage(this, coordinatorLayout);
     }
 
     @Override
@@ -204,7 +204,7 @@ public class PostQuestionActivity extends BaseActivity implements OnMapReadyCall
                 tryPostQuestionToApi(content);
             }
         } else {
-            AccountUtil.displayAccountSignInErrorMessage(coordinatorLayout);
+            AccountUtil.displayAccountSignInErrorMessage(this, coordinatorLayout);
         }
     }
 

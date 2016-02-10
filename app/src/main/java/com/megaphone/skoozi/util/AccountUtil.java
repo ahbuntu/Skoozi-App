@@ -6,9 +6,11 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
@@ -34,7 +36,7 @@ public class AccountUtil {
                 .putString(SharedPrefsUtil.ACCOUNT_NAME_KEY, accountName).apply();
         SkooziApplication.setUserAccount(accountName);
     }
-    public static void pickUserAccount(Activity activity, String action) {
+    public static void pickUserAccount(Activity activity) {
         Intent intent = AccountPicker.newChooseAccountIntent(null, null,
                 accountTypes, false, null, null, null, null); //alwaysPromptForAccount = false
         activity.startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
@@ -83,8 +85,15 @@ public class AccountUtil {
         }
     }
 
-    public static void displayAccountSignInErrorMessage(CoordinatorLayout layoutView) {
+    public static void displayAccountSignInErrorMessage(final Activity activity,
+                                                        CoordinatorLayout layoutView) {
         Snackbar.make(layoutView, R.string.no_account_login_message, Snackbar.LENGTH_LONG)
+                .setAction(R.string.snackbar_sign_in, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        pickUserAccount(activity);
+                    }
+                })
                 .show();
     }
 
