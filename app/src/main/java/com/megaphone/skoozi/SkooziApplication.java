@@ -1,25 +1,24 @@
 package com.megaphone.skoozi;
 
 import android.accounts.Account;
-import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
-import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.megaphone.skoozi.util.AccountUtil;
-import com.megaphone.skoozi.util.ConnectionUtil;
-import com.megaphone.skoozi.util.GoogleApiClientBroker;
 import com.megaphone.skoozi.util.SharedPrefsUtil;
 
 import io.fabric.sdk.android.Fabric;
 
 public class SkooziApplication extends Application {
-    private static SkooziApplication singleton;
-    public static String accessToken;
+    private static final String TAG = SkooziApplication.class.getSimpleName();
 
+    public static String accessToken;
+    private static SkooziApplication singleton;
     private static Account userAccount; // initialized onCreate() of application
+    private static boolean signinAckDisplayed;
 
     // Returns the application instance
     public static SkooziApplication getInstance() {
@@ -50,4 +49,16 @@ public class SkooziApplication extends Application {
         return userAccount != null;
     }
 
+    public static boolean shouldDisplaySignInAck() {
+        return !signinAckDisplayed;
+    }
+
+    public static void displaySignInAck(CoordinatorLayout coordinatorLayout) {
+        String accountName = getUserAccount().name;
+        if (TextUtils.isEmpty(accountName)) {
+            Log.d(TAG, "displaySignInAck: user does not have a saved user account");
+        }
+        AccountUtil.displayAccountSignedInMessage(coordinatorLayout, accountName);
+        signinAckDisplayed = true;
+    }
 }

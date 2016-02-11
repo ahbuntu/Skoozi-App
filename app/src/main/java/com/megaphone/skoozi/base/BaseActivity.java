@@ -103,6 +103,8 @@ abstract public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: invoked");
+        if (SkooziApplication.shouldDisplaySignInAck())
+            SkooziApplication.displaySignInAck(coordinatorLayout);
     }
 
     @Override
@@ -131,10 +133,11 @@ abstract public class BaseActivity extends AppCompatActivity {
     @CallSuper
     protected void googleAccountSelected(String accountName) {
         Log.d(TAG, "Google Account selected via account picker");
+        // TODO: 2016-02-10 move all account related actions to the AccountUtil; splitting is bad
         if (!SkooziApplication.hasUserAccount()) {
             AccountUtil.saveUserAccount(accountName);
         }
-        AccountUtil.displayAccountSignedInMessage(coordinatorLayout, accountName);
+        SkooziApplication.displaySignInAck(coordinatorLayout);
     }
 
     @CallSuper

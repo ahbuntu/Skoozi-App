@@ -51,6 +51,4 @@
     <string name="snackbar_sign_in">Sign In</string>
     <string name="no_account_login_message">Please sign in to create content.</string>
     <string name="account_login_success_message">Signed in as %1$s</string>
-
-
 </resources>
