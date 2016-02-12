@@ -98,10 +98,11 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     }
 
     private void setupToolbar() {
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        final ActionBar ab = getSupportActionBar();
-//        if (ab != null) ab.setDisplayHomeAsUpEnabled(true);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        final ActionBar ab = getSupportActionBar();
+        if (ab != null) ab.setDisplayHomeAsUpEnabled(true);
+        toolbar.setTitle(SkooziApplication.getUserAccount().name);
     }
 
 }
