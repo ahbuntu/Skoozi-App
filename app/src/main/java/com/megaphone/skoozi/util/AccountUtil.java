@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -33,7 +32,7 @@ public class AccountUtil {
 
     public static void saveUserAccount(String accountName) {
         SharedPrefsUtil.getEditor()
-                .putString(SharedPrefsUtil.ACCOUNT_NAME_KEY, accountName).apply();
+                .putString(SharedPrefsUtil.KEY_ACCOUNT_NAME, accountName).apply();
         SkooziApplication.setUserAccount(accountName);
     }
     public static void pickUserAccount(Activity activity) {

@@ -40,7 +40,7 @@ public class SkooziApplication extends Application {
     public static Account getUserAccount() {
         if (userAccount == null) {
             setUserAccount(SharedPrefsUtil.getInstance()
-                    .getString(SharedPrefsUtil.ACCOUNT_NAME_KEY, null));
+                    .getString(SharedPrefsUtil.KEY_ACCOUNT_NAME, null));
         }
         return userAccount;
     }

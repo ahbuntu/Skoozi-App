@@ -64,12 +64,17 @@
             android:layout_marginTop="@dimen/default_margin"
             android:orientation="vertical">
 
+            <TextView
+                style="@style/SectionHeader"
+                android:paddingLeft="0dp"
+                android:text="@string/user_section_details" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:layout_marginBottom="@dimen/content_spacing"
-                android:layout_marginTop="@dimen/content_spacing">
-                
+                android:layout_height="wrap_content"
+                android:minHeight="72dp"
+                android:layout_marginBottom="@dimen/content_spacing">
+
                 <ImageButton
                     android:id="@+id/nickname_edit_done"
                     android:layout_width="32dp"
@@ -77,29 +82,49 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:background="?attr/selectableItemBackground"
-                    android:src="@drawable/ic_done" />
+                    android:src="@drawable/ic_done"
+                    android:visibility="invisible"
+                    tools:visibility="visible" />
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/nickname_edit_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/content_spacing"
                     android:layout_marginRight="@dimen/content_spacing"
-                    android:layout_toLeftOf="@id/nickname_edit_done">
+                    android:layout_toLeftOf="@id/nickname_edit_done"
+                    android:visibility="invisible"
+                    tools:visibility="visible">
 
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
                         android:hint="@string/user_nickname_hint" />
-                    <!--<TextView-->
-                    <!--android:id="@+id/user_nickname"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_centerVertical="true"-->
-                    <!--tools:text="ahmadul.hassan@gmail.com" />-->
                 </android.support.design.widget.TextInputLayout>
 
+                <TextView
+                    android:id="@+id/user_nickname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginBottom="@dimen/content_spacing"
+                    android:layout_marginRight="@dimen/content_spacing"
+                    android:text="@string/user_saved_display_name"
+                    android:visibility="invisible"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/nickname_edit_container"
+                    android:layout_alignParentBottom="true"
+                    tools:text="Signed in as ahmadul.hassan@gmail.com"/>
             </RelativeLayout>
+
+            <TextView
+                style="@style/SectionHeader"
+                android:paddingLeft="0dp"
+                android:text="@string/user_section_notifications" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
