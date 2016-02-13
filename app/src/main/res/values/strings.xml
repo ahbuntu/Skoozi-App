@@ -30,6 +30,7 @@
     <string name="reply_error_message">No response provided</string>
 
     <!-- User Account -->
+    <string name="user_nickname_hint">Enter a display name.</string>
     <string name="user_avatar_content_desc">User content description</string>
     <string name="user_home_area">Home Area</string>
     <string name="user_work_area">Work Area</string>
