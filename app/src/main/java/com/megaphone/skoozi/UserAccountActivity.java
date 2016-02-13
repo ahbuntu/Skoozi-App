@@ -1,50 +1,45 @@
 package com.megaphone.skoozi;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
 import com.megaphone.skoozi.base.BaseActivity;
-import com.megaphone.skoozi.model.Question;
-import com.megaphone.skoozi.thread.ThreadActivity;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
-import com.megaphone.skoozi.util.MapDecorator;
-import com.megaphone.skoozi.util.PermissionUtil;
-import com.megaphone.skoozi.util.SkooziQnAUtil;
+import com.megaphone.skoozi.util.SharedPrefsButler;
 
 public class UserAccountActivity extends BaseActivity implements OnMapReadyCallback {
     private static final String TAG = UserAccountActivity.class.getSimpleName();
 
     private Location selfLocation;
     private GoogleMap notificationMap;
+    private TextInputLayout nicknameEditContainer;
+    private ImageButton nicknameEditDone;
+    private TextView nickname;
+    private TextView userSignedAs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_account);
+
+        nicknameEditContainer = (TextInputLayout) findViewById(R.id.nickname_edit_container);
+        nicknameEditDone = (ImageButton) findViewById(R.id.nickname_edit_done);
+        nickname = (TextView) findViewById(R.id.user_nickname);
         setupToolbar();
+
+        userSignedAs = (TextView) findViewById(R.id.user_signed_as);
+        userSignedAs.setText(
+                getString(R.string.user_details_signed_in, SkooziApplication.getUserAccount().name));
+
     }
 
     @Override
@@ -102,7 +97,16 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         setSupportActionBar(toolbar);
         final ActionBar ab = getSupportActionBar();
         if (ab != null) ab.setDisplayHomeAsUpEnabled(true);
-        toolbar.setTitle(SkooziApplication.getUserAccount().name);
+        if (SharedPrefsButler.getUserNickname() == null) {
+            toolbar.setTitle("");
+            nicknameEditContainer.setVisibility(View.VISIBLE);
+            nicknameEditDone.setVisibility(View.VISIBLE);
+            nickname.setVisibility(View.GONE);
+        } else {
+            toolbar.setTitle(SharedPrefsButler.getUserNickname());
+            nicknameEditContainer.setVisibility(View.GONE);
+            nicknameEditDone.setVisibility(View.GONE);
+            nickname.setVisibility(View.VISIBLE);
+        }
     }
-
 }
