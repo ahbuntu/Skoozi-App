@@ -138,94 +138,119 @@
                 android:paddingLeft="0dp"
                 android:text="@string/user_section_notifications" />
 
-            <RelativeLayout
+            <android.support.v7.widget.CardView
+                style="@style/CardView.Base"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp"
                 android:layout_width="match_parent"
-                android:layout_height="56dp">
+                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/home_area_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_centerVertical="true"
-                    android:src="@mipmap/ic_place_black_24dp" />
-
-                <TextView
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/home_area_icon"
-                    android:layout_marginLeft="16dp"
-                    android:layout_toRightOf="@id/home_area_icon"
-                    android:text="@string/user_default_notify_area" />
+                    android:layout_height="56dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/home_area_icon"
-                    android:layout_marginLeft="16dp"
-                    android:layout_toRightOf="@id/home_area_icon"
-                    android:text="@string/user_home_area" />
+                    <ImageView
+                        android:id="@+id/home_area_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/ic_place_black_24dp" />
 
-                <ImageView
-                    android:id="@+id/home_area_collapse"
-                    style="@style/NotificationAreaSelectors"
-                    android:contentDescription="@string/notify_map_collapse_content_description"
-                    android:src="@drawable/ic_collapse_arrow"
-                    tools:visibility="visible" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@id/home_area_icon"
+                        android:layout_marginLeft="16dp"
+                        android:layout_toRightOf="@id/home_area_icon"
+                        android:text="@string/user_default_notify_area" />
 
-                <ImageView
-                    android:id="@+id/home_area_expand"
-                    style="@style/NotificationAreaSelectors"
-                    android:contentDescription="@string/notify_map_expand_content_description"
-                    android:src="@drawable/ic_expand_arrow"
-                    tools:visibility="visible" />
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/home_area_icon"
+                        android:layout_marginLeft="16dp"
+                        android:layout_toRightOf="@id/home_area_icon"
+                        android:text="@string/user_home_area" />
 
-            <View
-                style="@style/Divider"
-                android:layout_marginLeft="56dp" />
+                    <ImageView
+                        android:id="@+id/home_area_collapse"
+                        style="@style/NotificationAreaSelectors"
+                        android:contentDescription="@string/notify_map_collapse_content_description"
+                        android:src="@drawable/ic_collapse_arrow"
+                        tools:visibility="visible" />
 
-            <RelativeLayout
+                    <ImageView
+                        android:id="@+id/home_area_expand"
+                        style="@style/NotificationAreaSelectors"
+                        android:contentDescription="@string/notify_map_expand_content_description"
+                        android:src="@drawable/ic_expand_arrow"
+                        tools:visibility="visible" />
+
+                    <View
+                        style="@style/VerticalDivider"
+                        android:layout_toLeftOf="@id/home_area_collapse" />
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_centerVertical="true">
+                android:layout_height="@dimen/default_margin" />
 
-                <ImageView
-                    android:id="@+id/work_area_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_centerVertical="true"
-                    android:src="@mipmap/ic_place_black_24dp" />
+            <android.support.v7.widget.CardView
+                style="@style/CardView.Base"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <TextView
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/work_area_icon"
-                    android:layout_marginLeft="16dp"
-                    android:layout_toRightOf="@id/work_area_icon"
-                    android:text="@string/user_default_notify_area" />
+                    android:layout_height="56dp"
+                    android:layout_centerVertical="true">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/work_area_icon"
-                    android:layout_marginLeft="16dp"
-                    android:layout_toRightOf="@id/work_area_icon"
-                    android:text="@string/user_work_area" />
+                    <ImageView
+                        android:id="@+id/work_area_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/ic_place_black_24dp" />
 
-                <ImageView
-                    android:id="@+id/work_area_collapse"
-                    style="@style/NotificationAreaSelectors"
-                    android:contentDescription="@string/notify_map_collapse_content_description"
-                    android:src="@drawable/ic_collapse_arrow"
-                    tools:visibility="visible" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@id/work_area_icon"
+                        android:layout_marginLeft="16dp"
+                        android:layout_toRightOf="@id/work_area_icon"
+                        android:text="@string/user_default_notify_area" />
 
-                <ImageView
-                    android:id="@+id/work_area_expand"
-                    style="@style/NotificationAreaSelectors"
-                    android:contentDescription="@string/notify_map_expand_content_description"
-                    android:src="@drawable/ic_expand_arrow"
-                    tools:visibility="visible" />
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/work_area_icon"
+                        android:layout_marginLeft="16dp"
+                        android:layout_toRightOf="@id/work_area_icon"
+                        android:text="@string/user_work_area" />
+
+                    <ImageView
+                        android:id="@+id/work_area_collapse"
+                        style="@style/NotificationAreaSelectors"
+                        android:contentDescription="@string/notify_map_collapse_content_description"
+                        android:src="@drawable/ic_collapse_arrow"
+                        tools:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/work_area_expand"
+                        style="@style/NotificationAreaSelectors"
+                        android:contentDescription="@string/notify_map_expand_content_description"
+                        android:src="@drawable/ic_expand_arrow"
+                        tools:visibility="visible" />
+
+                    <View
+                        style="@style/VerticalDivider"
+                        android:layout_toLeftOf="@id/work_area_collapse" />
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

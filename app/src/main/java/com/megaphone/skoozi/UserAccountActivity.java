@@ -1,8 +1,11 @@
 package com.megaphone.skoozi;
 
+import android.accounts.AccountManager;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +33,21 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     private SignInButton signinButton;
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
+                if (resultCode == RESULT_OK) {
+                    displayEnterNicknameMessage();
+                } else if (resultCode == RESULT_CANCELED) {
+                    googleAccountNotSelected();
+                }
+                return;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_account);
@@ -43,12 +61,7 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
 
         setupToolbar();
 
-        if (SkooziApplication.getUserAccount() != null) {
-            userSignedAs.setText(
-                    getString(R.string.user_details_signed_in, SkooziApplication.getUserAccount().name));
-        } else {
-            userSignedAs.setText(R.string.user_sign_in_instruction);
-        }
+
     }
 
     @Override
@@ -108,11 +121,20 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         if (ab != null) ab.setDisplayHomeAsUpEnabled(true);
         if (SharedPrefsButler.getUserNickname() == null) {
             toolbar.setTitle("");
+            nicknameEditContainer.setVisibility(View.VISIBLE);
+            nicknameEditDone.setVisibility(View.VISIBLE);
+            nickname.setVisibility(View.GONE);
+            displayEnterNicknameMessage();
+        } else {
+            toolbar.setTitle(SharedPrefsButler.getUserNickname());
             nicknameEditContainer.setVisibility(View.GONE);
             nicknameEditDone.setVisibility(View.GONE);
-            nickname.setVisibility(View.GONE);
-            userSignedAs.setText(R.string.user_sign_in_instruction);
+            nickname.setVisibility(View.VISIBLE);
+            signinButton.setVisibility(View.GONE);
+        }
 
+        if (SkooziApplication.getUserAccount() == null) {
+            userSignedAs.setText(R.string.user_sign_in_instruction);
             signinButton.setVisibility(View.VISIBLE);
             signinButton.setSize(SignInButton.SIZE_STANDARD);
             signinButton.setOnClickListener(new View.OnClickListener() {
@@ -122,11 +144,13 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
                 }
             });
         } else {
-            toolbar.setTitle(SharedPrefsButler.getUserNickname());
-            nicknameEditContainer.setVisibility(View.GONE);
-            nicknameEditDone.setVisibility(View.GONE);
-            nickname.setVisibility(View.VISIBLE);
-            signinButton.setVisibility(View.GONE);
+            userSignedAs.setText(
+                    getString(R.string.user_details_signed_in, SkooziApplication.getUserAccount().name));
         }
+    }
+
+    private void displayEnterNicknameMessage(){
+        Snackbar.make(coordinatorLayout, R.string.snackbar_select_display_name_message, Snackbar.LENGTH_INDEFINITE)
+                .show();
     }
 }
