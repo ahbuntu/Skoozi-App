@@ -37,9 +37,10 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         setupToolbar();
 
         userSignedAs = (TextView) findViewById(R.id.user_signed_as);
-        userSignedAs.setText(
-                getString(R.string.user_details_signed_in, SkooziApplication.getUserAccount().name));
-
+        if (SkooziApplication.getUserAccount() != null) {
+            userSignedAs.setText(
+                    getString(R.string.user_details_signed_in, SkooziApplication.getUserAccount().name));
+        }
     }
 
     @Override

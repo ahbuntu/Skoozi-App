@@ -54,11 +54,12 @@ public class SkooziApplication extends Application {
     }
 
     public static void displaySignInAck(CoordinatorLayout coordinatorLayout) {
-        String accountName = getUserAccount().name;
-        if (TextUtils.isEmpty(accountName)) {
+        Account account = getUserAccount();
+        if (account == null) {
             Log.d(TAG, "displaySignInAck: user does not have a saved user account");
+            return;
         }
-        AccountUtil.displayAccountSignedInMessage(coordinatorLayout, accountName);
+        AccountUtil.displayAccountSignedInMessage(coordinatorLayout, account.name);
         signinAckDisplayed = true;
     }
 }
