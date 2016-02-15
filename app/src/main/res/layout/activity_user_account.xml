@@ -96,6 +96,7 @@
                     tools:visibility="visible">
 
                     <EditText
+                        android:id="@+id/user_nickname_edit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/user_nickname_hint" />

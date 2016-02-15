@@ -9,7 +9,11 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -31,6 +35,7 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     private TextView nickname;
     private TextView userSignedAs;
     private SignInButton signinButton;
+    private EditText nicknameEdit;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -56,6 +61,7 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         nicknameEditContainer = (TextInputLayout) findViewById(R.id.nickname_edit_container);
         nicknameEditDone = (ImageButton) findViewById(R.id.nickname_edit_done);
         nickname = (TextView) findViewById(R.id.user_nickname);
+        nicknameEdit = (EditText) findViewById(R.id.user_nickname_edit);
         userSignedAs = (TextView) findViewById(R.id.user_signed_as);
         signinButton = (SignInButton) findViewById(R.id.sign_in_button);
 
@@ -122,7 +128,32 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         if (SharedPrefsButler.getUserNickname() == null) {
             toolbar.setTitle("");
             nicknameEditContainer.setVisibility(View.VISIBLE);
-            nicknameEditDone.setVisibility(View.VISIBLE);
+            nicknameEdit.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (TextUtils.isEmpty(s.toString())) {
+                        nicknameEditDone.setVisibility(View.INVISIBLE);
+                    } else
+                        nicknameEditDone.setVisibility(View.VISIBLE );
+                }
+            });
+            nicknameEditDone.setVisibility(View.INVISIBLE);
+            nicknameEditDone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO: 2016-02-15 display an alert dialog to confirm this is the user name the user wants
+                }
+            });
             nickname.setVisibility(View.GONE);
             displayEnterNicknameMessage();
         } else {
