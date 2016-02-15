@@ -1,7 +1,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/new_question_coordinator_layout"
+    android:id="@+id/user_account_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/default_margin"
             android:layout_marginRight="@dimen/default_margin"
-            android:layout_marginTop="@dimen/default_margin"
+            android:layout_marginTop="@dimen/content_spacing"
             android:orientation="vertical">
 
             <TextView
@@ -72,7 +72,6 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="72dp"
                 android:layout_marginBottom="@dimen/content_spacing">
 
                 <ImageButton
@@ -118,8 +117,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/nickname_edit_container"
+                    tools:text="Signed in as ahmadul.hassan@gmail.com" />
+
+                <com.google.android.gms.common.SignInButton
+                    android:id="@+id/sign_in_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_alignParentBottom="true"
-                    tools:text="Signed in as ahmadul.hassan@gmail.com"/>
+                    android:layout_below="@id/user_signed_as"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/default_margin"
+                    android:text="@string/common_signin_button_text_long"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
             </RelativeLayout>
 
             <TextView
@@ -129,7 +140,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="72dp">
+                android:layout_height="56dp">
 
                 <ImageView
                     android:id="@+id/home_area_icon"
@@ -175,7 +186,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="72dp"
+                android:layout_height="56dp"
                 android:layout_centerVertical="true">
 
                 <ImageView

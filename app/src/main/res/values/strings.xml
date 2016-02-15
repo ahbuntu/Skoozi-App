@@ -41,6 +41,8 @@
     <string name="user_section_notifications">Notifications</string>
     <string name="user_saved_display_name">Display Name: %s</string>
     <string name="user_details_signed_in">Signed in as %s</string>
+    <string name="user_sign_in_instruction">You are not signed in. \nSigning in will allow you to create content. </string>
+    <string name="user_sign_in_button">Sign In with Google</string>
 
     <!--Instructions-->
     <string name="new_question_hint">Ask a question</string>
