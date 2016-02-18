@@ -10,6 +10,10 @@
         <item> 25 KM </item>
     </string-array>
 
+    <!-- Buttons -->
+    <string name="button_ok">Ok</string>
+    <string name="button_cancel">Cancel</string>
+
     <!-- menu items -->
     <string name="action_home">Home</string>
     <string name="action_add_q">New Question</string>
@@ -43,6 +47,8 @@
     <string name="user_details_signed_in">Signed in as %s</string>
     <string name="user_sign_in_instruction">You are not signed in. \nSigning in will allow you to create content. </string>
     <string name="user_sign_in_button">Sign In with Google</string>
+    <string name="user_dialog_message">Once you set your display name, it cannot be changed.\n Are you sure you want to proceed?</string>
+    <string name="user_dialog_title">Confirm Display Name</string>
 
     <!--Instructions-->
     <string name="new_question_hint">Ask a question</string>

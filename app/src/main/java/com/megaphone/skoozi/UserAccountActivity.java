@@ -1,6 +1,7 @@
 package com.megaphone.skoozi;
 
 import android.accounts.AccountManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -147,7 +149,24 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
             nicknameEditDone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: 2016-02-15 display an alert dialog to confirm this is the user name the user wants
+                    AlertDialog.Builder builder = new AlertDialog.Builder(UserAccountActivity.this);
+
+                    builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // TODO: 2016-02-17 need to handle this
+                        }
+                    });
+                    builder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    builder.setMessage(R.string.user_dialog_message)
+                            .setTitle(R.string.user_dialog_title);
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
             });
             nickname.setVisibility(View.GONE);
