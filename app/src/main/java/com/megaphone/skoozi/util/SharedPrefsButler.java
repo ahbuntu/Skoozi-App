@@ -6,8 +6,8 @@ public class SharedPrefsButler {
         return SharedPrefsUtil.getInstance().getString(SharedPrefsUtil.KEY_USER_NICKNAME, null);
     }
 
-    public void putFutureUserNickname(String userNickname) {
+    public static void putFutureUserNickname(String userNickname) {
         SharedPrefsUtil.getEditor()
-                .putString(SharedPrefsUtil.KEY_ACCOUNT_NAME, userNickname).apply();
+                .putString(SharedPrefsUtil.KEY_USER_NICKNAME, userNickname).apply();
     }
 }

@@ -68,8 +68,8 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         signinButton = (SignInButton) findViewById(R.id.sign_in_button);
 
         setupToolbar();
-
-
+        setupSignedAs();
+        refreshNickname();
     }
 
     @Override
@@ -127,58 +127,10 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         setSupportActionBar(toolbar);
         final ActionBar ab = getSupportActionBar();
         if (ab != null) ab.setDisplayHomeAsUpEnabled(true);
-        if (SharedPrefsButler.getUserNickname() == null) {
-            toolbar.setTitle("");
-            nicknameEditContainer.setVisibility(View.VISIBLE);
-            nicknameEdit.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+        toolbar.setTitle(SharedPrefsButler.getUserNickname() == null ? "" : SharedPrefsButler.getUserNickname());
+    }
 
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (TextUtils.isEmpty(s.toString())) {
-                        nicknameEditDone.setVisibility(View.INVISIBLE);
-                    } else
-                        nicknameEditDone.setVisibility(View.VISIBLE );
-                }
-            });
-            nicknameEditDone.setVisibility(View.INVISIBLE);
-            nicknameEditDone.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(UserAccountActivity.this);
-
-                    builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // TODO: 2016-02-17 need to handle this
-                        }
-                    });
-                    builder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    builder.setMessage(R.string.user_dialog_message)
-                            .setTitle(R.string.user_dialog_title);
-
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-            });
-            nickname.setVisibility(View.GONE);
-            displayEnterNicknameMessage();
-        } else {
-            toolbar.setTitle(SharedPrefsButler.getUserNickname());
-            nicknameEditContainer.setVisibility(View.GONE);
-            nicknameEditDone.setVisibility(View.GONE);
-            nickname.setVisibility(View.VISIBLE);
-            signinButton.setVisibility(View.GONE);
-        }
-
+    private void setupSignedAs() {
         if (SkooziApplication.getUserAccount() == null) {
             userSignedAs.setText(R.string.user_sign_in_instruction);
             signinButton.setVisibility(View.VISIBLE);
@@ -193,6 +145,72 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
             userSignedAs.setText(
                     getString(R.string.user_details_signed_in, SkooziApplication.getUserAccount().name));
         }
+    }
+
+    private void refreshNickname() {
+        if (SharedPrefsButler.getUserNickname() == null) {
+            nicknameEditContainer.setVisibility(View.VISIBLE);
+            setupNicknameEdit(true);
+            nickname.setVisibility(View.GONE);
+            displayEnterNicknameMessage();
+        } else {
+            nicknameEditContainer.setVisibility(View.GONE);
+            nicknameEditDone.setVisibility(View.GONE);
+            nickname.setVisibility(View.VISIBLE);
+            signinButton.setVisibility(View.GONE);
+        }
+    }
+
+    private void setupNicknameEdit(boolean enableEdit) {
+        if (enableEdit) {
+            nicknameEdit.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (TextUtils.isEmpty(s.toString())) {
+                        nicknameEditDone.setVisibility(View.INVISIBLE);
+                    } else
+                        nicknameEditDone.setVisibility(View.VISIBLE);
+                }
+            });
+            nicknameEditDone.setVisibility(View.INVISIBLE);
+            setupNicknameEditButton();
+        }
+    }
+
+    private void setupNicknameEditButton() {
+        nicknameEditDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(UserAccountActivity.this);
+
+                builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        SharedPrefsButler.putFutureUserNickname(nicknameEdit.getText().toString());
+                        refreshNickname();
+                        // TODO: 2016-02-18 need to dismiss snackbar 
+                    }
+                });
+                builder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+
+                builder.setMessage(R.string.user_dialog_message)
+                        .setTitle(R.string.user_dialog_title);
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     private void displayEnterNicknameMessage(){
