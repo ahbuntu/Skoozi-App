@@ -154,9 +154,10 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
             nickname.setVisibility(View.GONE);
             displayEnterNicknameMessage();
         } else {
-            nicknameEditContainer.setVisibility(View.GONE);
+            nicknameEditContainer.setVisibility(View.INVISIBLE);
             nicknameEditDone.setVisibility(View.GONE);
             nickname.setVisibility(View.VISIBLE);
+            nickname.setText(getString(R.string.user_saved_display_name, SharedPrefsButler.getUserNickname()));
             signinButton.setVisibility(View.GONE);
         }
     }
@@ -195,7 +196,7 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
                     public void onClick(DialogInterface dialog, int id) {
                         SharedPrefsButler.putFutureUserNickname(nicknameEdit.getText().toString());
                         refreshNickname();
-                        // TODO: 2016-02-18 need to dismiss snackbar 
+                        // TODO: 2016-02-18 need to dismiss snackbar
                     }
                 });
                 builder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
