@@ -17,7 +17,7 @@
     <!-- menu items -->
     <string name="action_home">Home</string>
     <string name="action_add_q">New Question</string>
-    <string name="action_my_activity">My Activity</string>
+    <string name="action_user_profile">User Profile</string>
 
     <!-- New question -->
     <string name="new_question_map_heading">Currently @</string>

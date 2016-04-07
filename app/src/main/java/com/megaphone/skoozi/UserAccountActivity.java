@@ -1,6 +1,5 @@
 package com.megaphone.skoozi;
 
-import android.accounts.AccountManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
@@ -14,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -38,17 +39,11 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     private TextView userSignedAs;
     private SignInButton signinButton;
     private EditText nicknameEdit;
+    private Snackbar snackbar;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case AccountUtil.REQUEST_CODE_PICK_ACCOUNT:
-                if (resultCode == RESULT_OK) {
-                    displayEnterNicknameMessage();
-                } else if (resultCode == RESULT_CANCELED) {
-                    googleAccountNotSelected();
-                }
-                return;
             default:
                 super.onActivityResult(requestCode, resultCode, data);
         }
@@ -68,8 +63,18 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         signinButton = (SignInButton) findViewById(R.id.sign_in_button);
 
         setupToolbar();
-        setupSignedAs();
+        refreshSignedAs();
         refreshNickname();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem userItem = menu.findItem(R.id.action_user_profile);
+        if (userItem != null) {
+            userItem.setVisible(false);
+            userItem.setEnabled(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -130,7 +135,7 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         toolbar.setTitle(SharedPrefsButler.getUserNickname() == null ? "" : SharedPrefsButler.getUserNickname());
     }
 
-    private void setupSignedAs() {
+    private void refreshSignedAs() {
         if (SkooziApplication.getUserAccount() == null) {
             userSignedAs.setText(R.string.user_sign_in_instruction);
             signinButton.setVisibility(View.VISIBLE);
@@ -154,11 +159,10 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
             nickname.setVisibility(View.GONE);
             displayEnterNicknameMessage();
         } else {
-            nicknameEditContainer.setVisibility(View.INVISIBLE);
+            nicknameEditContainer.setVisibility(View.GONE);
             nicknameEditDone.setVisibility(View.GONE);
             nickname.setVisibility(View.VISIBLE);
             nickname.setText(getString(R.string.user_saved_display_name, SharedPrefsButler.getUserNickname()));
-            signinButton.setVisibility(View.GONE);
         }
     }
 
@@ -196,7 +200,7 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
                     public void onClick(DialogInterface dialog, int id) {
                         SharedPrefsButler.putFutureUserNickname(nicknameEdit.getText().toString());
                         refreshNickname();
-                        // TODO: 2016-02-18 need to dismiss snackbar
+                        snackbar.dismiss();
                     }
                 });
                 builder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
@@ -215,7 +219,15 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     }
 
     private void displayEnterNicknameMessage(){
-        Snackbar.make(coordinatorLayout, R.string.snackbar_select_display_name_message, Snackbar.LENGTH_INDEFINITE)
-                .show();
+        snackbar =  Snackbar.make(coordinatorLayout, R.string.snackbar_select_display_name_message, Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
+    }
+
+    private void displaySignInMessage(){
+        if (snackbar.isShownOrQueued()) return;
+
+        snackbar =  Snackbar.make(coordinatorLayout, getString(R.string.user_details_signed_in, SkooziApplication.getUserAccount().name),
+                Snackbar.LENGTH_SHORT);
+        snackbar.show();
     }
 }

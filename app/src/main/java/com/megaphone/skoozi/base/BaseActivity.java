@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -23,7 +22,7 @@ import com.megaphone.skoozi.util.GoogleApiClientBroker;
 abstract public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
     private GoogleApiClientBroker googleApiBroker;
-    private GoogleApiClient googleApiClient;
+    private GoogleApiClient   googleApiClient;
 
     protected CoordinatorLayout coordinatorLayout;
 
@@ -91,8 +90,8 @@ abstract public class BaseActivity extends AppCompatActivity {
         if (id == android.R.id.home) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
-        } else if (id == R.id.action_my_activity) {
-            Toast.makeText(this, "my activity", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.action_user_profile) {
             startActivity(new Intent(this, UserAccountActivity.class));
             return true;
         }
