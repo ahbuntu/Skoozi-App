@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -13,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +27,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.megaphone.skoozi.base.BaseActivity;
+import com.megaphone.skoozi.user.UserMapAreaDialog;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
 import com.megaphone.skoozi.util.SharedPrefsButler;
@@ -65,6 +69,37 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         setupToolbar();
         refreshSignedAs();
         refreshNickname();
+
+//        // The View with the BottomSheetBehavior
+//        View bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
+//        final BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+//        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+//            @Override
+//            public void onStateChanged(View bottomSheet, int newState) {
+//                // React to state change
+//                Log.e("onStateChanged", "onStateChanged:" + newState);
+////                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+////                    fab.setVisibility(View.GONE);
+////                } else {
+////                    fab.setVisibility(View.VISIBLE);
+////                }
+//            }
+//
+//            @Override
+//            public void onSlide(View bottomSheet, float slideOffset) {
+//                // React to dragging events
+//                Log.e("onSlide", "onSlide");
+//            }
+//        });
+//
+//        behavior.setPeekHeight(100);
+
+        coordinatorLayout.findViewById(R.id.work_area_expand).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayMapAreaDialog();
+            }
+        });
     }
 
     @Override
@@ -216,6 +251,11 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
                 dialog.show();
             }
         });
+    }
+
+    private void displayMapAreaDialog() {
+        BottomSheetDialogFragment bottomSheetDialogFragment = new UserMapAreaDialog();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     private void displayEnterNicknameMessage(){

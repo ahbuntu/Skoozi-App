@@ -250,6 +250,7 @@
                         style="@style/NotificationAreaSelectors"
                         android:contentDescription="@string/notify_map_expand_content_description"
                         android:src="@drawable/ic_expand_arrow"
+                        android:visibility="visible"
                         tools:visibility="visible" />
 
                     <View
@@ -260,4 +261,14 @@
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+    <!--<FrameLayout-->
+        <!--android:id="@+id/bottom_sheet"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:behavior_hideable="true"-->
+        <!--app:layout_behavior="android.support.design.widget.BottomSheetBehavior">-->
+
+        <!--<include layout="@layout/user_fragment_map_area"/>-->
+    <!--</FrameLayout>-->
+
 </android.support.design.widget.CoordinatorLayout>

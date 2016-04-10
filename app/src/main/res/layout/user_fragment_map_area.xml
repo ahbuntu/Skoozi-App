@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/user_area_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Home Area"/>
+
+    <fragment android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/user_area_map"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/map_height"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/user_area_postal"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="@string/user_area_postal"/>
+
+        <ImageButton
+            android:id="@+id/area_done"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/ic_done"/>
+    </LinearLayout>
+
+</LinearLayout>

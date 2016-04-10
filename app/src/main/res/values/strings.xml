@@ -49,6 +49,7 @@
     <string name="user_sign_in_button">Sign In with Google</string>
     <string name="user_dialog_message">Once you set your display name, it cannot be changed.\nAre you sure you want to proceed?</string>
     <string name="user_dialog_title">Confirm Display Name</string>
+    <string name="user_area_postal">Enter a postal code</string>
 
     <!--Instructions-->
     <string name="new_question_hint">Ask a question</string>
