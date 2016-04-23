@@ -5,8 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
 import android.view.View;
 
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.megaphone.skoozi.R;
 
 public class UserMapAreaDialog extends BottomSheetDialogFragment {
@@ -29,6 +34,11 @@ public class UserMapAreaDialog extends BottomSheetDialogFragment {
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.user_fragment_map_area, null);
+//        SupportMapFragment mapFragment = new SupportMapFragment();
+        GoogleMapFragment mapFragment = new GoogleMapFragment();
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.user_area_map_container, mapFragment, "test").commit();
+
         dialog.setContentView(contentView);
         CoordinatorLayout.LayoutParams layoutParams =
                 (CoordinatorLayout.LayoutParams) ((View) contentView.getParent()).getLayoutParams();

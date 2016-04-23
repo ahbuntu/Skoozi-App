@@ -12,10 +12,15 @@
         android:layout_height="wrap_content"
         tools:text="Home Area"/>
 
-    <fragment android:name="com.google.android.gms.maps.MapFragment"
-        android:id="@+id/user_area_map"
+    <FrameLayout
+        android:id="@+id/user_area_map_container"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/map_height"/>
+        android:layout_height="250dp"/>
+
+    <!--<fragment android:name="com.google.android.gms.maps.MapFragment"-->
+        <!--android:id="@+id/user_area_map"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="@dimen/map_height"/>-->
 
     <LinearLayout
         android:layout_width="match_parent"

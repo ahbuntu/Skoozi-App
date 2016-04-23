@@ -59,6 +59,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/content_spacing"
             android:layout_marginLeft="@dimen/default_margin"
             android:layout_marginRight="@dimen/default_margin"
             android:layout_marginTop="@dimen/content_spacing"
@@ -122,9 +123,9 @@
                     android:id="@+id/sign_in_button"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/default_margin"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
+                    android:layout_marginTop="@dimen/default_margin"
                     android:text="@string/common_signin_button_text_long"
                     android:visibility="gone"
                     tools:visibility="visible" />
@@ -133,12 +134,11 @@
                     android:id="@+id/user_signed_as"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toLeftOf="@id/sign_in_button"
                     android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/sign_in_button"
                     android:paddingRight="@dimen/content_spacing"
                     tools:text="Signed in as ahmadul.hassan@gmail.com" />
             </RelativeLayout>
-
 
             <TextView
                 style="@style/SectionHeader"
@@ -152,51 +152,63 @@
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp">
 
-                <RelativeLayout
+                <LinearLayout
+                    android:id="@+id/home_area"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/home_area_icon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_centerVertical="true"
-                        android:src="@mipmap/ic_place_black_24dp" />
-
-                    <TextView
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignTop="@id/home_area_icon"
-                        android:layout_marginLeft="16dp"
-                        android:layout_toRightOf="@id/home_area_icon"
-                        android:text="@string/user_default_notify_area" />
+                        android:layout_height="56dp">
 
-                    <TextView
+                        <ImageView
+                            android:id="@+id/home_area_icon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerVertical="true"
+                            android:src="@mipmap/ic_place_black_24dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@id/home_area_icon"
+                            android:layout_marginLeft="16dp"
+                            android:layout_toRightOf="@id/home_area_icon"
+                            android:text="@string/user_default_notify_area" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBottom="@id/home_area_icon"
+                            android:layout_marginLeft="16dp"
+                            android:layout_toRightOf="@id/home_area_icon"
+                            android:text="@string/user_home_area" />
+
+                        <ImageView
+                            android:id="@+id/home_area_action"
+                            style="@style/NotificationAreaSelectors"
+                            android:contentDescription="@string/notify_map_collapse_content_description"
+                            android:src="@drawable/ic_collapse_arrow" />
+
+                        <View
+                            style="@style/VerticalDivider"
+                            android:layout_toLeftOf="@id/home_area_action" />
+
+                    </RelativeLayout>
+
+                    <FrameLayout
+                        android:id="@+id/home_area_map_container"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignBottom="@id/home_area_icon"
-                        android:layout_marginLeft="16dp"
-                        android:layout_toRightOf="@id/home_area_icon"
-                        android:text="@string/user_home_area" />
+                        android:layout_height="wrap_content">
 
-                    <ImageView
-                        android:id="@+id/home_area_collapse"
-                        style="@style/NotificationAreaSelectors"
-                        android:contentDescription="@string/notify_map_collapse_content_description"
-                        android:src="@drawable/ic_collapse_arrow"
-                        tools:visibility="visible" />
-
-                    <ImageView
-                        android:id="@+id/home_area_expand"
-                        style="@style/NotificationAreaSelectors"
-                        android:contentDescription="@string/notify_map_expand_content_description"
-                        android:src="@drawable/ic_expand_arrow"
-                        tools:visibility="visible" />
-
-                    <View
-                        style="@style/VerticalDivider"
-                        android:layout_toLeftOf="@id/home_area_collapse" />
-                </RelativeLayout>
+                        <fragment
+                            android:id="@+id/user_area_home_map"
+                            android:name="com.google.android.gms.maps.MapFragment"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/map_height" />
+                    </FrameLayout>
+                </LinearLayout>
             </android.support.v7.widget.CardView>
 
             <Space
@@ -210,65 +222,74 @@
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp">
 
-                <RelativeLayout
+                <LinearLayout
+                    android:id="@+id/work_area"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_centerVertical="true">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/work_area_icon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_centerVertical="true"
-                        android:src="@mipmap/ic_place_black_24dp" />
-
-                    <TextView
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignTop="@id/work_area_icon"
-                        android:layout_marginLeft="16dp"
-                        android:layout_toRightOf="@id/work_area_icon"
-                        android:text="@string/user_default_notify_area" />
+                        android:layout_height="56dp">
 
-                    <TextView
+                        <ImageView
+                            android:id="@+id/work_area_icon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerVertical="true"
+                            android:src="@mipmap/ic_place_black_24dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@id/work_area_icon"
+                            android:layout_marginLeft="16dp"
+                            android:layout_toRightOf="@id/work_area_icon"
+                            android:text="@string/user_default_notify_area" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBottom="@id/work_area_icon"
+                            android:layout_marginLeft="16dp"
+                            android:layout_toRightOf="@id/work_area_icon"
+                            android:text="@string/user_work_area" />
+
+                        <ImageView
+                            android:id="@+id/work_area_action"
+                            style="@style/NotificationAreaSelectors"
+                            android:contentDescription="@string/notify_map_collapse_content_description"
+                            android:src="@drawable/ic_collapse_arrow" />
+
+                        <View
+                            style="@style/VerticalDivider"
+                            android:layout_toLeftOf="@id/work_area_action" />
+                    </RelativeLayout>
+
+                    <FrameLayout
+                        android:id="@+id/work_area_map_container"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignBottom="@id/work_area_icon"
-                        android:layout_marginLeft="16dp"
-                        android:layout_toRightOf="@id/work_area_icon"
-                        android:text="@string/user_work_area" />
+                        android:layout_height="wrap_content">
 
-                    <ImageView
-                        android:id="@+id/work_area_collapse"
-                        style="@style/NotificationAreaSelectors"
-                        android:contentDescription="@string/notify_map_collapse_content_description"
-                        android:src="@drawable/ic_collapse_arrow"
-                        tools:visibility="visible" />
-
-                    <ImageView
-                        android:id="@+id/work_area_expand"
-                        style="@style/NotificationAreaSelectors"
-                        android:contentDescription="@string/notify_map_expand_content_description"
-                        android:src="@drawable/ic_expand_arrow"
-                        android:visibility="visible"
-                        tools:visibility="visible" />
-
-                    <View
-                        style="@style/VerticalDivider"
-                        android:layout_toLeftOf="@id/work_area_collapse" />
-                </RelativeLayout>
+                        <fragment
+                            android:id="@+id/user_area_work_map"
+                            android:name="com.google.android.gms.maps.MapFragment"
+                            android:layout_width="match_parent"
+                            android:layout_height="250dp" />
+                    </FrameLayout>
+                </LinearLayout>
             </android.support.v7.widget.CardView>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
     <!--<FrameLayout-->
-        <!--android:id="@+id/bottom_sheet"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:behavior_hideable="true"-->
-        <!--app:layout_behavior="android.support.design.widget.BottomSheetBehavior">-->
+    <!--android:id="@+id/bottom_sheet"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--app:behavior_hideable="true"-->
+    <!--app:layout_behavior="android.support.design.widget.BottomSheetBehavior">-->
 
-        <!--<include layout="@layout/user_fragment_map_area"/>-->
+    <!--<include layout="@layout/user_fragment_map_area"/>-->
     <!--</FrameLayout>-->
 
 </android.support.design.widget.CoordinatorLayout>

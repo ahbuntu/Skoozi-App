@@ -2,6 +2,7 @@ package com.megaphone.skoozi;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
@@ -9,9 +10,12 @@ import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.test.suitebuilder.annotation.Suppress;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -20,12 +24,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.api.client.util.NullValue;
 import com.megaphone.skoozi.base.BaseActivity;
 import com.megaphone.skoozi.user.UserMapAreaDialog;
 import com.megaphone.skoozi.util.AccountUtil;
@@ -43,6 +51,12 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     private TextView userSignedAs;
     private SignInButton signinButton;
     private EditText nicknameEdit;
+    private ImageView homeAreaAction;
+    private ImageView workAreaAction;
+    private MapFragment homeAreaMap;
+    private MapFragment workAreaMap;
+    private FrameLayout homeAreaMapContainer;
+    private FrameLayout workAreaMapContainer;
     private Snackbar snackbar;
 
     @Override
@@ -65,10 +79,17 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         nicknameEdit = (EditText) findViewById(R.id.user_nickname_edit);
         userSignedAs = (TextView) findViewById(R.id.user_signed_as);
         signinButton = (SignInButton) findViewById(R.id.sign_in_button);
+        homeAreaAction = (ImageView) findViewById(R.id.home_area_action);
+        workAreaAction = (ImageView) findViewById(R.id.work_area_action);
+        homeAreaMap = (MapFragment) getFragmentManager().findFragmentById(R.id.user_area_home_map);
+        workAreaMap = (MapFragment) getFragmentManager().findFragmentById(R.id.user_area_work_map);
+        homeAreaMapContainer = (FrameLayout) findViewById(R.id.home_area_map_container);
+        workAreaMapContainer = (FrameLayout) findViewById(R.id.work_area_map_container);
 
         setupToolbar();
         refreshSignedAs();
         refreshNickname();
+        setupHomeAndWorkAreas();
 
 //        // The View with the BottomSheetBehavior
 //        View bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
@@ -93,13 +114,6 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
 //        });
 //
 //        behavior.setPeekHeight(100);
-
-        coordinatorLayout.findViewById(R.id.work_area_expand).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                displayMapAreaDialog();
-            }
-        });
     }
 
     @Override
@@ -122,7 +136,7 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
     }
 
@@ -253,21 +267,85 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         });
     }
 
-    private void displayMapAreaDialog() {
-        BottomSheetDialogFragment bottomSheetDialogFragment = new UserMapAreaDialog();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    private void setupHomeAndWorkAreas() {
+        boolean hasHomeArea = SharedPrefsButler.getHomeArea() != null;
+        homeAreaAction.setImageResource(hasHomeArea ? R.drawable.ic_collapse_arrow : R.drawable.ic_expand_arrow);
+        homeAreaMapContainer.setVisibility(hasHomeArea ? View.VISIBLE : View.GONE);
+
+        findViewById(R.id.home_area).setOnClickListener(getHomeAreaClickListener());
+
+        boolean hasWorkArea = SharedPrefsButler.getWorkArea() != null;
+        workAreaAction.setImageResource(hasWorkArea ? R.drawable.ic_collapse_arrow : R.drawable.ic_expand_arrow);
+        workAreaMapContainer.setVisibility(hasWorkArea ? View.VISIBLE : View.GONE);
+
+        findViewById(R.id.work_area).setOnClickListener(getWorkAreaClickListener());
     }
 
-    private void displayEnterNicknameMessage(){
-        snackbar =  Snackbar.make(coordinatorLayout, R.string.snackbar_select_display_name_message, Snackbar.LENGTH_INDEFINITE);
+    private View.OnClickListener getHomeAreaClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // toggle the visibility of the container
+                if (homeAreaMapContainer.getVisibility() == View.VISIBLE) {
+                    homeAreaMapContainer.setVisibility(View.GONE);
+                } else {
+                    homeAreaMapContainer.setVisibility(View.VISIBLE);
+                }
+
+                // this code block MUST be after the previous one
+                final boolean mapIsVisible = homeAreaMapContainer.getVisibility() == View.VISIBLE;
+                if (mapIsVisible){
+                    homeAreaAction.setImageResource(R.drawable.ic_collapse_arrow);
+                } else {
+                    homeAreaAction.setImageResource(R.drawable.ic_expand_arrow);
+                }
+            }
+        };
+    }
+
+    private View.OnClickListener getWorkAreaClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // toggle the visibility of the container
+                if (workAreaMapContainer.getVisibility() == View.VISIBLE) {
+                    workAreaMapContainer.setVisibility(View.GONE);
+                } else {
+                    workAreaMapContainer.setVisibility(View.VISIBLE);
+                }
+
+                // this code block MUST be after the previous one
+                final boolean mapIsVisible = workAreaMapContainer.getVisibility() == View.VISIBLE;
+                if (mapIsVisible){
+                    workAreaAction.setImageResource(R.drawable.ic_collapse_arrow);
+                } else {
+                    workAreaAction.setImageResource(R.drawable.ic_expand_arrow);
+                }
+            }
+        };
+    }
+
+    private void displayEnterNicknameMessage() {
+        snackbar = Snackbar.make(coordinatorLayout, R.string.snackbar_select_display_name_message, Snackbar.LENGTH_INDEFINITE);
         snackbar.show();
     }
 
-    private void displaySignInMessage(){
+    private void displaySignInMessage() {
         if (snackbar.isShownOrQueued()) return;
 
-        snackbar =  Snackbar.make(coordinatorLayout, getString(R.string.user_details_signed_in, SkooziApplication.getUserAccount().name),
+        snackbar = Snackbar.make(coordinatorLayout, getString(R.string.user_details_signed_in, SkooziApplication.getUserAccount().name),
                 Snackbar.LENGTH_SHORT);
         snackbar.show();
+    }
+
+    // TODO: 2016-04-23 Implement the home and work areas as bottom sheet dialogs
+    private void displayMapAreaDialog() {
+        // http://stackoverflow.com/questions/18206615/how-to-use-google-map-v2-inside-fragment
+        BottomSheetDialogFragment bottomSheetDialogFragment = new UserMapAreaDialog();
+//        FragmentTransaction transaction = getSupportFragmentManager()
+//                .beginTransaction()
+//                .replace(R.id.coordinator_layout, bottomSheetDialogFragment, "test");
+//        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), "test");
     }
 }

@@ -8,6 +8,10 @@ import com.megaphone.skoozi.SkooziApplication;
 public class SharedPrefsUtil {
     public static final String KEY_ACCOUNT_NAME = "skoozi.KEY_ACCOUNT_NAME";
     public static final String KEY_USER_NICKNAME = "skoozi.KEY_USER_NICKNAME";
+    public static final String KEY_HOME_AREA_LAT = "skoozi.KEY_HOME_AREA_LAT";
+    public static final String KEY_HOME_AREA_LNG = "skoozi.KEY_HOME_AREA_LNG";
+    public static final String KEY_WORK_AREA_LAT = "skoozi.KEY_WORK_AREA_LAT";
+    public static final String KEY_WORK_AREA_LNG = "skoozi.KEY_WORK_AREA_LNG";
 
     private static final String SKOOZI_SETTINGS = "skoozi_settings";
 
