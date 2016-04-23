@@ -16,12 +16,14 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -285,19 +287,17 @@ public class UserAccountActivity extends BaseActivity {
 
     private void setupHomeAndWorkAreas() {
         boolean hasHomeArea = SharedPrefsButler.getHomeCoords() != null;
-        homeAreaAction.setImageResource(hasHomeArea ? R.drawable.ic_collapse_arrow : R.drawable.ic_expand_arrow);
         homeAreaMapContainer.setVisibility(hasHomeArea ? View.VISIBLE : View.GONE);
-
-        findViewById(R.id.home_area).setOnClickListener(getHomeAreaClickListener());
+        setupAreaConfirmation(hasHomeArea, homeAreaMapContainer.getVisibility() == View.VISIBLE, homeAreaAction);
+        findViewById(R.id.home_area).setOnClickListener(getHomeAreaClickListener(hasHomeArea));
 
         boolean hasWorkArea = SharedPrefsButler.getWorkCoords() != null;
-        workAreaAction.setImageResource(hasWorkArea ? R.drawable.ic_collapse_arrow : R.drawable.ic_expand_arrow);
         workAreaMapContainer.setVisibility(hasWorkArea ? View.VISIBLE : View.GONE);
-
-        findViewById(R.id.work_area).setOnClickListener(getWorkAreaClickListener());
+        setupAreaConfirmation(hasWorkArea, workAreaMapContainer.getVisibility() == View.VISIBLE, workAreaAction);
+        findViewById(R.id.work_area).setOnClickListener(getWorkAreaClickListener(hasWorkArea));
     }
 
-    private View.OnClickListener getHomeAreaClickListener() {
+    private View.OnClickListener getHomeAreaClickListener(final boolean hasHomeArea) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -308,18 +308,13 @@ public class UserAccountActivity extends BaseActivity {
                     homeAreaMapContainer.setVisibility(View.VISIBLE);
                 }
 
-                // this code block MUST be after the previous one
-                final boolean mapIsVisible = homeAreaMapContainer.getVisibility() == View.VISIBLE;
-                if (mapIsVisible){
-                    homeAreaAction.setImageResource(R.drawable.ic_collapse_arrow);
-                } else {
-                    homeAreaAction.setImageResource(R.drawable.ic_expand_arrow);
-                }
+                setupAreaConfirmation(hasHomeArea, homeAreaMapContainer.getVisibility() == View.VISIBLE,
+                        homeAreaAction);
             }
         };
     }
 
-    private View.OnClickListener getWorkAreaClickListener() {
+    private View.OnClickListener getWorkAreaClickListener(final boolean hasWorkArea) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -329,16 +324,33 @@ public class UserAccountActivity extends BaseActivity {
                 } else {
                     workAreaMapContainer.setVisibility(View.VISIBLE);
                 }
-
-                // this code block MUST be after the previous one
-                final boolean mapIsVisible = workAreaMapContainer.getVisibility() == View.VISIBLE;
-                if (mapIsVisible){
-                    workAreaAction.setImageResource(R.drawable.ic_collapse_arrow);
-                } else {
-                    workAreaAction.setImageResource(R.drawable.ic_expand_arrow);
-                }
+                setupAreaConfirmation(hasWorkArea, workAreaMapContainer.getVisibility() == View.VISIBLE,
+                        workAreaAction);
             }
         };
+    }
+
+    private void setupAreaConfirmation(final boolean isAreaSaved, final boolean isMapVisible,
+                                       final ImageView areaConfirm) {
+        if (!isAreaSaved && isMapVisible) {
+            areaConfirm.setVisibility(View.VISIBLE);
+            areaConfirm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (v.getId() == R.id.home_area_action) {
+                        SharedPrefsButler.putFutureHomeCoords(new LatLng
+                                (selfLocation.getLatitude(), selfLocation.getLongitude()));
+                    } else if (v.getId() == R.id.work_area_action) {
+                        SharedPrefsButler.putFutureHomeCoords(new LatLng
+                                (selfLocation.getLatitude(), selfLocation.getLongitude()));
+                    }
+                }
+            });
+        } else {
+            // TODO: 2016-04-23 should really put an option to edit the address
+            areaConfirm.setVisibility(View.GONE);
+            areaConfirm.setClickable(false);
+        }
     }
 
     private void updateMap(GoogleMap map, LatLng origin, int radiusKm) {

@@ -189,12 +189,8 @@
                         <ImageView
                             android:id="@+id/home_area_action"
                             style="@style/NotificationAreaSelectors"
-                            android:contentDescription="@string/notify_map_collapse_content_description"
-                            android:src="@drawable/ic_collapse_arrow" />
-
-                        <View
-                            style="@style/VerticalDivider"
-                            android:layout_toLeftOf="@id/home_area_action" />
+                            android:clickable="true"
+                            android:src="@drawable/ic_done" />
 
                     </RelativeLayout>
 
@@ -269,12 +265,9 @@
                         <ImageView
                             android:id="@+id/work_area_action"
                             style="@style/NotificationAreaSelectors"
-                            android:contentDescription="@string/notify_map_collapse_content_description"
-                            android:src="@drawable/ic_collapse_arrow" />
-
-                        <View
-                            style="@style/VerticalDivider"
-                            android:layout_toLeftOf="@id/work_area_action" />
+                            android:clickable="true"
+                            android:src="@drawable/ic_done" />
+>
                     </RelativeLayout>
 
                     <RelativeLayout

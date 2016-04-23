@@ -49,6 +49,7 @@
     </style>
 
     <style name="NotificationAreaSelectors">
+        <item name="android:visibility">invisible</item>
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:layout_alignParentRight">true</item>
