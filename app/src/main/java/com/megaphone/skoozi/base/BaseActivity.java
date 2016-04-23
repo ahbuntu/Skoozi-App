@@ -1,6 +1,7 @@
 package com.megaphone.skoozi.base;
 
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
@@ -173,6 +174,12 @@ abstract public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method will be invoked when we have a connection to the Google API established.
+     * The Google API is currently used to retrieve the location of the user.
+     * Requests to {@link com.megaphone.skoozi.util.PermissionUtil#tryGetLatestLocation(Activity, GoogleApiClient)}
+     * should be made ONLY & WITHIN this method
+     */
     @CallSuper
     protected void onGoogleApiConnected() {
         Log.d(TAG, "onGoogleApiConnected: API connection established");

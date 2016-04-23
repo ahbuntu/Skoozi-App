@@ -13,7 +13,7 @@ public class SharedPrefsButler {
                 .putString(SharedPrefsUtil.KEY_USER_NICKNAME, userNickname).apply();
     }
 
-    public static LatLng getHomeArea() {
+    public static LatLng getHomeCoords() {
         double lat = Double.longBitsToDouble(SharedPrefsUtil.getInstance()
                 .getLong(SharedPrefsUtil.KEY_HOME_AREA_LAT, 0));
         double lng = Double.longBitsToDouble(SharedPrefsUtil.getInstance()
@@ -21,7 +21,7 @@ public class SharedPrefsButler {
         return (lat == 0 && lng == 0) ? null : new LatLng(lat, lng);
     }
 
-    public static void putFutureHomeArea(LatLng location) {
+    public static void putFutureHomeCoords(LatLng location) {
         SharedPrefsUtil.getEditor()
                 .putLong(SharedPrefsUtil.KEY_HOME_AREA_LAT, Double.doubleToRawLongBits(location.latitude))
                 .apply();
@@ -30,7 +30,7 @@ public class SharedPrefsButler {
                 .apply();
     }
 
-    public static LatLng getWorkArea() {
+    public static LatLng getWorkCoords() {
         double lat = Double.longBitsToDouble(SharedPrefsUtil.getInstance()
                 .getLong(SharedPrefsUtil.KEY_WORK_AREA_LAT, 0));
         double lng = Double.longBitsToDouble(SharedPrefsUtil.getInstance()
@@ -38,7 +38,7 @@ public class SharedPrefsButler {
         return (lat == 0 && lng == 0) ? null : new LatLng(lat, lng);
     }
 
-    public static void putFutureWorkArea(LatLng location) {
+    public static void putFutureWorkCoords(LatLng location) {
         SharedPrefsUtil.getEditor()
                 .putLong(SharedPrefsUtil.KEY_WORK_AREA_LAT, Double.doubleToRawLongBits(location.latitude))
                 .apply();

@@ -54,6 +54,7 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="?attr/actionBarSize"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -197,17 +198,27 @@
 
                     </RelativeLayout>
 
-                    <FrameLayout
+                    <RelativeLayout
                         android:id="@+id/home_area_map_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/home_area_instructions"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:text="@string/user_area_map_instructions"
+                            android:textColor="@color/accent" />
 
                         <fragment
                             android:id="@+id/user_area_home_map"
                             android:name="com.google.android.gms.maps.MapFragment"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/map_height" />
-                    </FrameLayout>
+                            android:layout_height="@dimen/map_height"
+                            android:layout_below="@id/home_area_instructions" />
+                    </RelativeLayout>
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
@@ -266,17 +277,30 @@
                             android:layout_toLeftOf="@id/work_area_action" />
                     </RelativeLayout>
 
-                    <FrameLayout
+                    <RelativeLayout
                         android:id="@+id/work_area_map_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/work_area_instructions"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="16dp"
+                            android:paddingBottom="8dp"
+                            android:paddingTop="8dp"
+                            android:lineSpacingExtra="2dp"
+                            android:paddingRight="16dp"
+                            android:text="@string/user_area_map_instructions"
+                            android:textColor="@color/accent" />
 
                         <fragment
                             android:id="@+id/user_area_work_map"
                             android:name="com.google.android.gms.maps.MapFragment"
                             android:layout_width="match_parent"
-                            android:layout_height="250dp" />
-                    </FrameLayout>
+                            android:layout_height="250dp"
+                            android:layout_below="@id/work_area_instructions" />
+                    </RelativeLayout>
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 

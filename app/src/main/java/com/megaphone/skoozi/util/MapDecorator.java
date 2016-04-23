@@ -32,9 +32,34 @@ public class MapDecorator {
                                             Location origin, int radius) {
         if (map == null || origin == null ) return;
 
-        int radiusColorRgb = ContextCompat.getColor(context, R.color.accent_material_light);
+        int radiusColorRgb = ContextCompat.getColor(context, R.color.accent);
         CircleOptions circleOptions = new CircleOptions()
                 .center(new LatLng(origin.getLatitude(), origin.getLongitude()))
+                .fillColor(Color.argb(RADIUS_TRANSPARENCY,
+                        Color.red(radiusColorRgb),
+                        Color.green(radiusColorRgb),
+                        Color.blue(radiusColorRgb)))
+                .radius(radius*1000); // need this in metres
+        map.addCircle(circleOptions);
+    }
+
+    public static void drawLocationMarker(GoogleMap map, LatLng origin) {
+        if (map == null || origin == null) return;
+
+        map.addMarker(new MarkerOptions()
+                .position(origin)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .title("Current location"));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, DEFAULT_ZOOM));
+    }
+
+    public static void drawNotificationArea(Context context, GoogleMap map,
+                                            LatLng origin, int radius) {
+        if (map == null || origin == null ) return;
+
+        int radiusColorRgb = ContextCompat.getColor(context, R.color.accent);
+        CircleOptions circleOptions = new CircleOptions()
+                .center(origin)
                 .fillColor(Color.argb(RADIUS_TRANSPARENCY,
                         Color.red(radiusColorRgb),
                         Color.green(radiusColorRgb),

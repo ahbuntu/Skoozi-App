@@ -11,9 +11,6 @@ import android.support.v4.content.ContextCompat;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
-/**
- * Created by ahmadulhassan on 2015-07-01.
- */
 public class PermissionUtil {
     private static final String FINE_LOCATION_PERMISSION = android.Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION_PERMISSION = android.Manifest.permission.ACCESS_COARSE_LOCATION;

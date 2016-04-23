@@ -2,49 +2,45 @@ package com.megaphone.skoozi;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.test.suitebuilder.annotation.Suppress;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.api.client.util.NullValue;
+import com.google.android.gms.maps.model.LatLng;
 import com.megaphone.skoozi.base.BaseActivity;
 import com.megaphone.skoozi.user.UserMapAreaDialog;
 import com.megaphone.skoozi.util.AccountUtil;
 import com.megaphone.skoozi.util.ConnectionUtil;
+import com.megaphone.skoozi.util.MapDecorator;
+import com.megaphone.skoozi.util.PermissionUtil;
 import com.megaphone.skoozi.util.SharedPrefsButler;
 
-public class UserAccountActivity extends BaseActivity implements OnMapReadyCallback {
+public class UserAccountActivity extends BaseActivity {
     private static final String TAG = UserAccountActivity.class.getSimpleName();
 
     private Location selfLocation;
-    private GoogleMap notificationMap;
     private TextInputLayout nicknameEditContainer;
     private ImageButton nicknameEditDone;
     private TextView nickname;
@@ -55,8 +51,10 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     private ImageView workAreaAction;
     private MapFragment homeAreaMap;
     private MapFragment workAreaMap;
-    private FrameLayout homeAreaMapContainer;
-    private FrameLayout workAreaMapContainer;
+    private GoogleMap homeMap;
+    private GoogleMap workMap;
+    private RelativeLayout homeAreaMapContainer;
+    private RelativeLayout workAreaMapContainer;
     private Snackbar snackbar;
 
     @Override
@@ -83,8 +81,8 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
         workAreaAction = (ImageView) findViewById(R.id.work_area_action);
         homeAreaMap = (MapFragment) getFragmentManager().findFragmentById(R.id.user_area_home_map);
         workAreaMap = (MapFragment) getFragmentManager().findFragmentById(R.id.user_area_work_map);
-        homeAreaMapContainer = (FrameLayout) findViewById(R.id.home_area_map_container);
-        workAreaMapContainer = (FrameLayout) findViewById(R.id.work_area_map_container);
+        homeAreaMapContainer = (RelativeLayout) findViewById(R.id.home_area_map_container);
+        workAreaMapContainer = (RelativeLayout  ) findViewById(R.id.work_area_map_container);
 
         setupToolbar();
         refreshSignedAs();
@@ -132,18 +130,30 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
 
         if (ConnectionUtil.hasNetwork(coordinatorLayout)) connectToGoogleApi();
 
-//        if (mapFragment != null)  mapFragment.getMapAsync(this);
+        if (homeAreaMap != null) homeAreaMap.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                homeMap = googleMap;
+                if (SharedPrefsButler.getHomeCoords() != null) {
+                    updateMap(homeMap, SharedPrefsButler.getHomeCoords(), 5);
+                }
+            }
+        });
+
+        if (workAreaMap != null) workAreaMap.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                workMap = googleMap;
+                if (SharedPrefsButler.getWorkCoords() != null) {
+                    updateMap(workMap, SharedPrefsButler.getWorkCoords(), 5);
+                }
+            }
+        });
     }
 
     @Override
     public void onPause() {
         super.onPause();
-    }
-
-    @Override
-    public void onMapReady(GoogleMap map) {
-        notificationMap = map;
-//        if (selfLocation != null) updateQuestionMap(10); // TODO: 2016-02-02 need to figure out correct radius value to use here
     }
 
     @Override
@@ -172,8 +182,14 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     @Override
     protected void onGoogleApiConnected() {
         super.onGoogleApiConnected();
-//        selfLocation = PermissionUtil.tryGetLatestLocation(UserAccountActivity.this, getGoogleApiClient());
-//        updateQuestionMap(10); // TODO: 2016-02-02 need to figure out correct radius value to use here
+        selfLocation = PermissionUtil.tryGetLatestLocation(UserAccountActivity.this, getGoogleApiClient());
+        if (selfLocation != null) {
+            LatLng mapCoords = new LatLng(selfLocation.getLatitude(), selfLocation.getLongitude());
+
+            if (homeMap != null)  updateMap(homeMap, mapCoords, 5);
+
+            if (workMap != null) updateMap(workMap, mapCoords, 5);
+        }
     }
 
     private void setupToolbar() {
@@ -268,13 +284,13 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
     }
 
     private void setupHomeAndWorkAreas() {
-        boolean hasHomeArea = SharedPrefsButler.getHomeArea() != null;
+        boolean hasHomeArea = SharedPrefsButler.getHomeCoords() != null;
         homeAreaAction.setImageResource(hasHomeArea ? R.drawable.ic_collapse_arrow : R.drawable.ic_expand_arrow);
         homeAreaMapContainer.setVisibility(hasHomeArea ? View.VISIBLE : View.GONE);
 
         findViewById(R.id.home_area).setOnClickListener(getHomeAreaClickListener());
 
-        boolean hasWorkArea = SharedPrefsButler.getWorkArea() != null;
+        boolean hasWorkArea = SharedPrefsButler.getWorkCoords() != null;
         workAreaAction.setImageResource(hasWorkArea ? R.drawable.ic_collapse_arrow : R.drawable.ic_expand_arrow);
         workAreaMapContainer.setVisibility(hasWorkArea ? View.VISIBLE : View.GONE);
 
@@ -323,6 +339,15 @@ public class UserAccountActivity extends BaseActivity implements OnMapReadyCallb
                 }
             }
         };
+    }
+
+    private void updateMap(GoogleMap map, LatLng origin, int radiusKm) {
+        map.clear(); // important to ensure that everything is cleared
+        MapDecorator.drawLocationMarker(map, origin);
+        MapDecorator.drawNotificationArea(this, map, origin, radiusKm);
+
+        map.moveCamera(CameraUpdateFactory.zoomTo(12f));
+        map.getUiSettings().setZoomControlsEnabled(true);
     }
 
     private void displayEnterNicknameMessage() {

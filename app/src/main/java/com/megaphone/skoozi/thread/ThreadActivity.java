@@ -217,7 +217,7 @@ public class ThreadActivity extends BaseActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap map) {
         GoogleMap newQuestionMap = map;
-        if (threadQuestion.locationLat != 0.0 && threadQuestion.locationLat != 0.0 ) {
+        if (threadQuestion.locationLat != 0.0 && threadQuestion.locationLon != 0.0 ) {
             LatLng postLocation = new LatLng(threadQuestion.locationLat,threadQuestion.locationLon);
             newQuestionMap.addMarker(new MarkerOptions()
                     .position(postLocation)

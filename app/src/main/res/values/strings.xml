@@ -2,7 +2,7 @@
     <string name="app_name">Skoozi</string>
 
     <string name="title_section1">NEARBY</string>
-    <string name="nearby_section_label">Showing all questions within a radius of  </string>
+    <string name="nearby_section_label">Showing all activity within a radius of  </string>
     <string-array name="nearby_radius_options">
         <item> 10 KM </item>
         <item> 1 KM </item>
@@ -47,7 +47,8 @@
     <string name="user_details_signed_in">Signed in as %s</string>
     <string name="user_sign_in_instruction">You are not signed in. \nSigning in will allow you to create content. </string>
     <string name="user_sign_in_button">Sign In with Google</string>
-    <string name="user_dialog_message">Once you set your display name, it cannot be changed.\nAre you sure you want to proceed?</string>
+    <string name="user_dialog_message">Once you set your display name, it cannot be changed.
+        \nAre you sure you want to proceed?</string>
     <string name="user_dialog_title">Confirm Display Name</string>
     <string name="user_area_postal">Enter a postal code</string>
 
