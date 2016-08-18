@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationServices;
 public class PermissionUtil {
     private static final String FINE_LOCATION_PERMISSION = android.Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION_PERMISSION = android.Manifest.permission.ACCESS_COARSE_LOCATION;
-    public static final int REQUEST_PERMISSION_LOCATION = 919191;
+    public static final int REQUEST_PERMISSION_LOCATION = 991;
 
     @TargetApi(23)
     public static Location tryGetLatestLocation(Activity activity, GoogleApiClient googleApiClient)

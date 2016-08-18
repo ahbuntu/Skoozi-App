@@ -51,7 +51,7 @@
         \nAre you sure you want to proceed?</string>
     <string name="user_dialog_title">Confirm Display Name</string>
     <string name="user_area_postal">Enter a postal code</string>
-    <string name="user_area_map_instructions">Displaying the current location. Drag the marker to select a different location.
+    <string name="user_area_map_instructions"> Drag the marker to select a different location.
         \nThe colored area is your notification radius.</string>
 
     <!--Instructions-->
